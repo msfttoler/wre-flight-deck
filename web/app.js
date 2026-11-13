@@ -160,10 +160,10 @@ function renderMap() {
     const point = project(item), active = selectedAirports.has(item.code);
     if (active) svg.append(svgNode("circle", { cx: point.x, cy: point.y, r: 12, class: "map-airport-ring" }));
     svg.append(svgNode("circle", { cx: point.x, cy: point.y, r: 5, class: `map-airport${active ? " active" : ""}` }));
-    const alignLeft = point.x > 735 || item.code === "SLC" || item.code === "LAX";
+    const alignLeft = point.x > 735 || item.code === "LAX";
     const below = item.code === "PDX" || item.code === "SJC";
     const labelY = point.y + (below ? 20 : item.code === "SLC" ? 0 : -12);
-    const labelX = point.x + (alignLeft ? -12 : 12);
+    const labelX = point.x + (alignLeft ? -12 : item.code === "SLC" ? 8 : 12);
     svg.append(svgNode("text", { x: labelX, y: labelY, "text-anchor": alignLeft ? "end" : "start", class: "map-code" }, item.code));
     svg.append(svgNode("text", { x: labelX, y: labelY + 18, "text-anchor": alignLeft ? "end" : "start", class: "map-city" }, item.city));
   }

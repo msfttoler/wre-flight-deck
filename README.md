@@ -11,6 +11,10 @@ All flights, fares, aircraft and team callsigns are fictional. This application
 does not contact an airline, move money, store passenger identities or operate
 aircraft. The engineering behavior is real; the airline is illustrative.
 
+![Flight Deck showing Seattle-to-Denver route search, flight options and the regional airport map.](docs/images/flight-deck.png)
+
+Actual local application, fictional schedule. Captured November 13, 2026.
+
 ## Get airborne
 
 Install **Node.js 24 or newer**, then:

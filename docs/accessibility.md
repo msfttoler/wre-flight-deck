@@ -22,6 +22,11 @@ checkpoints. Run `npm run test:e2e` after installing the declared development
 tools. Its report is bound to the code tested; a passing run is not a full
 criterion review. Re-run after UI changes.
 
+The rendered technical review identified and closed focus, contrast and
+legibility findings. Current scope and measurements are recorded in
+[verification](verification.md). No unresolved findings remained from that
+bounded review; unassessed A/AA requirements remain unreviewed.
+
 ## Human review still required
 
 Use the application with an appropriate screen reader, keyboard only, zoom,

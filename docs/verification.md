@@ -46,6 +46,20 @@ reads the same descriptor. The theme hash uses the application's literal
 script boundaries rather than a general HTML-filtering expression. No finding
 was dismissed to obtain the clean scan.
 
+## Polished interface revision
+
+Source: `1df77c8e8cbe95b47871608555b3bf30cea7834e`.
+
+`npm run check` and all 12 desktop/mobile Playwright journeys passed after the
+focus, contrast and typography changes. The journeys now assert that the next
+booking and departure-edit controls are actually inside the viewport, before
+an automated fill action can scroll them into view.
+
+Hosted Flight checks passed again on Node 24/26, including the browser job,
+and CodeQL analysis succeeded:
+- https://github.com/msfttoler/wre-flight-deck/actions/runs/43514755011
+- https://github.com/msfttoler/wre-flight-deck/actions/runs/43514754967
+
 ## Independent source clarity review
 
 All twelve weekly Markdown entry points and the contributing guide were
@@ -53,6 +67,28 @@ reviewed. One substantive lifecycle omission was fixed: stop/restart the
 server after backend changes, bind candidate checks to the actual SHA, and
 request a new quote after a pricing change. Bounded re-review closed that
 finding. This was source-text review, not a human classroom trial.
+
+## Rendered interface review
+
+The initial review inspected all five views at 1440, 375 and 320 pixels in
+both themes. It identified off-screen next-step focus, low-contrast dark
+badges and form boundaries, undersized metadata and three related minor
+patterns. Source-level fixes were independently rechecked. Enlarging the map
+labels exposed one collision, corrected by moving the SLC label pair rather
+than shrinking it.
+
+The final bounded recheck closed all findings from that review. It measured
+the dark confirmed badge at 6.62:1 and enabled dark form boundaries at 4.62:1.
+Mobile map codes measured 16.98px at 320 and 20.44px at 375. No map-label
+intersections remained in the checked desktop/mobile views. This is a
+scoped technical review, not complete WCAG conformance or physical projection
+testing.
+
+Reviewed final `web/app.js` SHA-256:
+`9186bbbba156de4ccefc7eda948cbea8d26a1586fd75bad46f3638b79bd09f7d`.
+The README image is an actual screenshot of this interface, not a mockup.
+The map-only repair also passed `npm run check` and both theme/reflow
+Playwright tests.
 
 ## What remains distinct
 
