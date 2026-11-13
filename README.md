@@ -39,7 +39,8 @@ prices expire after 15 real minutes. A quote does not hold a seat.
 
 **[Start here: all 12 sessions](docs/sessions.md)** ·
 [Contributing and native tests](CONTRIBUTING.md) ·
-[Architecture](docs/architecture.md) · [API](docs/api-contract.md)
+[Architecture](docs/architecture.md) · [API](docs/api-contract.md) ·
+[Copilot delivery loop](docs/agentic-sdlc.md)
 
 Every week starts from the same **`wre-v1` source baseline** with a clean clone
 and its own branch when editing is needed. No week imports another learner's

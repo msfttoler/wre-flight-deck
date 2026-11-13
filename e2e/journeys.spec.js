@@ -23,6 +23,7 @@ test("a real quote becomes a persisted booking and cancellation releases its sea
   await page.getByTestId("quote-coupon").fill("FIRSTFLIGHT");
   await page.getByTestId("quote-submit").click();
   await expect(page.getByTestId("booking-submit")).toBeVisible();
+  await expect(page.getByTestId("booking-callsign")).toBeInViewport({ ratio: 1 });
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   const quotes = await request.get("/api/events");
   expect(quotes.ok()).toBeTruthy();
@@ -86,6 +87,7 @@ test("the departure board saves a real gate change and shows its correlated even
   await page.goto("/");
   await page.getByTestId("nav-operations").click();
   await page.getByRole("button", { name: /^Edit FD/ }).first().click();
+  await expect(page.getByLabel("Departure status", { exact: true })).toBeInViewport({ ratio: 1 });
   const gate = page.getByLabel("Gate", { exact: true }).first();
   await gate.fill("C07");
   await page.getByRole("button", { name: "Save departure", exact: true }).first().click();

@@ -142,12 +142,13 @@ main { padding: 36px 36px 0; min-width: 0; outline: none; }
 .map-airport { fill: var(--cp-text); stroke: var(--cp-bg-elevated); stroke-width: 3; }
 .map-airport.active { fill: var(--cp-accent); }
 .map-airport-ring { fill: var(--cp-accent-soft); stroke: var(--cp-accent); stroke-width: 1; }
-.map-code { font: 700 12px Consolas, "Courier New", Courier, monospace; fill: var(--cp-text); paint-order: stroke; stroke: var(--cp-bg-elevated); stroke-width: 4px; stroke-linejoin: round; }
-.map-city { font: 8.5px "Segoe UI", Aptos, Calibri, sans-serif; fill: var(--cp-text-muted); paint-order: stroke; stroke: var(--cp-bg-elevated); stroke-width: 3px; }
+.map-code { font: 700 16px Consolas, "Courier New", Courier, monospace; fill: var(--cp-text); paint-order: stroke; stroke: var(--cp-bg-elevated); stroke-width: 4px; stroke-linejoin: round; }
+.map-city { font: 14px "Segoe UI", Aptos, Calibri, sans-serif; fill: var(--cp-text-muted); paint-order: stroke; stroke: var(--cp-bg-elevated); stroke-width: 3px; }
 .map-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 24px; font-size: .625rem; color: var(--cp-text-muted); }
-.map-footer>span:first-child { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.map-footer .map-legend { display: inline-flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .legend-line { display: inline-block; width: 16px; border-top: 2px solid var(--cp-border-strong); }
-.legend-line.selected { border-color: var(--cp-accent); margin-left: 8px; }
+.legend-line.selected { border-color: var(--cp-accent); }
 .network-text { padding: 0 24px 12px; font-size: .6875rem; color: var(--cp-text-muted); }
 .network-text summary { width: fit-content; padding: 5px 0; }
 .network-text p { margin-top: 8px; }
@@ -242,8 +243,16 @@ tr.selected td { background: var(--cp-accent-soft); }
 .week-list span:last-child { margin-left: auto; color: var(--cp-accent); }
 .learning-footnote { padding: 24px; background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); border-radius: .625rem; font-size: .8125rem; }
 .learning-footnote p { color: var(--cp-text-muted); margin-top: 6px; }
-.field-hint, .quote-expiry, .fare-placeholder small, .itinerary-detail, .itinerary-price small, .map-footer, .network-text, .section-heading .subtle { font-size: .75rem; }
-.request-id { font-size: .6875rem; }
+.field-hint, .quote-expiry, .fare-placeholder small, .itinerary-detail,
+.itinerary-price small, .map-footer, .network-text, .section-heading .subtle,
+.request-id, .fare-meta, .fare-line, .connection-line, .airport-time span,
+.status-tag, .board-note, th, table, .event time, .reservation .subtle,
+.boundary-note, .week-list span:first-child { font-size: .875rem; }
+.form-feedback, .empty-note, .empty-state p { font-size: .875rem; }
+.eyebrow, .nav-caption, .map-label, .environment { font-size: .75rem; }
+.section-heading .eyebrow, .search-panel .eyebrow, .panel-heading .eyebrow,
+.schedule-stamp .eyebrow { font-size: .75rem; }
+.brand small, .sidebar-footnote, .workspace-footer { font-size: .6875rem; letter-spacing: .5px; }
 html[data-theme="dark"] :is(
   .eyebrow, .subtle, .empty-note, .form-feedback:not([data-kind="error"]), .boundary-note,
   .brand small, .environment, .nav-caption, .sidebar nav a, .sidebar-bottom p,
@@ -258,6 +267,8 @@ html[data-theme="dark"] :is(
 html[data-theme="dark"] .sidebar nav a[aria-current] { color: var(--cp-accent); background: var(--cp-surface); border-color: var(--cp-border-strong); }
 html[data-theme="dark"] .itinerary.selected { background: var(--cp-surface); border-color: var(--cp-accent); }
 html[data-theme="dark"] .map-city { fill: var(--cp-text-soft); }
+html[data-theme="dark"] input:enabled, html[data-theme="dark"] select:enabled { border-color: var(--cp-text-muted); }
+html[data-theme="dark"] :is(.status-tag.confirmed, .status-tag.boarding) { background: var(--cp-surface); }
 @media (min-width: 1600px) { main { padding: 44px 52px 0; } .planning-desk { grid-template-columns: 330px minmax(0, 1fr); } .journey-workspace { grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; } .network-map svg { max-height: 360px; } }
 @media (max-width: 1200px) { .app-shell { grid-template-columns: 188px minmax(0, 1fr); } .sidebar { padding-right: 10px; padding-left: 10px; } .sidebar nav a { font-size: .75rem; gap: 7px; padding: 10px; } .nav-number { display: none; } main { padding: 28px 24px 0; } h1 { font-size: 1.75rem; } .schedule-stamp { min-width: 150px; padding-left: 16px; } .planning-desk { grid-template-columns: 260px minmax(0, 1fr); } .search-panel, .panel-heading { padding: 22px; } .panel-heading { padding-bottom: 0; } .map-label { display: none; } .journey-workspace { grid-template-columns: minmax(0, 1fr) 288px; gap: 24px; } .operations-layout { grid-template-columns: minmax(0, 1fr); } .operations-editor { max-width: 480px; } }
 @media (max-width: 960px) { .app-shell { grid-template-columns: 1fr; } .sidebar { padding: 8px 16px; display: block; border-right: 0; border-bottom: 1px solid var(--cp-border); } .sidebar>div:first-child { display: flex; align-items: center; gap: 4px; } .sidebar nav { display: flex; gap: 4px; } .sidebar nav a { font-size: .75rem; gap: 6px; white-space: nowrap; } .nav-caption, .sidebar-bottom, .nav-number { display: none; } .nav-symbol { font-size: 18px; } .sidebar nav a>span:last-child:not(:first-child) { display: none; } main { padding: 28px 24px 0; } .masthead { min-height: 78px; padding: 16px 24px; } .journey-workspace { grid-template-columns: minmax(0, 1fr) 300px; } .page-heading { margin-bottom: 24px; } }
@@ -267,8 +278,22 @@ html[data-theme="dark"] .map-city { fill: var(--cp-text-soft); }
   .sidebar nav a { justify-content: flex-start; font-size: .75rem; padding-left: 12px; }
   .sidebar nav[aria-label="Resources"] a { font-size: .75rem; margin: 2px 0 0; padding-left: 12px; }
   .journey-steps li { flex: 1; align-items: flex-start; font-size: .6875rem; }
-  .map-code { font-size: 15px; }
+  .map-code { font-size: 22px; }
   .map-city { display: none; }
-  .map-footer, .network-text { font-size: .75rem; }
+  .map-footer, .network-text { font-size: .875rem; }
+  .brand small, .workspace-footer { font-size: .6875rem; }
+  .brand small { max-width: 26ch; }
+  .event time { font-size: .875rem; }
+  .schedule-stamp>span:last-child { font-size: .875rem; }
+  .section-heading .subtle { max-width: 120px; }
+  .journey-steps li { flex-direction: column; font-size: .875rem; gap: 8px; }
+  .journey-steps li span { width: 26px; height: 26px; font-size: 12px; }
+}
+@media (max-width: 960px) {
+  .app-shell { grid-template-rows: auto 1fr; }
+  .swap-row { height: 44px; }
+  .swap-button { min-width: 44px; min-height: 44px; height: 44px; }
+  .table-button, .choose-button, .sidebar nav a,
+  .sidebar nav[aria-label="Resources"] a { min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *:before, *:after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }

@@ -24,6 +24,28 @@ locations used to extract the application's own theme script. They were not
 intentionally introduced or fabricated for Week 06. Findings and subsequent
 fix status remain visible in GitHub code scanning.
 
+## Repaired application revision
+
+Source: `135af7786bbce9d8ba372455ae520e9c9323efea`.
+
+| Check | Actual result |
+| --- | --- |
+| `npm test` locally | 113 passed, including new static-file descriptor and theme-byte tests |
+| `npm run check` locally | Passed |
+| Expanded `npm run test:e2e` locally | 12 desktop/mobile journeys passed |
+| Fresh GitHub clone, no `node_modules`, `npm start` | Health endpoint passed; 8 airports and 18 flights available |
+| Hosted Flight checks | Native tests on Node 24/26 and browser job succeeded |
+| Hosted CodeQL | Analysis succeeded; zero open findings returned after the repair scan |
+
+Hosted records:
+- https://github.com/msfttoler/wre-flight-deck/actions/runs/43513567299
+- https://github.com/msfttoler/wre-flight-deck/actions/runs/43513567014
+
+The static-file fix opens without following a final symlink and validates and
+reads the same descriptor. The theme hash uses the application's literal
+script boundaries rather than a general HTML-filtering expression. No finding
+was dismissed to obtain the clean scan.
+
 ## Independent source clarity review
 
 All twelve weekly Markdown entry points and the contributing guide were

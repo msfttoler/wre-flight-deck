@@ -34,6 +34,12 @@ function feedback(target, message = "", kind = "info") {
   element.dataset.kind = kind;
   element.hidden = !message;
 }
+function revealAndFocus(target) {
+  const element = typeof target === "string" ? $(target) : target;
+  if (!element) return;
+  element.scrollIntoView({ block: "center", inline: "nearest", behavior: "auto" });
+  element.focus();
+}
 function errorText(error) {
   return `${error.message}${error.requestId ? ` Request ID: ${error.requestId}.` : ""}`;
 }
@@ -154,10 +160,12 @@ function renderMap() {
     const point = project(item), active = selectedAirports.has(item.code);
     if (active) svg.append(svgNode("circle", { cx: point.x, cy: point.y, r: 12, class: "map-airport-ring" }));
     svg.append(svgNode("circle", { cx: point.x, cy: point.y, r: 5, class: `map-airport${active ? " active" : ""}` }));
-    const rightEdge = point.x > 735;
+    const alignLeft = point.x > 735 || item.code === "SLC" || item.code === "LAX";
     const below = item.code === "PDX" || item.code === "SJC";
-    svg.append(svgNode("text", { x: point.x + (rightEdge ? -12 : 12), y: point.y + (below ? 20 : -9), "text-anchor": rightEdge ? "end" : "start", class: "map-code" }, item.code));
-    svg.append(svgNode("text", { x: point.x + (rightEdge ? -12 : 12), y: point.y + (below ? 33 : 5), "text-anchor": rightEdge ? "end" : "start", class: "map-city" }, item.city));
+    const labelY = point.y + (below ? 20 : item.code === "SLC" ? 0 : -12);
+    const labelX = point.x + (alignLeft ? -12 : 12);
+    svg.append(svgNode("text", { x: labelX, y: labelY, "text-anchor": alignLeft ? "end" : "start", class: "map-code" }, item.code));
+    svg.append(svgNode("text", { x: labelX, y: labelY + 18, "text-anchor": alignLeft ? "end" : "start", class: "map-city" }, item.city));
   }
   $("#network-map").replaceChildren(svg);
   const routes = [...new Set(flights.map((item) => `${item.origin} to ${item.destination}`))];
@@ -236,8 +244,7 @@ function selectItinerary(item) {
   renderItineraries();
   renderFare();
   renderMap();
-  $("#bags")?.focus({ preventScroll: true });
-  if (matchMedia("(max-width: 700px)").matches) $("#fare-content").scrollIntoView({ behavior: "auto", block: "start" });
+  revealAndFocus("#bags");
 }
 function renderFare() {
   if (!state.selected) {
@@ -267,7 +274,7 @@ function renderFare() {
       state.quote = result.quote;
       setStep("book");
       renderFare();
-      $("#callsign").focus({ preventScroll: true });
+      revealAndFocus("#callsign");
     } catch (error) {
       feedback(quoteFeedback, errorText(error), "error");
       quoteButton.disabled = false;
@@ -340,7 +347,7 @@ async function bookJourney(callsign, button, status) {
       node("a", { href: "#reservations" }, "View reservations →"),
       node("small", { className: "request-id" }, `Request ID: ${result.requestId || "not supplied"}`)));
     feedback("#global-feedback", `Booking ${booking.reference} confirmed for ${booking.callsign}.`);
-    $("#fare-content a").focus({ preventScroll: true });
+    revealAndFocus("#fare-content a");
     await refreshRelated();
   } catch (error) {
     if (!error.ambiguous) {
@@ -394,7 +401,7 @@ function renderBookings() {
           }
         } }, "Confirm cancellation"),
         node("button", { type: "button", className: "quiet-button", onClick: () => actions.replaceChildren(cancelButton) }, "Keep booking"));
-      actions.querySelector("button")?.focus();
+      revealAndFocus(actions.querySelector("button"));
     } }, "Cancel reservation");
     if (booking.status !== "cancelled") actions.append(cancelButton);
     return node("article", { className: "reservation", "data-testid": "booking-row", "data-booking-id": booking.id },
@@ -414,7 +421,7 @@ function renderDepartures() {
     node("td", {}, `${item.origin} → ${item.destination}`), node("td", {}, item.gate || "Unassigned"),
     node("td", {}, node("span", { className: `status-tag ${item.status}` }, item.status)), node("td", {}, `${item.availableSeats}/${item.capacity}`),
     node("td", {}, node("button", { type: "button", className: "table-button", "aria-label": `Edit ${item.number}, ${item.origin} to ${item.destination}`, onClick: () => {
-      state.flight = item; renderDepartures(); renderFlightEditor(); $("#flight-status")?.focus({ preventScroll: true });
+      state.flight = item; renderDepartures(); renderFlightEditor(); revealAndFocus("#flight-status");
     } }, "Edit", node("span", { "aria-hidden": "true" }, "↗")))))));
   $("#departure-board").replaceChildren(table);
 }
@@ -456,6 +463,11 @@ function renderFlightEditor(message = "") {
     node("label", { for: "flight-gate" }, "Gate"), gate, node("span", { id: "gate-hint", className: "field-hint" }, "A01-Z99. A gate is required for boarding or departure."),
     item.status === "departed" ? node("p", { className: "field-hint" }, "This flight has departed. Further changes are not allowed.") : null, submit, feedbackNode);
   $("#flight-editor").replaceChildren(form);
+  if (message) {
+    const target = item.status === "departed" ? $("#ops-editor-title") : status;
+    if (item.status === "departed") target.tabIndex = -1;
+    revealAndFocus(target);
+  }
 }
 async function loadEvents() {
   const result = await api("/api/events");
