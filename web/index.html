@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="WRE Flight Deck: a fictional regional airline, built for real engineering practice.">
+  <title>WRE Flight Deck | Plan a journey</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to workspace</a>
+  <header class="masthead">
+    <a class="brand" href="#plan">
+      <svg viewBox="0 0 42 42" class="brand-mark" aria-hidden="true"><path d="M5 31 18 7h6l13 24h-8l-8-15-8 15Z"/><path d="M15 31h12v4H15Z"/></svg>
+      <span>WRE <strong>FLIGHT DECK</strong><small>REGIONAL AIR / ENGINEERING EDITION</small></span>
+    </a>
+    <div class="masthead-actions"><span class="environment">FICTIONAL AIRLINE</span><button id="theme-toggle" class="quiet-button" type="button" aria-label="Switch to dark theme">Dark mode</button></div>
+  </header>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <p class="nav-caption">WORKSPACE</p>
+        <nav aria-label="Workspace">
+          <a href="#plan" aria-current="page"><span class="nav-symbol" aria-hidden="true">↗</span>Plan a journey<span class="nav-number">01</span></a>
+          <a href="#reservations"><span class="nav-symbol" aria-hidden="true">▤</span>Reservations<span class="nav-number">02</span></a>
+          <a href="#operations"><span class="nav-symbol" aria-hidden="true">≡</span>Departures<span class="nav-number">03</span></a>
+          <a href="#journal"><span class="nav-symbol" aria-hidden="true">↳</span>Event journal<span class="nav-number">04</span></a>
+        </nav>
+        <p class="nav-caption learn-caption">BEHIND THE FLIGHT DECK</p>
+        <nav aria-label="Resources"><a href="#learn"><span class="nav-symbol" aria-hidden="true">⌑</span>Learn &amp; build<span aria-hidden="true">↗</span></a></nav>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="runway-art" aria-hidden="true"><span>27</span><i></i><i></i><i></i><i></i><span>09</span></div>
+        <p>Small airline.<br><strong>Real engineering.</strong></p>
+        <span class="sidebar-footnote">LOCAL WORKSPACE · NO REAL TICKETS</span>
+      </div>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div id="global-feedback" class="feedback global-feedback" role="status" aria-live="polite" hidden></div>
+      <section id="view-plan" class="view" aria-labelledby="plan-title">
+        <div class="page-heading">
+          <div><p class="eyebrow">JOURNEY PLANNING / WRE REGIONAL</p><h1 id="plan-title">A little further. A little simpler.</h1><p class="page-description">Find your connection. Review the fare. Get your team on board.</p></div>
+          <div class="schedule-stamp"><span class="eyebrow">FICTIONAL SCHEDULE</span><strong id="scenario-date">Loading schedule…</strong><span>All departure times in UTC</span></div>
+        </div>
+        <ol class="journey-steps" aria-label="Booking progress">
+          <li id="step-find" aria-current="step"><span>01</span>Find a route</li>
+          <li id="step-fare"><span>02</span>Review the fare</li>
+          <li id="step-book"><span>03</span>Confirm booking</li>
+        </ol>
+        <div class="planning-desk">
+          <section class="search-panel" aria-labelledby="search-title">
+            <p class="eyebrow">YOUR NEXT DEPARTURE</p><h2 id="search-title">Where are we headed?</h2>
+            <form id="search-form">
+              <label for="origin">From</label><select id="origin" name="origin" required disabled><option value="">Loading airports…</option></select>
+              <div class="swap-row"><span class="route-rule"></span><button id="swap-airports" class="swap-button" type="button" aria-label="Swap departure and destination airports" disabled>⇅</button></div>
+              <label for="destination">To</label><select id="destination" name="destination" required disabled><option value="">Loading airports…</option></select>
+              <div class="passenger-field"><label for="passengers">Passengers</label><select id="passengers" name="passengers"><option value="1">1 passenger</option><option value="2">2 passengers</option><option value="3">3 passengers</option><option value="4">4 passengers</option><option value="5">5 passengers</option><option value="6">6 passengers</option></select></div>
+              <button id="search-button" class="primary-button wide" type="submit" disabled>Find flights <span aria-hidden="true">↗</span></button>
+              <p id="search-feedback" class="form-feedback" role="status" aria-live="polite">Connecting to the local schedule.</p>
+            </form>
+          </section>
+          <section class="network-panel" aria-labelledby="network-title">
+            <div class="panel-heading"><div><p class="eyebrow">THE REGIONAL NETWORK</p><h2 id="network-title">Good places. Connected.</h2></div><span class="map-label">ROUTE ATLAS / 01</span></div>
+            <div id="network-map" class="network-map"><p class="empty-note">The route map will appear when the schedule is available.</p></div>
+            <div class="map-footer"><span><i class="legend-line" aria-hidden="true"></i>Scheduled route <i class="legend-line selected" aria-hidden="true"></i>Selected itinerary</span><span>Approximate geography. Not for navigation.</span></div>
+            <details class="network-text"><summary>Airports &amp; routes in text</summary><div id="network-routes"></div></details>
+          </section>
+        </div>
+        <div class="journey-workspace">
+          <section class="results-panel" aria-labelledby="results-title">
+            <div class="section-heading"><div><p class="eyebrow">MAKE THE CONNECTION</p><h2 id="results-title">Your flight options</h2></div><span id="results-count" class="subtle">Ready when you are</span></div>
+            <div id="itineraries"><div class="empty-state"><span class="empty-mark" aria-hidden="true">↗</span><h3>Your next journey starts above.</h3><p>Choose two airports to see direct flights and one-stop connections, with current seat availability.</p></div></div>
+          </section>
+          <aside class="fare-panel" aria-labelledby="fare-title"><div class="section-heading"><div><p class="eyebrow">NO SURPRISES AT THE GATE</p><h2 id="fare-title">Your fare, clearly.</h2></div></div><div id="fare-content"><div class="fare-placeholder"><span aria-hidden="true">02 / 03</span><h3>One step at a time.</h3><p>Select a flight to add bags, apply a coupon, and see an exact price before booking.</p><div class="ticket-perforation" aria-hidden="true"></div><small>Fictional bookings. No payment details.</small></div></div></aside>
+        </div>
+      </section>
+      <section id="view-reservations" class="view" aria-labelledby="reservations-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">TEAM TRAVEL / RESERVATIONS</p><h1 id="reservations-title">Everyone accounted for.</h1><p class="page-description">Fictional team callsigns, real seat allocation. No personal data needed.</p></div><button id="refresh-bookings" class="secondary-button" type="button">Refresh reservations ↻</button></div>
+        <div id="bookings-feedback" class="form-feedback" role="status" aria-live="polite"></div><div id="bookings-list" class="reservation-list"></div>
+      </section>
+      <section id="view-operations" class="view" aria-labelledby="operations-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">GROUND OPERATIONS / DEPARTURES</p><h1 id="operations-title">Keep the turn moving.</h1><p class="page-description">Assign a gate. Update a departure. Every change has a version and a trace.</p></div><button id="refresh-flights" class="secondary-button" type="button">Refresh schedule ↻</button></div>
+        <p class="board-note"><span class="eyebrow">DEPARTURE BOARD</span><span id="board-date"></span><span>ALL TIMES UTC</span></p>
+        <div class="operations-layout"><div id="departure-board" class="table-scroll" tabindex="0" role="region" aria-label="Departure board, scroll horizontally on narrow screens"></div><aside class="operations-editor" aria-labelledby="ops-editor-title"><p class="eyebrow">GROUND CONTROL</p><h2 id="ops-editor-title">Update a departure</h2><div id="flight-editor"><p class="empty-note">Select a flight from the departure board to change its gate or status.</p></div></aside></div>
+        <p class="boundary-note">This fictional schedule is not live air traffic data and cannot be used to operate an aircraft.</p>
+      </section>
+      <section id="view-journal" class="view" aria-labelledby="journal-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">SYSTEM RECORD / EVENT JOURNAL</p><h1 id="journal-title">Every change leaves a trail.</h1><p class="page-description">Application events from this workspace, newest first. Request IDs connect the dots.</p></div><button id="refresh-events" class="secondary-button" type="button">Refresh journal ↻</button></div>
+        <div id="events-feedback" class="form-feedback" role="status" aria-live="polite"></div><div id="events-list"></div>
+        <p class="boundary-note">These are local application events, not GitHub webhooks or evidence of hosted CI.</p>
+      </section>
+      <section id="view-learn" class="view" aria-labelledby="learn-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">THE HANGAR / LEARN &amp; BUILD</p><h1 id="learn-title">Twelve sessions. One working airline.</h1><p class="page-description">A practical place to work on the parts that keep a product in the air.</p></div></div>
+        <div class="learning-intro"><h2>Start fresh. Build one part well.</h2><p>Each session starts from the same working baseline. You do not need to complete previous sessions, stack week-by-week changes, or use another team's solution. The parts work independently and connect through the API contract.</p><p><a id="repository-link" href="https://github.com/" target="_blank" rel="noopener noreferrer">Open the project on GitHub ↗</a><span id="repository-note" class="subtle"></span></p></div>
+        <ol id="week-links" class="week-list"></ol>
+        <div class="learning-footnote"><strong>Practice, not passenger service.</strong><p>Use synthetic team callsigns only. No real travel, payments, personal passenger data, or live aviation information belongs here.</p></div>
+      </section>
+      <footer class="workspace-footer"><span>WRE FLIGHT DECK <span aria-hidden="true">/</span> BUILT TO BE TAKEN APART.</span><span id="connection-state">API not yet connected</span></footer>
+    </main>
+  </div>
+</body>
+</html>
