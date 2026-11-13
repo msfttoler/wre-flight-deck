@@ -73,12 +73,18 @@ unrelated evidence, return to the first unresolved release decision.
    a clearly labeled local assessment candidate, not an actual hosted release.
 2. Read the actual test/check evidence and run `npm test` locally on your
    baseline. A candidate at another SHA needs its own checkout/test evidence;
-   baseline success is not candidate success. Use an additional fresh local
+   baseline success is not candidate success. Stop your own server with Ctrl-C
+   **before switching to the candidate**. Use an additional fresh local
    branch at the observed candidate only if the code is available and within
-   your authorized target; record the switch and source.
-3. Inspect a meaningful UI path: route -> quote -> reservation. Observe
-   fictional price arithmetic and displayed state. Explain which behavior
-   tests cover versus what was manually inspected.
+   your authorized target. Confirm the intended clone and record
+   `git rev-parse HEAD` after checkout, then run `npm test` for that candidate.
+3. Start `npm start` from the candidate checkout and reload the browser before
+   recording UI evidence. Backend edits do not reload automatically; after any
+   API edit, repeat the owned-server stop, clone/SHA confirmation and restart.
+   Inspect route -> **new quote** -> reservation. Existing quotes retain their
+   earlier persisted prices; keep `.data/` intact. Observe fictional price
+   arithmetic and displayed state. Explain which behavior tests cover versus
+   what was manually inspected, bound to the recorded candidate SHA.
 4. Inspect actual current merge requirements, analysis revision and release
    artifact/provenance if available. Use GitHub's PR Checks, Security and Release
    views; select real objects, never placeholder numbers. Missing evidence is

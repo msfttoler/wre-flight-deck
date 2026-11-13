@@ -5,6 +5,11 @@ broken app. Turn a request for a booking-status filter into a scoped plan,
 tested local change and your own review. The feature below is proposed new
 behavior, not a claim that the current contract already supports it.
 
+Product request: [#1: reservation-status filter](https://github.com/msfttoler/wre-flight-deck/issues/1).
+This is a requested enhancement to the working baseline, not a staged bug or
+an already implemented feature. The demo addresses that request; the lab below
+is a separate proposed extension.
+
 ## Preparation and independent entry
 
 Read [shared setup and evidence rules](sessions.md) and [booking API](api-contract.md).
@@ -50,7 +55,10 @@ of its tools and whether the tests actually distinguish the behavior we want."
    and an empty result. Manually predict one result before reading the generated
    assertion, then run `npm test`. Do not trust tests merely because they agree
    with generated implementation.
-5. In the actual UI, check filtering and clearing with keyboard controls.
+5. After API edits, stop your own server with Ctrl-C, confirm the intended clone
+   and record `git rev-parse HEAD`. Restart `npm start` from that clone and reload
+   the browser; backend edits do not reload automatically. Keep `.data/` intact.
+   In the actual UI, check filtering and clearing with keyboard controls.
    Review `git diff --check` and `git diff`, especially whether filtering hides
    data only in the browser or is implemented as requested in the API.
    Compare the base source in GitHub; do not imply the local diff is a PR.
@@ -69,7 +77,10 @@ Take the request through plan -> source verification -> bounded change -> real
 tests -> personal review. Preserve the existing no-personal-data contract.
 Use actual booking statuses and current component/source locations. Cover at
 least a match, no match, omitted filter and one decision-changing boundary.
-Verify the actual UI and capture any incomplete part honestly.
+Before checking the UI after API edits, stop your own server with Ctrl-C,
+confirm the intended clone and record `git rev-parse HEAD`, restart `npm start`
+from that clone and reload the browser. Keep `.data/` intact. Verify the actual
+UI and capture any incomplete part honestly.
 
 Submit your request, accepted plan, source revision, final diff, actual test
 result, manual UI observations and one suggestion you rejected or corrected

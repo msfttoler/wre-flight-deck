@@ -23,6 +23,7 @@ test("a real quote becomes a persisted booking and cancellation releases its sea
   await page.getByTestId("quote-coupon").fill("FIRSTFLIGHT");
   await page.getByTestId("quote-submit").click();
   await expect(page.getByTestId("booking-submit")).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   const quotes = await request.get("/api/events");
   expect(quotes.ok()).toBeTruthy();
   const callsign = `CREW${Date.now().toString().slice(-9)}`;
@@ -59,6 +60,7 @@ test("an invalid coupon reports the real API error without booking anything", as
   await page.getByTestId("quote-coupon").fill("NOTREAL");
   await page.getByTestId("quote-submit").click();
   await expect(page.getByRole("status").filter({ hasText: /coupon/i })).toContainText(/FIRSTFLIGHT/);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   expect((await (await request.get("/api/bookings")).json()).bookings.length).toBe(before);
   await page.getByTestId("quote-coupon").fill("");
   await page.getByTestId("quote-submit").click();
@@ -80,6 +82,21 @@ test("the API rejects stale departure updates instead of overwriting an operator
   expect(updated.gate).toBe("A09");
 });
 
+test("the departure board saves a real gate change and shows its correlated event", async ({ page, request }) => {
+  await page.goto("/");
+  await page.getByTestId("nav-operations").click();
+  await page.getByRole("button", { name: /^Edit FD/ }).first().click();
+  const gate = page.getByLabel("Gate", { exact: true }).first();
+  await gate.fill("C07");
+  await page.getByRole("button", { name: "Save departure", exact: true }).first().click();
+  await expect.poll(async () => {
+    const body = await (await request.get("/api/network")).json();
+    return body.flights.some(f => f.gate === "C07");
+  }).toBeTruthy();
+  await page.getByTestId("nav-journal").click();
+  await expect(page.getByRole("main")).toContainText("C07");
+});
+
 test("both themes and all main views have no automated axe findings or page overflow", async ({ page }) => {
   for (const theme of ["light", "dark"]) {
     await page.goto(`/?scoutTheme=${theme}`);
@@ -92,6 +109,9 @@ test("both themes and all main views have no automated axe findings or page over
       expect(results.violations).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
     }
+    await page.getByRole("link", { name: "Learn & build" }).click();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   }
 });
 

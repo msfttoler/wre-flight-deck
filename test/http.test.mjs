@@ -327,11 +327,12 @@ test('only allowlisted static assets are served, with correct MIME types and bod
     assert.match(response.headers['content-security-policy'], /default-src 'self'/);
     assert.ok(!response.headers['content-security-policy'].includes("'unsafe-inline'"));
     if (filename === 'index.html') {
-      const match = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/i.exec(response.body);
-      if (match && !/\bsrc\s*=/i.test(match[1]) && match[2].trim()) {
-        const hash = createHash('sha256').update(match[2]).digest('base64');
-        assert.ok(response.headers['content-security-policy'].includes(`'sha256-${hash}'`));
-      }
+      const start = response.body.indexOf('<script>');
+      const end = response.body.indexOf('</script>', start + '<script>'.length);
+      assert.ok(start !== -1 && end > start, 'The product includes its known inline theme script.');
+      const script = response.body.slice(start + '<script>'.length, end);
+      const hash = createHash('sha256').update(script).digest('base64');
+      assert.ok(response.headers['content-security-policy'].includes(`'sha256-${hash}'`));
     }
     const head = await raw(f, { path, method: 'HEAD' });
     assert.equal(head.status, 200);

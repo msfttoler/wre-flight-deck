@@ -41,7 +41,12 @@ convenience.
    Keep atomic seat allocation, version checks and idempotent retry semantics.
 5. Run the full suite and inspect `git diff --check`, `git diff` and
    `git status --short`. Report actual results, revision and untested behavior.
-   Verify the affected UI manually; a unit test does not prove browser behavior.
+   Before manually verifying the affected UI after API edits, stop your own
+   server with Ctrl-C, confirm the intended clone and record `git rev-parse HEAD`,
+   then restart `npm start` from that clone and reload the browser. Backend
+   edits do not reload automatically. For pricing changes, request a new quote;
+   existing quotes retain their earlier persisted prices. Keep `.data/` intact.
+   A unit test does not prove browser behavior.
 
 For docs, retain descriptive links, ordered headings, text instructions and
 keyboard-usable paths. Do not rely on color, screenshots or a timed quiz alone.

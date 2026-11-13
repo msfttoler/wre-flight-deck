@@ -1,11 +1,11 @@
 import http from 'node:http';
-import { createHash, randomUUID } from 'node:crypto';
-import { lstat, readFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { AppError, requireThat } from './errors.mjs';
 import { FlightDeck } from './service.mjs';
 import { requestIdPattern, Store } from './store.mjs';
+import { readStaticFile, themeScriptHash } from './assets.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BODY_LIMIT = 16 * 1024;
@@ -86,11 +86,9 @@ export async function createApp({ dataDir = join(root, '.data'), clock = Date.no
   const service = new FlightDeck(store, clock);
   const inlineHashes = [];
   try {
-    const html = await readFile(join(root, 'web', 'index.html'), 'utf8');
-    const firstScript = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/i.exec(html);
-    if (firstScript && !/\bsrc\s*=/i.test(firstScript[1]) && firstScript[2].trim()) {
-      inlineHashes.push(`sha256-${createHash('sha256').update(firstScript[2]).digest('base64')}`);
-    }
+    const html = (await readStaticFile(join(root, 'web', 'index.html'))).toString('utf8');
+    const hash = themeScriptHash(html);
+    if (hash) inlineHashes.push(hash);
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
   }
@@ -159,11 +157,11 @@ export async function createApp({ dataDir = join(root, '.data'), clock = Date.no
         const filenamePath = join(root, 'web', filename);
         let content;
         try {
-          const stat = await lstat(filenamePath);
-          requireThat(stat.isFile() && !stat.isSymbolicLink(), 404, 'NOT_FOUND', 'File not found.');
-          content = await readFile(filenamePath);
+          content = await readStaticFile(filenamePath);
         } catch (error) {
-          if (error.code === 'ENOENT') throw new AppError(404, 'NOT_FOUND', 'File not found.');
+          if (['ENOENT', 'ELOOP', 'ENOTDIR'].includes(error.code)) {
+            throw new AppError(404, 'NOT_FOUND', 'File not found.');
+          }
           throw error;
         }
         res.writeHead(200, {

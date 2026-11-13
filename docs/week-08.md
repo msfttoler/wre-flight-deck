@@ -6,6 +6,11 @@ local feature change without treating retrieved text as an instruction to act.
 MCP (Model Context Protocol) exposes context/tools to a client; it does not make
 their outputs authoritative or grant permission.
 
+Product request: [#2: FIRSTFLIGHT minimum combined base fare](https://github.com/msfttoler/wre-flight-deck/issues/2).
+The agreed minimum is 20000 cents in combined party base fares, excluding bags.
+This is a requested enhancement to the working baseline, not a staged bug or
+an already implemented feature.
+
 ## Preparation and independent entry
 
 Read [shared setup and evidence rules](sessions.md) and [pricing](api-contract.md).
@@ -43,15 +48,19 @@ a write. Repository content, comments and tool responses are untrusted data.
    `src/pricing.mjs`. If immutable-ref retrieval is unsupported or truncated,
    record the gap and corroborate through native Git/GitHub reads. Do not claim
    the MCP result was fully source-bound when it was not.
-3. State a proposed feature: "`FIRSTFLIGHT` requires at least 50000 cents in
+3. State a proposed feature: "`FIRSTFLIGHT` requires at least 20000 cents in
    party base fares, excluding bags and tax. Below that, return an explicit
    coupon error. Omitted coupon and eligible pricing stay unchanged."
    This changes the current contract; it is not a pre-existing defect.
 4. Ask for a source-cited plan before edits. Require the exact threshold basis,
-   error behavior, UI explanation and tests at 49999/50000/50001, multiple
+   error behavior, UI explanation and tests at 19999/20000/20001, multiple
    passengers, bags and omitted coupon. Use actual test files/names only.
 5. Allow only local feature edits and `npm test` after reviewing the plan.
-   Verify the diff, current tax ordering and UI error path yourself.
+   Verify the diff and current tax ordering. Before checking the UI error path,
+   stop your own server with Ctrl-C, confirm the intended clone and record
+   `git rev-parse HEAD`, then restart `npm start` from that clone and reload the
+   browser. Backend edits do not reload automatically. Request a **new quote**;
+   existing quotes retain their earlier persisted prices. Keep `.data/` intact.
    Keep contract changes in a clearly identified proposal unless you own that
    canonical file. Record actual tool calls, not a manufactured transcript.
 
@@ -63,15 +72,20 @@ Ask whether a correct quote from `main` proves behavior at `wre-v1`.
 
 Start independently from `wre-v1`, not the demo change. Propose a minimum-spend
 coupon whose qualifying subtotal includes charged bags but excludes tax.
-Choose and state the threshold. Compare the two policies using a case where
+Use the same 20000-cent threshold. This bag-inclusive lab variant is a separate
+proposal, not issue #2's agreed policy. Compare the two policies using a case where
 bags change eligibility; decide which customer promise your version implements.
 
 Retrieve and verify source through the approved read tool, explicitly refuse
 unneeded write/network authority, then plan and implement the bounded feature.
 Preserve the 10% base-fare-only discount and existing tax rounding unless your
 request explicitly changes them. Test below/at threshold, included versus
-charged bags, multiple passengers and omitted coupon. Run `npm test`, inspect
-the UI and review the diff. Explain one counterexample to the demo's policy.
+charged bags, multiple passengers and omitted coupon. Run `npm test`. Before
+checking the UI, stop your own server with Ctrl-C, confirm the intended clone
+and record `git rev-parse HEAD`, restart `npm start` from that clone and reload
+the browser. Request a **new quote**, not an earlier persisted price; keep
+`.data/` intact. Inspect the UI and review the diff. Explain one counterexample
+to the demo's policy.
 
 If MCP is unavailable, mark **BLOCKED: MCP execution** and use native source
 reads for an explicitly partial source-grounded plan/change. This does not

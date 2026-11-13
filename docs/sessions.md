@@ -52,6 +52,12 @@ replacement tag. A published tag is not permission to move it.
 From the clone root, run `npm test` for the real native Node test suite, then
 `npm start` in a separate terminal. Visit `http://127.0.0.1:3000`. Stop your own
 server with Ctrl-C. Expected behavior in these guides is not recorded execution.
+`npm start` does not reload backend edits. Before browser checks after API
+changes, stop your own server with Ctrl-C, confirm the intended clone and record
+`git rev-parse HEAD`, then restart `npm start` from that clone and reload the
+browser. Stop the server before switching revisions and start it from the
+intended checkout. For pricing changes, request a **new quote**: existing quotes
+retain their earlier persisted prices. Keep `.data/` intact.
 If the package, entry point or UI is missing, runtime work is **BLOCKED**.
 There is no lesson setup, solution or grading script.
 
