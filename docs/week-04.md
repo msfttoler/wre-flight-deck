@@ -8,20 +8,36 @@ checkout and first actionable cause before proposing a repair.
 
 Read [shared setup and evidence rules](sessions.md). The owner supplies actual
 Actions configuration and an accessible run URL when available; a failure is
-not guaranteed. Learners need local write and existing read-only Actions access,
-not rerun or settings permission.
+not guaranteed. The initial investigation needs existing read-only Actions
+access, not a local branch, Node, an app server, rerun or settings permission.
+
+```bash
+gh run list --repo msfttoler/wre-flight-deck --limit 10
+```
+
+You can instead inspect available runs in GitHub Actions in the browser. If a
+local source comparison or approved edit is useful, choose an unused directory
+in a parent you own and replace `YOUR-ID` with your unique attempt:
 
 ```bash
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-w04-YOUR-ID
 cd wre-w04-YOUR-ID
-git switch -c learner/w04-YOUR-ID wre-v1
-git rev-parse HEAD
-npm test
-npm start
+git ls-files .github/workflows
 ```
 
-Use Node 24+ and your unique `YOUR-ID`. Missing tag/runtime blocks app entry.
-Inspect one route/quote in the UI, so a failed assertion has product meaning.
+Only an authorized local edit needs a learner branch. In the clean clone,
+confirm the approved `wre-v1` SHA and replace `YOUR-ID` with an unused name:
+
+```bash
+git status --short
+git rev-parse 'wre-v1^{commit}'
+git switch -c learner/w04-YOUR-ID wre-v1
+git rev-parse HEAD
+```
+
+Follow the [application setup](sessions.md#for-application-or-local-edit-work-use-a-fresh-clone)
+if app tests or the UI are relevant. Missing Node or a tag blocks that optional
+app path, not an available hosted read.
 
 ## Mental model and facilitator demo
 
@@ -41,9 +57,9 @@ failure can be a consequence of an earlier failed step.
 3. Find the first actionable error. Separate a failing assertion from runner
    provisioning, dependency retrieval, permission refusal or cancellation.
    A successful run can teach tracing, but is not a failure investigation.
-4. Compare the workflow file at the run's revision with your `wre-v1` checkout.
-   Run `git ls-files .github/workflows` locally to locate actual files. Do not
-   assume today's `main` contains the workflow that executed.
+4. Compare the workflow file at the run's revision with the approved `wre-v1`
+   baseline, using GitHub's source view or a local clone. Do not assume today's
+   `main` contains the workflow that executed.
 5. If the run's code is available and safe to inspect, compare it in GitHub at
    its SHA. A local `npm test` at another SHA is baseline evidence only, not a
    reproduction. Propose the smallest next diagnostic with its authority needs.
@@ -69,6 +85,26 @@ If only successful runs exist, assess what they cover and what they do not.
 If there are no accessible runs, mark hosted investigation **BLOCKED**, inspect
 the actual local workflow and propose which event/log evidence is needed.
 If no workflow exists either, do not invent one; report owner preparation missing.
+
+### If using this repository for the course timeout exercise
+
+At the recorded `wre-v1` revision, the CI, CodeQL and release jobs already
+have job-level timeouts. Do not remove one to manufacture an eligible edit.
+Inspect a selected job and compare its limit with actual completed runs. For
+an observed numeric run ID, the following read shows job timestamps:
+
+```bash
+RUN_ID='PASTE_ACTUAL_RUN_ID'
+gh run view "$RUN_ID" --repo msfttoler/wre-flight-deck \
+  --json jobs --jq '.jobs[] | {name,status,startedAt,completedAt,conclusion}'
+```
+
+Use a duration only for a completed, non-skipped job with valid start and end
+timestamps. Pending, skipped or missing timestamps are not duration evidence;
+a failed or canceled job may not represent normal runtime. One run is a sample,
+not a duration distribution. Retaining the limit or asking its owner for more
+operating evidence can be the right decision; do not describe a no-change
+decision as an executed hosted repair.
 
 ## Failure, recovery and tradeoff
 
