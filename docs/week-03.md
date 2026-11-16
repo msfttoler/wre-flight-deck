@@ -28,14 +28,64 @@ An application checkout and local UI are optional for this identity task.
 If you choose to inspect them, confirm the approved baseline and follow the
 [application setup](sessions.md#for-application-or-local-edit-work-use-a-fresh-clone).
 From a parent you own, replace `YOUR-ID` with a unique attempt and use a new
-directory and branch:
+directory:
 
 ```bash
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-w03-YOUR-ID
+```
+
+Only if the clone succeeds, enter it:
+
+```bash
 cd wre-w03-YOUR-ID
-git switch -c learner/w03-YOUR-ID wre-v1
+```
+
+If `cd` fails, stop before any Git command; do not continue from the parent.
+Otherwise inspect the target and baseline:
+
+```bash
+git remote -v
+git status --short
+git rev-parse 'wre-v1^{commit}'
+```
+
+Compare both origin URLs with the approved Flight Deck repository and the tag
+SHA with the owner's approved baseline in [sessions.md](sessions.md). Stop if
+the target differs, the worktree is dirty, or the tag is absent or mismatched.
+For read-only source inspection, select the `wre-v1` tag in GitHub's Code view
+or use `git show` with a real path at that tag. No branch is needed.
+
+To start the optional local app at the approved baseline without editing, switch
+the clean clone to that tag and verify the checked-out SHA:
+
+```bash
+git switch --detach wre-v1
+```
+
+If switching fails, stop. Only after it succeeds, check the selected commit:
+
+```bash
 git rev-parse HEAD
 ```
+
+Stop if it differs from the approved SHA. Follow the application setup only
+after that check.
+
+Only an authorized local edit needs a learner branch. For one, use an unused name:
+
+```bash
+git switch -c learner/w03-YOUR-ID wre-v1
+```
+
+If branch creation fails, stop before editing; preserve the existing work and
+select another unused name. Only after it succeeds, verify the branch starts
+at the approved SHA:
+
+```bash
+git rev-parse HEAD
+```
+
+If it differs from the approved SHA, stop before editing.
 
 Local planning and dispatch controls are not GitHub authorization.
 
@@ -45,8 +95,10 @@ Use the [85-minute route](sessions.md#shared-85-minute-delivery): demo 12-30,
 individual practice 35-70, self-check/debrief 70-83.
 
 Authentication establishes identity. Authorization permits a particular action
-against a particular resource. A public read might succeed anonymously. Git's
-local commit author is not necessarily the authenticated GitHub account.
+against a particular resource. A public read might succeed anonymously. Git
+records author and committer fields locally; neither is necessarily the
+authenticated GitHub account. A cryptographic commit signature, if used, is a
+separate check.
 
 1. Open the public repository and identify its owner and name. If you already
    have an approved clone, `git remote -v` shows its target and transport;
@@ -74,9 +126,11 @@ local commit author is not necessarily the authenticated GitHub account.
    rules change and local app write. For each, name the identity/resource and
    whether evidence establishes permission or leaves it unknown.
 
-Say: "A valid credential can still lack permission for this action. We can
-identify the missing authority without trying a destructive operation."
-Ask which identity signs a local commit and which would authenticate a push.
+Say: "A valid credential can still lack permission for this action. If the
+limiting authority is not visible, we can name what the owner needs to check
+without trying a destructive operation."
+Ask whose names Git records as author and committer, and what authenticates a
+push. Signing a commit is a separate, optional verification.
 
 ## Independent practice: a different actor boundary
 

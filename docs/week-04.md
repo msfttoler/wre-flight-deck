@@ -21,19 +21,70 @@ in a parent you own and replace `YOUR-ID` with your unique attempt:
 
 ```bash
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-w04-YOUR-ID
-cd wre-w04-YOUR-ID
-git ls-files .github/workflows
 ```
 
-Only an authorized local edit needs a learner branch. In the clean clone,
-confirm the approved `wre-v1` SHA and replace `YOUR-ID` with an unused name:
+Only if the clone succeeds, enter it:
+
+```bash
+cd wre-w04-YOUR-ID
+```
+
+If `cd` fails, stop before any Git command; do not continue from the parent.
+Otherwise inspect its target:
+
+```bash
+git remote -v
+```
+
+Before using the clone, compare both origin URLs with the approved Flight Deck
+repository and confirm the `wre-v1` SHA against the owner's approved baseline in
+[sessions.md](sessions.md):
 
 ```bash
 git status --short
 git rev-parse 'wre-v1^{commit}'
+```
+
+Stop if the target differs, the worktree is dirty, or the tag is absent or
+mismatched. List workflow paths from that approved tag, not from whatever
+branch the clone happened to open:
+
+```bash
+git ls-tree -r --name-only wre-v1 -- .github/workflows
+```
+
+Only an authorized local edit needs a learner branch. For one, replace
+`YOUR-ID` with an unused name and create the branch:
+
+```bash
 git switch -c learner/w04-YOUR-ID wre-v1
+```
+
+If branch creation fails, stop before editing; preserve the existing work and
+select another unused name. Only after it succeeds, confirm the branch starts
+at the approved SHA:
+
+```bash
 git rev-parse HEAD
 ```
+
+If it differs from the approved SHA, stop before editing.
+
+For an optional app test or UI read without a local edit, switch the clean clone
+to the approved tag instead:
+
+```bash
+git switch --detach wre-v1
+```
+
+If switching fails, stop. Only after it succeeds, check the selected commit:
+
+```bash
+git rev-parse HEAD
+```
+
+Stop if it differs from the approved SHA. If you already created the verified
+learner branch for an authorized edit, stay on that branch; do not discard work.
 
 Follow the [application setup](sessions.md#for-application-or-local-edit-work-use-a-fresh-clone)
 if app tests or the UI are relevant. Missing Node or a tag blocks that optional
@@ -44,9 +95,11 @@ app path, not an available hosted read.
 Use the [85-minute route](sessions.md#shared-85-minute-delivery), preserving
 35-70 individual practice and 70-83 self-check/debrief.
 
-An event selects a workflow revision and starts jobs; jobs run steps on a
-runner. The checkout may be a PR test merge rather than the PR head. A later
-failure can be a consequence of an earlier failed step.
+An eligible event can trigger a workflow, subject to its filters and conditions;
+its jobs run steps on a runner. The workflow-source revision is a separate
+question from the run's head SHA and the code a job checks out. The checkout may
+be a PR test merge rather than the PR head. A later failure can be a consequence
+of an earlier failed step.
 
 1. In GitHub Actions, choose an observed run, not an invented number. Read the
    trigger event, workflow, branch, revision, attempt, timestamps and conclusion.
@@ -57,9 +110,12 @@ failure can be a consequence of an earlier failed step.
 3. Find the first actionable error. Separate a failing assertion from runner
    provisioning, dependency retrieval, permission refusal or cancellation.
    A successful run can teach tracing, but is not a failure investigation.
-4. Compare the workflow file at the run's revision with the approved `wre-v1`
-   baseline, using GitHub's source view or a local clone. Do not assume today's
-   `main` contains the workflow that executed.
+4. Compare the workflow file at the run's workflow-source revision with the
+   approved `wre-v1` baseline. In GitHub, open repository > Code > branch/tag
+   selector > Tags > `wre-v1` > `.github/workflows` > the selected file. Inspect
+   the run's source revision separately if it can be identified; otherwise mark
+   that comparison unknown. Do not assume the run's head or checkout SHA is the
+   workflow-source revision, or that today's `main` contains the executed file.
 5. If the run's code is available and safe to inspect, compare it in GitHub at
    its SHA. A local `npm test` at another SHA is baseline evidence only, not a
    reproduction. Propose the smallest next diagnostic with its authority needs.
@@ -82,8 +138,10 @@ make a bounded local proposal or edit/test it on your branch; no hosted repair
 is claimed.
 
 If only successful runs exist, assess what they cover and what they do not.
-If there are no accessible runs, mark hosted investigation **BLOCKED**, inspect
-the actual local workflow and propose which event/log evidence is needed.
+If there are no accessible runs, mark hosted investigation **BLOCKED**. In the
+browser, use repository > Code > branch/tag selector > Tags > `wre-v1` >
+`.github/workflows` > a selected workflow, or inspect the approved tag in the
+local clone, then propose which event/log evidence is needed.
 If no workflow exists either, do not invent one; report owner preparation missing.
 
 ### If using this repository for the course timeout exercise
