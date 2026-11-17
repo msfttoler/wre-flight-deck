@@ -29,29 +29,45 @@ is a prerequisite. Week 01 and Week 02 are included here as new app entry points
 The published Week 02 course remains unchanged; this companion does not inherit
 its approval or claim an equivalent required-check gate.
 
-## Start each week from a fresh clone
+## Choose the setup your task needs
 
-You need basic terminal/Git familiarity, Node.js 24 or later, npm, Git, a browser
-and, for the optional hosted reads, GitHub CLI with existing authorized access.
-Check `node --version`, `npm --version`, `git --version`, `gh --version` and
-`gh auth status`. Do not paste credentials or expand token scopes for a lesson.
-Read [the API contract](api-contract.md) before changing behavior.
+Weeks 03 and 04 can start with read-only GitHub investigation; neither needs
+an application server, Node, a learner branch or a clone just to inspect hosted
+evidence. Follow the week's guide for the actual target and permission. Hosted
+reads need existing authorized access; a public browser view does not prove a
+particular account's permissions.
 
-Every week supplies its own clone directory and branch command. Run them from a
+Check `gh --version` and `gh auth status --help` when the task uses GitHub CLI.
+If help lists both `--active` and `--no-refresh`, use
+`gh auth status --active --no-refresh --hostname github.com` to inspect only
+the active account without refreshing it during that status check. Otherwise
+skip the status command and record that status as unknown. Do not paste account
+metadata or credentials, use token-display options, or expand token scopes.
+
+## For application or local-edit work, use a fresh clone
+
+App work needs Node.js 24 or later, npm, Git and a browser. Check
+`node --version`, `npm --version` and `git --version`; read
+[the API contract](api-contract.md) before changing behavior. A read-only
+source investigation can clone without creating a branch or starting the app.
+
+When a guide calls for a local edit, run its clone and branch commands from a
 parent directory you own. Replace `YOUR-ID` with a non-sensitive unique handle
 and attempt suffix, for example `river-a1`. Choose a new directory and branch
 for every attempt. These names select workspaces; they do not provision access.
 
 `git switch -c ... wre-v1` creates a learner branch from the same intended tag,
 not from another learner's work. Record `git rev-parse HEAD` and
-`git rev-parse 'wre-v1^{commit}'`. The tag is an intended entry point until the
-owner publishes it and binds its immutable SHA. If absent or mismatched, mark
+`git rev-parse 'wre-v1^{commit}'`. On 2026-11-16, `wre-v1` resolved to
+`59fae25ea3f18068e2140240d2fb606f35041974`; confirm the owner's approved
+baseline before class because a tag can move. If absent or mismatched, mark
 entry **BLOCKED**; do not silently substitute `main`, invent a SHA or create a
 replacement tag. A published tag is not permission to move it.
 
-From the clone root, run `npm test` for the real native Node test suite, then
-`npm start` in a separate terminal. Visit `http://127.0.0.1:3000`. Stop your own
-server with Ctrl-C. Expected behavior in these guides is not recorded execution.
+When the week's application task requires it, run `npm test` from the clone
+root for the real native Node test suite. Start `npm start` in a separate
+terminal only when the task needs the app, and visit `http://127.0.0.1:3000`.
+Stop your own server with Ctrl-C. Expected behavior is not recorded execution.
 `npm start` does not reload backend edits. Before browser checks after API
 changes, stop your own server with Ctrl-C, confirm the intended clone and record
 `git rev-parse HEAD`, then restart `npm start` from that clone and reload the
@@ -74,8 +90,8 @@ checks. `/api/events` is an application journal, **not** GitHub webhook evidence
 
 ## One-time owner preparation, not learner prerequisites
 
-Before delivery, the owner must make the real app/test/UI baseline available,
-publish `wre-v1` and separately record its SHA. Configure and verify any intended
+Before delivery, the owner must confirm the real app/test/UI baseline and
+approved `wre-v1` SHA. Configure and verify any intended
 CI, CodeQL and release-provenance workflows against actual revisions. Record
 check names, run URLs, analysis availability and release assets only after they
 exist. Workflow YAML alone does not establish a required check or successful run.
@@ -131,12 +147,12 @@ proves native UI rehearsal, classroom effectiveness or production readiness.
 
 ## Delivery state
 
-These are authored instructions, not run transcripts. At authoring, no hosted
-PR, run, rule, alert, release, attestation, App delivery or MCP call is asserted.
-Hosted-dependent steps are **BLOCKED pending actual evidence**. Runtime
-rehearsal and independent technical, clarity, rendered-document accessibility
-and classroom reviews are **UNREVIEWED**. Check current official guidance and
-client help before delivery; UI labels and tool availability can change.
+These are authored instructions, not run transcripts. A scoped historical
+read-only pilot is recorded in [delivery status](status.md); it is not a full
+rehearsal or ordinary-learner permission test. Hosted-dependent steps are
+**BLOCKED pending the relevant actual evidence**. Full UI, accessibility and
+classroom reviews are **UNREVIEWED**. Check current official guidance and client
+help before delivery; UI labels and tool availability can change.
 
 Use [GitHub Docs](https://docs.github.com/), the installed `gh help`, and
 [Node test runner documentation](https://nodejs.org/api/test.html) to resolve

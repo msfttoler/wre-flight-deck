@@ -28,13 +28,26 @@ npm start
 Open **http://127.0.0.1:3000**. No `npm install`, API keys, containers or cloud
 subscription are needed to run the application.
 
-1. Find a route from Seattle to Denver. Compare nonstop and connecting options.
-2. Select an itinerary. Add bags and try `FIRSTFLIGHT`. Read the actual fare
-   breakdown before confirming.
-3. Reserve under a fictional team callsign, such as `SKYCREW`.
-4. Open Reservations: the booking is saved and its seats leave inventory.
-5. Open Operations: assign a gate, move through boarding and departure, then
-   inspect the event journal. Try a cancellation before and after departure.
+1. In **From**, select **SEA · Seattle**. In **To**, select **DEN · Denver**.
+   Set **Passengers** to **1 passenger**, then click **Find flights**.
+2. Compare the options by stops, UTC times, available seats and base fare.
+   Click **Review fare** on the itinerary you want.
+3. Under **Checked bags**, choose **1 bag / passenger**. Enter `FIRSTFLIGHT`
+   in **Coupon (optional)**, click **Calculate fare**, and read every price
+   line and **Total · USD**. The coupon discounts base fare, not bag fees. A
+   quote expires after 15 minutes and does not reserve a seat.
+4. Enter a unique synthetic label, such as `TEAM-ORBIT-A1`, in **Fictional
+   team callsign**. Click **Confirm fictional booking** once. Wait for
+   **BOOKING CONFIRMED** and note the reference. Do not enter a person's name
+   or payment details.
+5. Click **View reservations** or open **Reservations** from the workspace
+   menu. Find your callsign and verify its reference, route, total and
+   **confirmed** status.
+
+The Plan a journey screen also has optional, exact steps for updating a
+fictional departure, checking its local event, and cancelling only the booking
+you just made. Departure updates persist in `.data/`; do not delete that
+directory to reset a lesson. A local event is not a GitHub webhook or CI run.
 
 Dates describe the labeled fictional schedule, not today's flights. Quoted
 prices expire after 15 real minutes. A quote does not hold a seat.
@@ -49,6 +62,10 @@ prices expire after 15 real minutes. A quote does not hold a seat.
 Every week starts from the same **`wre-v1` source baseline** with a clean clone
 and its own branch when editing is needed. No week imports another learner's
 work. Local application state is separate from Git history.
+
+The on-screen quick-start guide is on `main`. The approved `wre-v1` tag is an
+earlier baseline and does not include that guide; use the numbered steps above
+when running the app from `wre-v1`.
 
 | Week | Your engineering task |
 | --- | --- |

@@ -41,9 +41,8 @@ test("a real quote becomes a persisted booking and cancellation releases its sea
   await page.getByTestId("nav-reservations").click();
   await expect(page.getByTestId("booking-row").filter({ hasText: callsign })).toBeVisible();
   await row.getByTestId("booking-cancel").click();
-  // The UI may ask for an explicit inline confirmation before the actual write.
-  const confirm = row.getByRole("button", { name: /confirm cancellation/i });
-  if (await confirm.isVisible()) await confirm.click();
+  await expect(row.getByText("Release this team's seats?")).toBeVisible();
+  await row.getByRole("button", { name: "Confirm cancellation" }).click();
   await expect.poll(async () => {
     const body = await (await request.get("/api/bookings")).json();
     return body.bookings.find(b => b.id === before.id)?.status;
@@ -53,6 +52,40 @@ test("a real quote becomes a persisted booking and cancellation releases its sea
   await page.getByTestId("nav-journal").click();
   await expect(page.getByRole("main")).toContainText(/cancel/i);
   expect(errors).toEqual([]);
+});
+
+test("the first-use guide gives exact booking steps and safe optional follow-ups", async ({ page }) => {
+  await page.goto("/");
+  const guide = page.locator("#first-run-guide");
+  await expect(guide.getByRole("heading", { name: "Start here: make and verify a fictional booking" })).toBeVisible();
+  const steps = guide.locator(".first-run-disclosure");
+  await expect(steps).not.toHaveAttribute("open", "");
+  await steps.locator(":scope > summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(steps).toHaveAttribute("open", "");
+  await expect(steps.locator(".first-run-steps > li")).toHaveCount(5);
+  await expect(guide).toContainText("SEA · Seattle");
+  await expect(guide).toContainText("DEN · Denver");
+  await expect(guide).toContainText("FIRSTFLIGHT");
+  await expect(guide).toContainText("TEAM-ORBIT-A1");
+  await expect(guide).toContainText("does not reserve a seat");
+  await expect(guide).toContainText("not a GitHub webhook or CI run");
+  await expect(guide.getByText("Optional: cancel only the booking you just made")).toBeVisible();
+  for (const theme of ["light", "dark"]) {
+    await page.goto(`/?scoutTheme=${theme}`);
+    const expandedGuide = page.locator("#first-run-guide");
+    const disclosure = expandedGuide.locator(".first-run-disclosure");
+    await disclosure.locator(":scope > summary").click();
+    const optionalSteps = expandedGuide.locator(".first-run-extra");
+    await optionalSteps.nth(0).locator(":scope > summary").click();
+    await expect(optionalSteps.nth(0)).toContainText("A12");
+    await expect(optionalSteps.nth(0)).toContainText("flight updated");
+    await optionalSteps.nth(1).locator(":scope > summary").click();
+    await expect(optionalSteps.nth(1)).toContainText("Confirm cancellation");
+    await expect(optionalSteps.nth(1)).toContainText("scheduled departure time");
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  }
 });
 
 test("an invalid coupon reports the real API error without booking anything", async ({ page, request }) => {
@@ -96,6 +129,7 @@ test("the departure board saves a real gate change and shows its correlated even
     return body.flights.some(f => f.gate === "C07");
   }).toBeTruthy();
   await page.getByTestId("nav-journal").click();
+  await expect(page.getByRole("heading", { name: "flight updated", exact: true }).first()).toBeVisible();
   await expect(page.getByRole("main")).toContainText("C07");
 });
 

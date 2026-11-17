@@ -32,6 +32,20 @@ Installing software or logging in does not establish a Copilot entitlement.
 An authored workflow is not an executed workflow. A green check is not an
 enforced merge gate. An attestation is not a production approval.
 
+## Scoped read-only pilot
+
+On 2026-11-16, an agent investigated Weeks 03 and 04 against revision
+`59fae25ea3f18068e2140240d2fb606f35041974` with the repository owner's
+ADMIN access. A same-repository issues API read succeeded; a misspelled path
+returned 404 and the corrected path succeeded. The 404 was not a permission
+denial. A [completed push run](https://github.com/msfttoler/wre-flight-deck/actions/runs/43515740797)
+and its job checkout were inspected at that revision. All inspected jobs
+already had timeouts, so no timeout was changed.
+
+This was not an ordinary-learner permission test, UI rehearsal, classroom
+pilot, PR-merge check or hosted change. The instructions changed afterward;
+their complete delivery remains unreviewed.
+
 ## Existing WRE materials
 
 These are new application entry points. They do not silently replace the
