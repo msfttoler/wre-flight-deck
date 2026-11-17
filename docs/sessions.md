@@ -28,6 +28,10 @@ No previous week, completed lab, existing learner branch or persistent app state
 is a prerequisite. Week 01 and Week 02 are included here as new app entry points.
 The published Week 02 course remains unchanged; this companion does not inherit
 its approval or claim an equivalent required-check gate.
+These Flight Deck guides are standalone companions, not replacements for the
+existing WRE decks, notes or labs. In particular, the existing Week 07/08
+materials use a different scenario. Do not mix the routes until the course
+owner has aligned the materials.
 
 ## Choose the setup your task needs
 
@@ -55,6 +59,13 @@ When a guide calls for a local edit, run its clone and branch commands from a
 parent directory you own. Replace `YOUR-ID` with a non-sensitive unique handle
 and attempt suffix, for example `river-a1`. Choose a new directory and branch
 for every attempt. These names select workspaces; they do not provision access.
+Use a bash-compatible terminal; on Windows, Git Bash is one option. Run the
+commands in the stated order, and stop if a prerequisite fails. Git may open
+long output in a pager; press `q` to return to the prompt. Shell variables set
+in one terminal are not automatically available in another. On a narrow
+screen, GitHub may horizontally scroll a command block. Use its **Copy code
+to clipboard** button and paste into a plain-text editor with line wrapping
+to read the entire command before substituting placeholders or running it.
 
 `git switch -c ... wre-v1` creates a learner branch from the same intended tag,
 not from another learner's work. Record `git rev-parse HEAD` and
@@ -66,14 +77,19 @@ replacement tag. A published tag is not permission to move it.
 
 When the week's application task requires it, run `npm test` from the clone
 root for the real native Node test suite. Start `npm start` in a separate
-terminal only when the task needs the app, and visit `http://127.0.0.1:3000`.
-Stop your own server with Ctrl-C. Expected behavior is not recorded execution.
+terminal only when the task needs the app. Wait for your own server's
+startup message before visiting its reported local address; do not browse
+an unknown listener if the port is occupied. Stop your own server with
+Ctrl-C. Expected behavior is not recorded execution.
 `npm start` does not reload backend edits. Before browser checks after API
 changes, stop your own server with Ctrl-C, confirm the intended clone and record
-`git rev-parse HEAD`, then restart `npm start` from that clone and reload the
-browser. Stop the server before switching revisions and start it from the
-intended checkout. For pricing changes, request a **new quote**: existing quotes
-retain their earlier persisted prices. Keep `.data/` intact.
+`git rev-parse HEAD`, then restart on the same selected port from that clone.
+Reload the browser only after your server reports that it started. Stop the
+server before switching revisions and start it from the intended checkout.
+For pricing changes, request a **new quote**. Saved quote bytes retain their
+recorded prices, but a changed rule can cause the app to reject old state
+during startup. Keep `.data/` intact. Use a new, unused data directory only
+for a separately labeled UI check; it does not prove old-state compatibility.
 If the package, entry point or UI is missing, runtime work is **BLOCKED**.
 There is no lesson setup, solution or grading script.
 
