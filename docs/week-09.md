@@ -26,43 +26,44 @@ ask the owner for the exact missing record without changing an installation.
    Node.js 24 or later, and a bash-compatible terminal such as Git Bash on
    Windows. Replace `river-a1` with an unused, non-sensitive attempt name:
 
-   ```bash
-   cd ~
+   <pre tabindex="0"><code>cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w09-river-a1
-   ```
+   </code></pre>
 
    If cloning fails or the folder exists, stop and choose another name.
    After a successful clone:
 
-   ```bash
-   cd ~/wre-w09-river-a1
+   <pre tabindex="0"><code>cd ~/wre-w09-river-a1
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
-   ```
+   </code></pre>
 
    Confirm both remote URLs name `msfttoler/wre-flight-deck`, the worktree is
    clean, and the tag SHA is the owner's approved SHA. The `##` line is a
    branch header; other status lines indicate changes. Do not share URLs that
    contain credentials. If the tag is absent or mismatched, local app entry
    is **BLOCKED**; do not substitute `main`.
-4. For this read-only app demonstration, no learner branch is required:
+4. The checkout is read-only, so no learner branch is required. The optional
+   local booking writes this app's own local state; it makes no hosted change.
+   Select the baseline:
 
-   ```bash
-   git switch --detach wre-v1
-   ```
+   <pre tabindex="0"><code>git switch --detach wre-v1
+   </code></pre>
 
    If switching fails, stop. Only after it succeeds:
 
-   ```bash
-   git rev-parse HEAD
-   ```
+   <pre tabindex="0"><code>git rev-parse HEAD
+   </code></pre>
 
    Stop if `HEAD` differs from the approved SHA. Only then run `npm start`.
-   Open `http://127.0.0.1:3000`. If port 3000 is occupied, do not stop
-   another person's process; use `PORT=3001 npm start` and open port 3001.
-   Missing Node or local app access blocks only this contrast, not an
-   available hosted read. The `wre-v1` app predates the in-app quick-start.
+   Wait for your terminal to print `Flight Deck: http://127.0.0.1:3000`
+   and stay running before opening that address. If port 3000 is occupied,
+   do not stop another person's process or browse its listener. After your
+   failed start exits, use `PORT=3001 npm start` and open port 3001 only
+   after your server reports that it started. Missing Node or local app access
+   blocks only this contrast, not an available hosted read. The `wre-v1` app
+   predates the in-app quick-start.
 
 No learner needs App-owner, organization-owner, or repository-administrator
 access. No previous session or existing learner workspace is needed.

@@ -12,10 +12,11 @@ predicted impact.
 ## Before class: establish the comparison
 
 1. Read [shared setup and evidence rules](sessions.md). The owner supplies
-   an **approved workflow baseline SHA**, its intended invariant, and an
-   accessible current revision. The `wre-v1` source tag is a candidate
-   baseline only if the owner has also approved its workflows for this
-   comparison. Do not turn a tag name or today's `main` into approval.
+   an **approved workflow baseline SHA**, its intended invariant, a second
+   invariant for independent practice if available, and an accessible
+   current revision. The `wre-v1` source tag is a candidate baseline only
+   if the owner has also approved its workflows for this comparison. Do not
+   turn a tag name or today's `main` into approval.
 2. The normal route needs a browser and Git. Use a bash-compatible terminal
    such as Git Bash on Windows. Node, an app server, a learner branch,
    administrator rights, and hosted writes are not required for this
@@ -23,27 +24,27 @@ predicted impact.
 3. Make an independent clone. `river-a1` is an example; replace it in every
    command with your own non-sensitive, unused attempt name:
 
-   ```bash
-   cd ~
+   <pre tabindex="0"><code>cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w10-river-a1
-   ```
+   </code></pre>
 
    If cloning fails or the folder exists, stop and choose another name.
    After a successful clone:
 
-   ```bash
-   cd ~/wre-w10-river-a1
+   <pre tabindex="0"><code>cd ~/wre-w10-river-a1
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
    git rev-parse 'origin/main^{commit}'
-   ```
+   </code></pre>
 
    Confirm both remote URLs name `msfttoler/wre-flight-deck`. Do not share
    a URL containing credentials. The `##` status line is a branch header;
    other lines indicate changes. Stop and preserve any unexpected changes.
-   Record the two full SHAs as observations: neither is automatically the
-   owner's approved workflow baseline.
+   Record the available full SHAs as observations: neither is automatically
+   the owner's approved workflow baseline. If the `wre-v1` tag is missing
+   but `origin/main` resolves, continue with the current-only inventory and
+   request an approved baseline.
 4. Ask the owner which actual SHA and invariant to use. If no approved
    baseline is supplied, mark **BLOCKED: baseline approval**. You can still
    inventory the current workflow and request the missing decision; do not
@@ -68,34 +69,51 @@ evidence that a hosted workflow or branch rule executed.
 
 ## 12-30: Facilitator demonstration
 
+**If the approved baseline is missing:** In the same terminal, replace the
+placeholder with the full observed current SHA recorded during preparation:
+
+<pre tabindex="0"><code>CURRENT_SHA='PASTE_OBSERVED_FULL_SHA'
+git rev-parse --verify "${CURRENT_SHA}^{commit}"
+git ls-tree -r --name-only "$CURRENT_SHA" -- .github/workflows
+</code></pre>
+
+If the SHA does not resolve, stop and request an accessible immutable ref.
+If the listing contains `.github/workflows/ci.yml`, open that actual current
+file with:
+
+<pre tabindex="0"><code>git show "${CURRENT_SHA}:.github/workflows/ci.yml"
+</code></pre>
+
+Record its trigger, checkout and test command. If the file is absent, open
+another listed workflow or mark the source read **BLOCKED**. This inventory
+does not establish drift. Skip demo steps 1-3 and continue at step 4; keep
+**baseline approval BLOCKED**.
+
 1. **12-16 - Bind the two revisions.** In your clone, use the full SHA
    approved by the owner as the baseline and the full SHA of the actual
    current revision you intend to examine. In the assignments below, replace
    the text between quotes with those observed SHAs; do not type placeholders
    as if they were commits.
 
-   ```bash
-   BASELINE_SHA='PASTE_APPROVED_FULL_SHA'
+   <pre tabindex="0"><code>BASELINE_SHA='PASTE_APPROVED_FULL_SHA'
    CURRENT_SHA='PASTE_OBSERVED_FULL_SHA'
-   ```
+   </code></pre>
 
    Confirm each commit exists locally:
 
-   ```bash
-   git rev-parse --verify "${BASELINE_SHA}^{commit}"
+   <pre tabindex="0"><code>git rev-parse --verify "${BASELINE_SHA}^{commit}"
    git rev-parse --verify "${CURRENT_SHA}^{commit}"
-   ```
+   </code></pre>
 
    Each command should print a full commit SHA. If either fails, stop the
    local comparison and ask for an accessible ref or use the owner's
    authorized immutable GitHub view. Do not substitute another branch.
 2. **16-20 - Find the real files and diff.** Run:
 
-   ```bash
-   git ls-tree -r --name-only "$BASELINE_SHA" -- .github/workflows
+   <pre tabindex="0"><code>git ls-tree -r --name-only "$BASELINE_SHA" -- .github/workflows
    git ls-tree -r --name-only "$CURRENT_SHA" -- .github/workflows
    git diff "$BASELINE_SHA" "$CURRENT_SHA" -- .github/workflows
-   ```
+   </code></pre>
 
    Read the path list before naming a file. If no workflow is present at a
    required revision, mark that comparison **BLOCKED** and ask the owner
@@ -105,10 +123,9 @@ evidence that a hosted workflow or branch rule executed.
    commit. For example, if both path lists include
    `.github/workflows/ci.yml`, run:
 
-   ```bash
-   git show "${BASELINE_SHA}:.github/workflows/ci.yml"
+   <pre tabindex="0"><code>git show "${BASELINE_SHA}:.github/workflows/ci.yml"
    git show "${CURRENT_SHA}:.github/workflows/ci.yml"
-   ```
+   </code></pre>
 
    Check the actual trigger/filter, checkout, runtime, test command,
    permissions, and job/check names as relevant to the owner's invariant.
@@ -122,10 +139,11 @@ evidence that a hosted workflow or branch rule executed.
    checkout step to look for the actual checked-out revision. If the logs
    do not establish it, record **unknown**. A run's head SHA and the job's
    checkout can differ; a test merge is not automatically wrong.
-5. Say which difference was observed in source, what the run actually
-   establishes, and what remains a prediction. A renamed check may affect a
-   rule expecting the old name, but only actual rule evidence can establish
-   the current required check.
+5. If you compared two revisions, say which difference was observed in
+   source. Otherwise say no comparison was possible. In either case, state
+   what the run actually establishes and what remains a prediction. A
+   renamed check may affect a rule expecting the old name, but only actual
+   rule evidence can establish the current required check.
 
 If GitHub Actions access or logs are unavailable, mark execution evidence
 **BLOCKED** and continue with the local source comparison.
@@ -148,16 +166,18 @@ Start independent work at minute 35 even if hosted evidence is unavailable.
 
 1. Pick one invariant different from the facilitator's: test execution,
    token permissions, trigger coverage, or the release producer. Write the
-   exact condition the owner expects; if it is not supplied, mark its
-   approval **BLOCKED** rather than making it up.
-2. In your own clone, set `BASELINE_SHA` and `CURRENT_SHA` to the owner's
-   actual full SHAs using the assignments above. Verify both with `git
-   rev-parse --verify` before proceeding. Record the repository and SHAs in
-   a note outside tracked app files.
-3. List the workflow files at both commits and run the two-revision `git
-   diff` from the demonstration. Open the actual affected file at each
-   revision. Record its path, observed difference or confirmed empty diff,
-   and the invariant it could affect.
+   exact condition the owner expects. If no second invariant was approved,
+   label yours a **proposal** and its approval **BLOCKED**.
+2. In your own clone, set `CURRENT_SHA` to the observed full SHA and verify
+   it using the current-only commands above. If an approved baseline exists,
+   also set `BASELINE_SHA` to the owner's actual full SHA and verify it.
+   Record the repository and available SHAs outside tracked app files.
+3. If both commits resolve and the baseline is approved, list their workflow
+   files and run the two-revision `git diff` from the demonstration. Open the
+   actual affected file at each revision. Record its path, observed difference
+   or confirmed empty diff, and the invariant it could affect. Otherwise use
+   the current-only inventory above, mark the comparison **BLOCKED**, and
+   write the exact baseline decision you need.
 4. In GitHub **Actions**, open a real accessible run if one exists. Record
    the run URL, event, conclusion, revision, and actual checkout when its
    log establishes it. If the run or checkout is unavailable, mark that
@@ -177,9 +197,10 @@ Start independent work at minute 35 even if hosted evidence is unavailable.
 
 ## 70-85: Self-check, recovery, and close
 
-**70-75:** Check that both SHAs resolve to the intended commits and every
-claim identifies its file or run. An empty diff does not establish that a
-job ran or that settings are unchanged.
+**70-75:** Check that every supplied SHA resolves to the intended commit and
+every claim identifies its file or run. If the approved baseline is missing,
+keep the comparison **BLOCKED**. An empty diff does not establish that a job
+ran or that settings are unchanged.
 
 **75-81:** Discuss one observed or proposed difference. If a repair would
 restore an older runtime or pin, check current requirements before

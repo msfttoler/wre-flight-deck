@@ -28,6 +28,10 @@ No previous week, completed lab, existing learner branch or persistent app state
 is a prerequisite. Week 01 and Week 02 are included here as new app entry points.
 The published Week 02 course remains unchanged; this companion does not inherit
 its approval or claim an equivalent required-check gate.
+These Flight Deck guides are standalone companions, not replacements for the
+existing WRE decks, notes or labs. In particular, the existing Week 07/08
+materials use a different scenario. Do not mix the routes until the course
+owner has aligned the materials.
 
 ## Choose the setup your task needs
 
@@ -74,10 +78,13 @@ terminal only when the task needs the app, and visit `http://127.0.0.1:3000`.
 Stop your own server with Ctrl-C. Expected behavior is not recorded execution.
 `npm start` does not reload backend edits. Before browser checks after API
 changes, stop your own server with Ctrl-C, confirm the intended clone and record
-`git rev-parse HEAD`, then restart `npm start` from that clone and reload the
-browser. Stop the server before switching revisions and start it from the
-intended checkout. For pricing changes, request a **new quote**: existing quotes
-retain their earlier persisted prices. Keep `.data/` intact.
+`git rev-parse HEAD`, then restart on the same selected port from that clone.
+Open the browser only after your server reports that it started. Stop the
+server before switching revisions and start it from the intended checkout.
+For pricing changes, request a **new quote**. Saved quote bytes retain their
+recorded prices, but a changed rule can cause the app to reject old state
+during startup. Keep `.data/` intact. Use a new, unused data directory only
+for a separately labeled UI check; it does not prove old-state compatibility.
 If the package, entry point or UI is missing, runtime work is **BLOCKED**.
 There is no lesson setup, solution or grading script.
 

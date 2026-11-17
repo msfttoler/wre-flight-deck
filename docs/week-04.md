@@ -26,9 +26,8 @@ Read [shared setup and evidence](sessions.md). If using `gh`, run
 CLI status as unknown. Do not display tokens or expand credentials. List
 actual runs with:
 
-```bash
-gh run list --repo msfttoler/wre-flight-deck --limit 10
-```
+<pre tabindex="0"><code>gh run list --repo msfttoler/wre-flight-deck --limit 10
+</code></pre>
 
 Alternatively, open `https://github.com/msfttoler/wre-flight-deck` >
 **Actions** and read the available list. No accessible run means hosted
@@ -41,32 +40,28 @@ or UI observations, result and limits. Redact secrets and private log content.
 From a parent you own, replace `YOUR-ID` with a unique, non-sensitive handle
 and attempt suffix using only letters, digits and hyphens, such as `river-a1`:
 
-```bash
-git clone https://github.com/msfttoler/wre-flight-deck.git wre-w04-YOUR-ID
-```
+<pre tabindex="0"><code>git clone https://github.com/msfttoler/wre-flight-deck.git wre-w04-YOUR-ID
+</code></pre>
 
 Only if cloning succeeds, enter it:
 
-```bash
-cd wre-w04-YOUR-ID
-```
+<pre tabindex="0"><code>cd wre-w04-YOUR-ID
+</code></pre>
 
 If `cd` fails, stop before running Git. Otherwise check the target and tag:
 
-```bash
-git remote -v
+<pre tabindex="0"><code>git remote -v
 git status --short --branch
 git rev-parse 'wre-v1^{commit}'
-```
+</code></pre>
 
 Compare both origin URLs with `msfttoler/wre-flight-deck` without exposing
 credentials and compare the tag commit with the owner's approved SHA. A
 different target, dirty clone, missing tag or mismatch is **BLOCKED**. List
 workflow files from the verified tag, not the clone's default branch:
 
-```bash
-git ls-tree -r --name-only wre-v1 -- .github/workflows
-```
+<pre tabindex="0"><code>git ls-tree -r --name-only wre-v1 -- .github/workflows
+</code></pre>
 
 For an optional local edit, create an unused branch with
 `git switch -c learner/w04-YOUR-ID wre-v1`. If that fails, stop before
@@ -136,10 +131,9 @@ an expected observation a recorded result.
 For an optional CLI read, replace `RUN_ID` with the numeric ID of the actual
 run; it is not a fixed course ID:
 
-```bash
-gh run view RUN_ID --repo msfttoler/wre-flight-deck --json databaseId,attempt,event,headBranch,headSha,status,conclusion,workflowName,url,jobs
+<pre tabindex="0"><code>gh run view RUN_ID --repo msfttoler/wre-flight-deck --json databaseId,attempt,event,headBranch,headSha,status,conclusion,workflowName,url,jobs
 gh run view RUN_ID --repo msfttoler/wre-flight-deck --log
-```
+</code></pre>
 
 The log can contain sensitive details: inspect it privately and record only
 redacted evidence. If investigating an older attempt, consult
@@ -186,20 +180,21 @@ runtime mismatch rather than a checkout failure. Do not manufacture a failure.
    failure investigation.
 4. **54-60:** In **Code** > branch/tag selector > **Tags** > `wre-v1`, open
    `.github/workflows` and the selected workflow, or use the verified local
-   clone. Read its triggers, conditions, checkout and relevant job. Compare
-   it with the executed source only if that source revision is known. If
-   neither run nor workflow is available, mark both **BLOCKED** and name the
-   owner preparation needed.
+   clone. If no run was selected, use `.github/workflows/ci.yml` as the
+   source-only example, after verifying the tag SHA; if it is unavailable,
+   mark that read **BLOCKED**. Read its triggers, conditions, checkout and
+   relevant job. Compare it with the executed source only if that source
+   revision is known. If neither run nor workflow is available, mark both
+   **BLOCKED** and name the owner preparation needed.
 5. **60-66:** If the course asks about a job timeout, inspect the selected
    job's actual `timeout-minutes` at the approved tag. The recorded baseline
    already contains job-level timeouts in the CI, CodeQL and release
    workflows; confirm the selected file instead of removing one. For an
    observed numeric run ID, this optional read lists job timestamps:
 
-   ```bash
-   RUN_ID='PASTE_ACTUAL_RUN_ID'
+   <pre tabindex="0"><code>RUN_ID='PASTE_ACTUAL_RUN_ID'
    gh run view "$RUN_ID" --repo msfttoler/wre-flight-deck --json jobs --jq '.jobs[] | {name,status,startedAt,completedAt,conclusion}'
-   ```
+   </code></pre>
 
    Replace the placeholder with the ID from the actual run page. Calculate a
    duration only for a completed, non-skipped job with valid start and end

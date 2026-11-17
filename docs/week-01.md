@@ -25,26 +25,23 @@ hyphens, such as `river-a1`; use it in both directory and branch names.
 In a terminal, from a parent directory you own, check the tools and create
 a fresh clone:
 
-```bash
-git --version
+<pre tabindex="0"><code>git --version
 node --version
 npm --version
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-w01-YOUR-ID
-```
+</code></pre>
 
 Only if the clone succeeds, enter it:
 
-```bash
-cd wre-w01-YOUR-ID
-```
+<pre tabindex="0"><code>cd wre-w01-YOUR-ID
+</code></pre>
 
 If `cd` fails, stop before running Git. Otherwise inspect the clone:
 
-```bash
-git remote -v
+<pre tabindex="0"><code>git remote -v
 git status --short --branch
 git rev-parse 'wre-v1^{commit}'
-```
+</code></pre>
 
 Compare the origin fetch and push URLs with `msfttoler/wre-flight-deck`,
 without sharing credentials. Compare the resolved tag commit with the owner's
@@ -52,9 +49,8 @@ approved SHA. A different target, dirty clone, missing tag or mismatch is
 **BLOCKED**; do not substitute `main`. Create an unused branch only after
 those checks:
 
-```bash
-git switch -c learner/w01-YOUR-ID wre-v1
-```
+<pre tabindex="0"><code>git switch -c learner/w01-YOUR-ID wre-v1
+</code></pre>
 
 If branch creation fails, stop and choose another unused name; do not edit an
 existing branch. Only after success, run `git rev-parse HEAD` and confirm it
@@ -122,9 +118,8 @@ workspace. The following commands run from that clone's root.
 2. Run `git add docs/architecture.md`, then
    `git diff --cached -- docs/architecture.md`. Commit only that observation:
 
-   ```bash
-   git commit -m "Document quote observation"
-   ```
+   <pre tabindex="0"><code>git commit -m "Document quote observation"
+   </code></pre>
 
    If Git refuses the commit, keep the edit and resolve the author/signing
    requirement through the owner; do not disable a required signing policy.
@@ -134,35 +129,31 @@ workspace. The following commands run from that clone's root.
 3. Stop the local app if it is running. Create a different local branch from
    the approved tag:
 
-   ```bash
-   git switch -c recovery/w01-YOUR-ID wre-v1
-   ```
+   <pre tabindex="0"><code>git switch -c recovery/w01-YOUR-ID wre-v1
+   </code></pre>
 
    If the switch fails, stop before cherry-picking. After success, confirm
    `git branch --show-current` names your recovery branch, then run:
 
-   ```bash
-   git log --oneline --all -8
+   <pre tabindex="0"><code>git log --oneline --all -8
    git reflog -8
-   ```
+   </code></pre>
 
    The commit is absent from the recovery branch, but is still reachable from
    the original branch. The reflog is this clone's record and can expire.
 4. Replace `COMMIT_SHA` with the full SHA actually recorded in step 2:
 
-   ```bash
-   git cherry-pick COMMIT_SHA
-   ```
+   <pre tabindex="0"><code>git cherry-pick COMMIT_SHA
+   </code></pre>
 
    If cherry-pick stops or fails, use the failure guidance below before
    continuing. Only after it succeeds, run:
 
-   ```bash
-   git rev-parse HEAD
+   <pre tabindex="0"><code>git rev-parse HEAD
    git show --stat --oneline HEAD
    git diff wre-v1..HEAD -- docs/architecture.md
    npm test
-   ```
+   </code></pre>
 
    Read the actual diff and test result. Cherry-pick applies the commit's
    change to the selected branch; its resulting SHA may differ because parent
@@ -209,19 +200,17 @@ changed condition is a second, uncommitted edit. Do not push.
    Note why this second change is not contained in `COMMIT_SHA`.
 4. **50-55:** Preserve just that tracked edit, then identify the actual stash:
 
-   ```bash
-   git stash push -m "w01 unrelated observation" -- README.md
-   ```
+   <pre tabindex="0"><code>git stash push -m "w01 unrelated observation" -- README.md
+   </code></pre>
 
    If that fails, stop and preserve the edit. After success, run
    `git stash list` and find the entry with that message. Replace `N` in
    the next command with its observed number, keeping the quotes, and check
    its contents:
 
-   ```bash
-   git stash show -p 'stash@{N}'
+   <pre tabindex="0"><code>git stash show -p 'stash@{N}'
    git status --short
-   ```
+   </code></pre>
 
    If there is no matching entry or its patch does not contain your README
    edit, stop before switching. This path-limited stash does not save
@@ -241,17 +230,15 @@ changed condition is a second, uncommitted edit. Do not push.
    establish a merge. Run `git stash list` again and identify the same saved
    edit; its number can change. Apply it without dropping its backup:
 
-   ```bash
-   git stash apply 'stash@{N}'
-   ```
+   <pre tabindex="0"><code>git stash apply 'stash@{N}'
+   </code></pre>
 
    Replace `N` with the entry's current observed number. If apply reports a
    conflict, use the failure guidance before claiming success. Otherwise run:
 
-   ```bash
-   git status --short
+   <pre tabindex="0"><code>git status --short
    git diff -- README.md
-   ```
+   </code></pre>
 
    Verify the README edit is present and the recovered commit still contains
    only the intended change.

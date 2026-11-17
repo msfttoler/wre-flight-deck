@@ -37,35 +37,31 @@ raw sensitive payloads or private account metadata.
 From a parent you own, replace `YOUR-ID` with a non-sensitive unique handle
 and attempt suffix using only letters, digits and hyphens, such as `river-a1`:
 
-```bash
-git --version
+<pre tabindex="0"><code>git --version
 node --version
 npm --version
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-w06-YOUR-ID
-```
+</code></pre>
 
 Only if cloning succeeds, enter the new directory:
 
-```bash
-cd wre-w06-YOUR-ID
-```
+<pre tabindex="0"><code>cd wre-w06-YOUR-ID
+</code></pre>
 
 If `cd` fails, stop before Git. Otherwise inspect the target and baseline:
 
-```bash
-git remote -v
+<pre tabindex="0"><code>git remote -v
 git status --short --branch
 git rev-parse 'wre-v1^{commit}'
-```
+</code></pre>
 
 Compare both origin URLs with `msfttoler/wre-flight-deck` without exposing
 credentials and the tag commit with the owner's approved SHA. A different
 target, dirty clone, missing tag or mismatch is **BLOCKED**; do not substitute
 `main`. For a read-only local test, select the approved tag:
 
-```bash
-git switch --detach wre-v1
-```
+<pre tabindex="0"><code>git switch --detach wre-v1
+</code></pre>
 
 If the switch fails, stop. Only after success, use `git rev-parse HEAD` and
 confirm the approved SHA. To make an authorized local test edit instead,
@@ -119,9 +115,8 @@ available.
    establish which alert results are available for the target branch. With
    an authorized `gh`, an optional read is:
 
-   ```bash
-   gh run list --repo msfttoler/wre-flight-deck --workflow codeql.yml --limit 10
-   ```
+   <pre tabindex="0"><code>gh run list --repo msfttoler/wre-flight-deck --workflow codeql.yml --limit 10
+   </code></pre>
 
    If `gh` is used, follow the conditional status check in
    [sessions](sessions.md#choose-the-setup-your-task-needs). An unavailable
@@ -194,10 +189,9 @@ limit, but only the first is finding-specific triage.
      for the 16 KiB limit and exact boundary. In a verified clone, these
      native reads help locate them:
 
-     ```bash
-     git grep -n -e 'BODY_LIMIT' -e 'jsonBody' wre-v1 -- src/server.mjs
+     <pre tabindex="0"><code>git grep -n -e 'BODY_LIMIT' -e 'jsonBody' wre-v1 -- src/server.mjs
      git grep -n -e '16 KiB' -e 'chunked transfer' wre-v1 -- test/http.test.mjs
-     ```
+     </code></pre>
 
      If the tag or files are unavailable, mark this source review **BLOCKED**.
 3. **48-54:** Change one assumption and explain the decision:
@@ -213,9 +207,8 @@ limit, but only the first is finding-specific triage.
 4. **54-62:** If you have the verified local clone and Node 24+, run the
    relevant real tests from its root. For the body-limit fallback, use:
 
-   ```bash
-   node --test test/http.test.mjs
-   ```
+   <pre tabindex="0"><code>node --test test/http.test.mjs
+   </code></pre>
 
    For an actual alert, locate its relevant tests with `git ls-files test`
    and run the project's `npm test` instead; explain which assertions relate

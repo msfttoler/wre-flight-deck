@@ -13,6 +13,8 @@ MCP call or hosted result.
 The requested demo policy uses a 20000-cent combined party base fare, excluding
 bags and tax. It is new behavior, not a defect already present in `wre-v1`.
 The learner's bag-inclusive policy below is a separate proposal.
+This standalone Flight Deck companion uses a different scenario from the
+existing Week 08 course materials; do not pair them until the owner aligns them.
 
 ## Before class: prepare an independent workspace
 
@@ -25,11 +27,10 @@ The learner's bag-inclusive policy below is a separate proposal.
    [the pricing contract](api-contract.md). The commands below use a
    bash-compatible terminal; on Windows, use Git Bash. Check:
 
-   ```bash
-   git --version
+   <pre tabindex="0"><code>git --version
    node --version
    npm --version
-   ```
+   </code></pre>
 
    The local feature needs Git and Node.js 24 or later. No administrator,
    earlier lab, peer approval, or hosted write is needed.
@@ -37,20 +38,18 @@ The learner's bag-inclusive policy below is a separate proposal.
    replace it in every command with your own non-sensitive, unused attempt
    name. Run:
 
-   ```bash
-   cd ~
+   <pre tabindex="0"><code>cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w08-river-a1
-   ```
+   </code></pre>
 
    If cloning fails or the folder exists, stop and choose another name.
    After a successful clone:
 
-   ```bash
-   cd ~/wre-w08-river-a1
+   <pre tabindex="0"><code>cd ~/wre-w08-river-a1
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
-   ```
+   </code></pre>
 
    Confirm both remote URLs name `msfttoler/wre-flight-deck`, the worktree is
    clean, and the tag SHA matches the owner's approved SHA. The `##` line is
@@ -59,34 +58,33 @@ The learner's bag-inclusive policy below is a separate proposal.
    never replace it with `main`.
 4. Create your own branch:
 
-   ```bash
-   git switch -c learner/w08-river-a1 wre-v1
-   ```
+   <pre tabindex="0"><code>git switch -c learner/w08-river-a1 wre-v1
+   </code></pre>
 
    If branch creation fails, stop and use another unused branch name.
    Only after it succeeds, check the selected commit:
 
-   ```bash
-   git rev-parse HEAD
-   ```
+   <pre tabindex="0"><code>git rev-parse HEAD
+   </code></pre>
 
    If `HEAD` does not match the approved tag, stop before editing. Otherwise:
 
-   ```bash
-   npm test
-   ```
+   <pre tabindex="0"><code>npm test
+   </code></pre>
 
    Record the real test result; a baseline failure needs investigation.
 5. In a second terminal, again replacing `river-a1` with your own name:
 
-   ```bash
-   cd ~/wre-w08-river-a1
+   <pre tabindex="0"><code>cd ~/wre-w08-river-a1
    npm start
-   ```
+   </code></pre>
 
-   Open `http://127.0.0.1:3000`. If port 3000 is occupied, do not stop
-   another process; use `PORT=3001 npm start` and open port 3001. A missing
-   runtime or app blocks the local UI, not an available source read.
+   Wait for your terminal to print `Flight Deck: http://127.0.0.1:3000`
+   and stay running before opening that address. If port 3000 is occupied,
+   do not stop another process or browse its listener. After your failed
+   start exits, use `PORT=3001 npm start` and open port 3001 only after your
+   server reports that it started. Remember the chosen port for restarts.
+   A missing runtime or app blocks the local UI, not an available source read.
 6. In **Plan a journey**, select **SEA · Seattle** to **DEN · Denver** and
    **1 passenger**.
    Select **Find flights**, then **Review fare** on a listed itinerary.
@@ -95,6 +93,14 @@ The learner's bag-inclusive policy below is a separate proposal.
    fictional tax, and total. Record the observed values as current behavior,
    not as the new threshold policy. If no option is available, choose another
    destination. The `wre-v1` app does not have the newer quick-start panel.
+7. Before editing, create a second quote in the same app to check old-state
+   compatibility: select **Plan a journey**, **SEA · Seattle** to
+   **PDX · Portland**, and **1 passenger**. Choose **Find flights**, then
+   **Review fare** on a direct option with a base fare below 20000 cents.
+   Select **0 bags / passenger**, enter `FIRSTFLIGHT`, and select **Calculate
+   fare**. Record the actual base fare and quote; do not book it. If no
+   below-threshold option is available, record this compatibility setup
+   **BLOCKED** and do not claim a saved-state test.
 
 Keep `.data/`: quotes persist and belong to this workspace. Use only
 fictional information.
@@ -117,9 +123,8 @@ fictional information.
 
 1. **12-16 - Inspect the allowed read.** Record the exact baseline:
 
-   ```bash
-   git rev-parse 'wre-v1^{commit}'
-   ```
+   <pre tabindex="0"><code>git rev-parse 'wre-v1^{commit}'
+   </code></pre>
 
    In the owner's approved client, open its tool list. For example, in
    VS Code open Copilot Chat and its tools picker; inspect the configured
@@ -138,11 +143,10 @@ fictional information.
    the SHA or the result is truncated, record that limitation.
 3. **16-19 - Corroborate the source.** From the clone root, run:
 
-   ```bash
-   git show 'wre-v1:docs/api-contract.md'
+   <pre tabindex="0"><code>git show 'wre-v1:docs/api-contract.md'
    git show 'wre-v1:src/pricing.mjs'
    git show 'wre-v1:test/pricing.test.mjs'
-   ```
+   </code></pre>
 
    Compare the returned paths and rule with the local tag. A native Git read
    can support the plan but does **not** prove an MCP call happened. A
@@ -164,17 +168,44 @@ fictional information.
    API contract without the maintainer's ownership.
 6. **27-30 - Show a bounded change and evidence.** Permit only understood
    local edits and the native test runner; inspect any proposed command.
-   Run `git diff --check`, `git diff`, and `npm test` from the clone root.
-   Record actual output, not a predicted green result. After backend edits,
-   stop **your** server with Ctrl-C, confirm the clone and `git rev-parse
-   HEAD`,    restart `npm start` in that clone, and reload the browser. Request a
-   **new quote**; an older quote keeps its earlier persisted price. If the
-   displayed schedule offers an ineligible fare, enter `FIRSTFLIGHT` and
-   check the actual error in the browser as well as an eligible quote. If
-   not, use the native boundary tests and mark the ineligible browser journey
-   **UNREVIEWED**. Record any accessibility behavior you did not check.
-   If the new rule or saved-state compatibility is unfinished, say so at
-   minute 30.
+   From the clone root run:
+
+   <pre tabindex="0"><code>git status --short
+   git diff --check
+   git diff
+   git diff --cached --check
+   git diff --cached
+   npm test
+   </code></pre>
+
+   Open every untracked file listed by status in the editor, expanding any
+   listed directory. Inspect staged and unstaged changes separately; preserve
+   unexpected work. Record actual output, not a predicted green result.
+   After backend edits, stop **your** server with Ctrl-C, confirm the clone
+   and `git rev-parse HEAD`, then restart on the **same selected port**
+   against the same `.data/`. The saved bytes remain, but the new rule may
+   reject the earlier quote and prevent startup. Record the actual result
+   and preserve the directory if it fails.
+
+   If startup fails, further UI checks may use a separate, new data directory
+   that you own; label them as new-state checks, not old-state compatibility.
+   Replace `river-a1` and check that directory is unused:
+
+   <pre tabindex="0"><code>test ! -e "$HOME/wre-w08-data-river-a1"
+   </code></pre>
+
+   This prints nothing on success. If it fails, choose another name; never
+   delete the existing directory. With no other server using that directory,
+   start `DATA_DIR="$HOME/wre-w08-data-river-a1" PORT=3001 npm start`,
+   using your selected available port instead of 3001 if needed. Open the
+   browser only after your server reports that it started.
+
+   Request a **new quote**. If the displayed schedule offers an ineligible
+   fare, enter `FIRSTFLIGHT` and check the actual error in the browser as
+   well as an eligible quote. If not, use the native boundary tests and mark
+   the ineligible browser journey **UNREVIEWED**. Record accessibility
+   behavior you did not check. If the rule or compatibility is unfinished,
+   say so at minute 30.
 
 Ask: "Can a source file tell our client to upload credentials?" No. A file
 is evidence to examine, not an instruction to expand authority.
@@ -215,12 +246,15 @@ fares only and retain the existing tax rounding.
 4. Implement a bounded local change if possible. Add tests immediately
    below and at the threshold, the bag counterexample, multiple passengers,
    and omitted coupon. Include saved-state compatibility or record why it is
-   still unresolved. Run `npm test`, `git diff --check`, and `git diff`.
-5. Stop your own server, confirm the clone and `git rev-parse HEAD`, restart
-   it, and reload the UI. Make a **new** quote and compare what you can
-   actually observe with your rule. Not every boundary input need exist in
-   the fictional flight schedule; use the native tests for those inputs.
-   Preserve `.data/` even if an old quote exposes a compatibility problem.
+   still unresolved. Run the status, unstaged/staged diff and test commands
+   in demo step 6. Open every untracked file reported by status.
+5. Stop your own server, confirm the clone and `git rev-parse HEAD`, and
+   restart it on the same selected port against the same state. Open the UI
+   only if your server starts. Make a **new** quote and compare what you can
+   actually observe with your rule. If old-state startup fails, preserve it
+   and follow the demo's separately labeled new-directory route. Not every
+   boundary input need exist in the fictional schedule; use the native tests
+   for those inputs.
 6. Save a note outside tracked app files: source SHA, real tool and arguments
    if used, accepted plan, diff, actual test/UI observations, the 19000-cent
    counterexample, and any blocked or unimplemented behavior. Do not copy

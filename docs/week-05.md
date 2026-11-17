@@ -28,11 +28,10 @@ move, recreate or silently replace `wre-v1`.
 
 If `gh` is installed, check its actual help before using it:
 
-```bash
-gh --version
+<pre tabindex="0"><code>gh --version
 gh release download --help
 gh attestation verify --help
-```
+</code></pre>
 
 If using an authenticated CLI, follow the conditional `gh auth status` check
 in [sessions](sessions.md#choose-the-setup-your-task-needs). Do not display
@@ -44,10 +43,9 @@ Create a new evidence directory outside a clone. Replace `YOUR-ID` with a
 unique, non-sensitive handle and attempt suffix using only letters, digits
 and hyphens, such as `river-a1`:
 
-```bash
-EVIDENCE_DIR="$HOME/wre-w05-evidence-YOUR-ID"
+<pre tabindex="0"><code>EVIDENCE_DIR="$HOME/wre-w05-evidence-YOUR-ID"
 mkdir "$EVIDENCE_DIR"
-```
+</code></pre>
 
 If `mkdir` reports that it exists or fails, stop and choose another new path;
 do not overwrite or delete someone else's files. Keep a plain-text note
@@ -63,15 +61,13 @@ blank or unavailable, stop before downloading.
 
 From a parent directory you own, use a separate unused name:
 
-```bash
-git clone https://github.com/msfttoler/wre-flight-deck.git wre-w05-YOUR-ID
-```
+<pre tabindex="0"><code>git clone https://github.com/msfttoler/wre-flight-deck.git wre-w05-YOUR-ID
+</code></pre>
 
 Only if the clone succeeds, enter the new directory:
 
-```bash
-cd wre-w05-YOUR-ID
-```
+<pre tabindex="0"><code>cd wre-w05-YOUR-ID
+</code></pre>
 
 If `cd` fails, stop before Git. Run `git remote -v`,
 `git status --short --branch` and `git rev-parse 'wre-v1^{commit}'`.
@@ -124,12 +120,11 @@ or execute a downloaded asset during this read-only exercise.
    evidence directory. Replace the two placeholder values with the observed
    tag and exact asset name:
 
-   ```bash
-   RELEASE_TAG='PASTE_OBSERVED_RELEASE_TAG'
+   <pre tabindex="0"><code>RELEASE_TAG='PASTE_OBSERVED_RELEASE_TAG'
    ASSET_NAME='PASTE_EXACT_ASSET_NAME'
    gh release download "$RELEASE_TAG" --repo msfttoler/wre-flight-deck --pattern "$ASSET_NAME" --dir "$EVIDENCE_DIR"
    ls -l "$EVIDENCE_DIR"
-   ```
+   </code></pre>
 
    `--pattern` is a glob, not an exact-name guarantee. Use it only when the
    observed name has no glob metacharacters and uniquely matches the selected
@@ -146,11 +141,10 @@ or execute a downloaded asset during this read-only exercise.
    file path instead of pasting it as shell syntax. For an ordinary name,
    set `ASSET_PATH` and inspect the digest:
 
-   ```bash
-   ASSET_PATH="$EVIDENCE_DIR/$ASSET_NAME"
+   <pre tabindex="0"><code>ASSET_PATH="$EVIDENCE_DIR/$ASSET_NAME"
    shasum -a 256 "$ASSET_PATH"
    gh attestation verify "$ASSET_PATH" --repo msfttoler/wre-flight-deck
-   ```
+   </code></pre>
 
    `shasum` is common on macOS; where available, Linux learners may use
    `sha256sum "$ASSET_PATH"` instead. If neither digest command is available,
@@ -169,8 +163,7 @@ or execute a downloaded asset during this read-only exercise.
    source ref, for example `refs/tags/v1.0.0` only if that is the approved
    ref. Do not paste a value containing a single quote into these assignments.
 
-   ```bash
-   SIGNER_WORKFLOW='msfttoler/wre-flight-deck/.github/workflows/release.yml'
+   <pre tabindex="0"><code>SIGNER_WORKFLOW='msfttoler/wre-flight-deck/.github/workflows/release.yml'
    SOURCE_SHA='PASTE_APPROVED_FULL_SOURCE_SHA'
    SOURCE_REF='PASTE_APPROVED_FULL_SOURCE_REF'
    gh attestation verify "$ASSET_PATH" \
@@ -179,14 +172,14 @@ or execute a downloaded asset during this read-only exercise.
      --source-digest "$SOURCE_SHA" \
      --source-ref "$SOURCE_REF" \
      --format json --jq '.[].verificationResult.statement.subject[] | {name,digest}'
-   ```
+   </code></pre>
 
    Check the actual command result and compare the verified subject digest
    with the separate SHA-256 reading. Record the exact restrictions and result.
    The signed statement's predicate can contain workflow-controlled metadata;
    do not treat it alone as independently trusted producer identity. Open the
-   owner's actual run URL, or use **Actions** > the observed release workflow
-   > the actual run > its job. Expand checkout, attestation and publication
+   owner's actual run URL, or select **Actions**, the observed release
+   workflow, the actual run, and its job. Expand checkout, attestation and publication
    steps if available; record their revision and conclusions. A current tag
    link is not proof that the tag never moved. An unavailable field or run is
    unknown, not passed.
@@ -202,8 +195,8 @@ or execute a downloaded asset during this read-only exercise.
    prefix. Confirm the selected file rather than assuming a release ran.
 
 **Ask:** "Does a statement for another file prove this download?" No; the
-subject digest must bind the exact bytes. Next, apply a stricter producer
-requirement to the actual evidence, not to an invented second artifact.
+subject digest must bind the exact bytes. Next, add an independently approved
+expected digest to the actual evidence, not an invented second artifact.
 
 ## 30-33: Live Quiz Sprint
 
@@ -224,17 +217,19 @@ work at minute 35 even if verification is blocked.
 ## 35-70: Independent practice
 
 Use the real asset from the demo, or a different actual asset if one is
-available. The changed condition is a stricter consumer requirement: accept
-only the owner's recorded workflow **and** approved source ref, in addition
-to matching the bytes. Do not invent an asset, edit a statement or generate
-provenance.
+available. The changed condition adds an **independently approved expected
+SHA-256** for the selected asset to the demo's workflow, source and ref policy.
+The expected digest must come from the owner through an approved independent
+channel, not from hashing the file you are deciding whether to accept. Do not
+invent an asset, edit a statement or generate provenance.
 
 1. **35-40:** Write the target repository and the owner's actual expected
-   workflow, source ref and source SHA. Record the observed release URL,
-   tag and asset name separately. If the policy is missing, mark that
-   acceptance condition **BLOCKED**, but still verify an available asset
-   without claiming policy acceptance. If the release itself is missing,
-   mark it **BLOCKED** and continue to step 5.
+   workflow, source ref, source SHA and independently approved asset SHA-256.
+   Record the observed release URL, tag and asset name separately. If a
+   required policy value is missing, mark that acceptance condition
+   **BLOCKED**, but still verify an available asset without claiming policy
+   acceptance. If the release is missing, mark it **BLOCKED** and continue
+   to step 5.
 2. **40-48:** In your own new evidence directory, download the selected
    asset using the demo's `gh release download` steps or the browser
    alternative. Inspect the directory and set `ASSET_PATH` to that exact
@@ -248,11 +243,13 @@ provenance.
    all the flags, apply the stricter command from demo step 4 with your
    actual approved values. Otherwise mark that policy check **BLOCKED**;
    never describe an unsupported or unrun restriction as enforced.
-4. **54-60:** Make one row each for **bytes/subject**, **signer or issuer**,
-   **repository**, **workflow**, **source SHA**, **source ref** and
-   **build/run link**. For each, cite the actual verified field or enforced
-   restriction and compare it with the owner's policy. Mark an observed
-   mismatch **FAIL** and absent evidence **BLOCKED**. Accept the artifact
+4. **54-60:** Make one row each for **bytes/subject**, **approved expected
+   digest**, **signer or issuer**, **repository**, **workflow**, **source
+   SHA**, **source ref** and **build/run link**. Compare the independent
+   expected digest with both the local SHA-256 and verified subject digest.
+   For every row, cite the actual source or enforced restriction and compare
+   it with the owner's policy. Mark an observed mismatch **FAIL** and absent
+   evidence **BLOCKED**. Accept the artifact
    for this stated policy only if every required condition is established.
    A successful repository-level verification is not, by itself, the
    stricter workflow/ref decision.

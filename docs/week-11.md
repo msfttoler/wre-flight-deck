@@ -21,21 +21,19 @@ recommendation, and a specific request for the facts an owner must supply.
 3. Create a fresh source clone. `river-a1` is an example; replace it in every
    command with your own non-sensitive, unused attempt name:
 
-   ```bash
-   cd ~
+   <pre tabindex="0"><code>cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w11-river-a1
-   ```
+   </code></pre>
 
    If cloning fails or the folder exists, stop and choose another name.
    After a successful clone:
 
-   ```bash
-   cd ~/wre-w11-river-a1
+   <pre tabindex="0"><code>cd ~/wre-w11-river-a1
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
    git rev-parse HEAD
-   ```
+   </code></pre>
 
    Confirm both remote URLs name `msfttoler/wre-flight-deck`. Do not share a
    URL containing credentials. The `##` line is a branch header; other
@@ -71,12 +69,11 @@ history or a dataset to upload for this exercise.
 
 1. **12-16 - Identify the source snapshot.** In your clone, run:
 
-   ```bash
-   git remote -v
+   <pre tabindex="0"><code>git remote -v
    git rev-parse HEAD
    git branch -a
    git tag --list
-   ```
+   </code></pre>
 
    Record the source repository, observed `HEAD`, visible branch/tag names,
    and observation time. A normal clone does not prove that every
@@ -84,10 +81,9 @@ history or a dataset to upload for this exercise.
    credential-bearing URLs into the inventory.
 2. **16-20 - Inventory tracked implementation.** From the clone root, run:
 
-   ```bash
-   git ls-files
+   <pre tabindex="0"><code>git ls-files
    git ls-files .github/workflows
-   ```
+   </code></pre>
 
    Open `package.json` and one path actually listed under
    `.github/workflows`. Record the actual runtime requirement, native test
@@ -146,9 +142,18 @@ Start independent work at minute 35 even if settings are unavailable.
    and name the redacted evidence an authorized owner could provide.
 4. Fill at least these inventory rows: tracked source/workflow; one hosted
    item or unavailable setting; destination requirement; and the local
-   `.data/` boundary. For each, fill the evidence, status, owner, acceptance
-   check, and rollback concern. Use **unknown** when the owner has not
-   supplied the destination fact.
+   `.data/` boundary. For the last row, open `.gitignore` and run these
+   commands from the clone root:
+
+   <pre tabindex="0"><code>git ls-files -- .data
+   git check-ignore -v .data/state.json
+   </code></pre>
+
+   Record the actual tracked-file listing and ignore rule separately. An
+   ignore rule alone does not prove that no matching file was already tracked.
+   For each row, fill the evidence, status, owner, acceptance check, and
+   rollback concern. Use **unknown** when the owner has not supplied the
+   destination fact.
 5. Recommend **ready**, **not ready**, or **unknown** only for your
    stated condition. Explain the observation that supports the recommendation
    and the next fact that could change it. A conditional recommendation is

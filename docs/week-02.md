@@ -25,26 +25,23 @@ Read [shared setup and evidence](sessions.md) and
 non-sensitive unique handle and attempt suffix using only letters, digits
 and hyphens, such as `river-a1`. From a parent directory you own, run:
 
-```bash
-git --version
+<pre tabindex="0"><code>git --version
 node --version
 npm --version
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-w02-YOUR-ID
-```
+</code></pre>
 
 Only if cloning succeeds, enter the new directory:
 
-```bash
-cd wre-w02-YOUR-ID
-```
+<pre tabindex="0"><code>cd wre-w02-YOUR-ID
+</code></pre>
 
 If `cd` fails, stop before Git. Otherwise check the target:
 
-```bash
-git remote -v
+<pre tabindex="0"><code>git remote -v
 git status --short --branch
 git rev-parse 'wre-v1^{commit}'
-```
+</code></pre>
 
 Compare both origin URLs with `msfttoler/wre-flight-deck` without exposing
 credentials. Compare the resolved tag commit with the owner's approved SHA.
@@ -53,9 +50,8 @@ not use `main` instead.
 
 Create a new local branch:
 
-```bash
-git switch -c learner/w02-YOUR-ID wre-v1
-```
+<pre tabindex="0"><code>git switch -c learner/w02-YOUR-ID wre-v1
+</code></pre>
 
 If it fails, choose an unused name and stop before editing. Only after it
 succeeds, run `git rev-parse HEAD` and confirm it equals the approved tag.
@@ -140,10 +136,9 @@ edit is then claimed.
    As an optional read, replace `PR_NUMBER` with the observed numeric PR
    number:
 
-   ```bash
-   gh pr view PR_NUMBER --repo msfttoler/wre-flight-deck --json url,headRefOid,baseRefName,statusCheckRollup,mergeStateStatus
+   <pre tabindex="0"><code>gh pr view PR_NUMBER --repo msfttoler/wre-flight-deck --json url,headRefOid,baseRefName,statusCheckRollup,mergeStateStatus
    gh pr checks PR_NUMBER --repo msfttoler/wre-flight-deck
-   ```
+   </code></pre>
 
    These commands do not run CI. A nonzero checks command can reflect a
    pending or failing check; read its actual state.
@@ -181,8 +176,8 @@ Keep the current `wre-v1` tag, pricing contract and behavior unchanged unless
 the owner separately approves a product change. A proposal is not an
 implemented feature.
 
-If the clone is blocked, use GitHub **Code** > branch/tag selector > **Tags**
-> `wre-v1`. At the repository root, open the displayed commit and compare its
+If the clone is blocked, use GitHub **Code** > branch/tag selector > **Tags**,
+then select `wre-v1`. At the repository root, open the displayed commit and compare its
 full URL SHA with the owner's approved baseline before reading the three
 files in step 1. If the SHA is missing or mismatched, the approved-source
 read is **BLOCKED**. With the verified browser source, complete the proposal
