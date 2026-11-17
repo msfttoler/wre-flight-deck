@@ -55,6 +55,10 @@ When a guide calls for a local edit, run its clone and branch commands from a
 parent directory you own. Replace `YOUR-ID` with a non-sensitive unique handle
 and attempt suffix, for example `river-a1`. Choose a new directory and branch
 for every attempt. These names select workspaces; they do not provision access.
+Use a bash-compatible terminal; on Windows, Git Bash is one option. Run the
+commands in the stated order, and stop if a prerequisite fails. Git may open
+long output in a pager; press `q` to return to the prompt. Shell variables set
+in one terminal are not automatically available in another.
 
 `git switch -c ... wre-v1` creates a learner branch from the same intended tag,
 not from another learner's work. Record `git rev-parse HEAD` and

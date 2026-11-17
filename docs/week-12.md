@@ -2,136 +2,308 @@
 
 The airline's release engineer needs a defensible decision for one candidate,
 not a collection of unrelated green badges. Assemble source, behavior, checks,
-security and provenance evidence around one immutable candidate and record
-release/hold/unknown with explicit limits. WRE has no exam or production approval.
+security, and provenance evidence around one immutable candidate. Record
+**release**, **hold**, or **unknown** as a recommendation, not an actual
+deployment or production approval.
 
-## Preparation and independent entry
+**By the end:** make a one-page, evidence-bound decision and identify who
+owns each unresolved condition. WRE has no exam or required earlier lab.
 
-Read [shared setup and evidence rules](sessions.md). No earlier lab or completed
-workspace is required. The owner supplies the published baseline and, if
-available, an actual candidate SHA, PR/run links, security analysis and release
-artifact/provenance. No candidate or hosted result is assumed.
-Learners need local write and existing read-only GitHub access; publishing,
-merging, dispatching and another person's approval are not prerequisites.
+## Before class: prepare a candidate and evidence
 
-```bash
-git clone https://github.com/msfttoler/wre-flight-deck.git wre-w12-YOUR-ID
-cd wre-w12-YOUR-ID
-git switch -c learner/w12-YOUR-ID wre-v1
-git rev-parse HEAD
-npm test
-npm start
-```
+1. Read [shared setup and evidence rules](sessions.md). The owner supplies
+   the approved `wre-v1` source SHA and, if available, one actual candidate
+   SHA, its PR/run links, relevant security analysis, and its release
+   artifact and approved producer. No hosted candidate, check, alert, or
+   attestation is assumed.
+2. The local portion needs Git, Node.js 24 or later, a browser, and a
+   bash-compatible terminal such as Git Bash on Windows. Artifact
+   verification also needs an already available GitHub CLI and authorized
+   read access; check `gh --version` without displaying a token. If either is
+   unavailable, that verification is **BLOCKED**. Learners do not publish,
+   merge, dispatch workflows, change settings, or need another person's
+   approval.
+3. Make a fresh clone. `river-a1` is an example; replace it in every command
+   with your own non-sensitive, unused attempt name:
 
-Use Node 24+ and your unique `YOUR-ID`. Missing tag/runtime blocks app entry.
-Inspect a route, quote and fictional reservation in the UI. Do not treat
-persistent local state as release evidence from another instance.
+   ```bash
+   cd ~
+   git clone https://github.com/msfttoler/wre-flight-deck.git wre-w12-river-a1
+   ```
 
-## Six-part 85-minute route
+   If cloning fails or the folder exists, stop and choose another name.
+   After a successful clone:
 
-| Minutes | Part | Facilitation |
-|---|---|---|
-| 00-05 | Opening | Reframe as a release decision assembled from familiar engineering moves |
-| 05-10 | Flash Rewind | Choose relevant beats/traps below; no prior attendance assumed |
-| 10-14 | Manual Live Quiz Sprint | Paper, fingers or chat; discuss evidence, not speed |
-| 14-35 | Engineering Strategy Clinic | Read, Rule Out, Return; model the candidate evidence review |
-| 35-70 | Independent Capstone Lab | Individual decision under a changed release condition |
-| 70-85 | Close | 70-83 self-check/debrief; 83-85 customer transfer and recognition of the work |
+   ```bash
+   cd ~/wre-w12-river-a1
+   git remote -v
+   git status --short --branch
+   git rev-parse 'wre-v1^{commit}'
+   ```
 
-This keeps 35 minutes of individual practice and 13 minutes of self-check/
-facilitator debrief. Optional certification scheduling is a separate invitation,
-not a WRE exam claim or condition of completion.
+   Confirm both remote URLs name `msfttoler/wre-flight-deck`, the worktree
+   is clean, and the tag SHA matches the owner's approved SHA. The `##`
+   line is a branch header; other status lines indicate changes. Do not
+   share a remote URL containing credentials. If the tag is absent or
+   mismatched, baseline entry is **BLOCKED**; do not substitute `main`.
+4. Select the clean baseline without creating a shared branch:
 
-## Flash Rewind: one beat and trap per week
+   ```bash
+   git switch --detach wre-v1
+   ```
 
-- 01: preserve recoverable work; local reflog is not remote backup.
-- 02: inspect actual required checks; a green test is not a merge rule.
-- 03: identify actor and target; authentication is not authorization.
-- 04: trace event and checkout; a different SHA may be a valid test merge.
-- 05: bind bytes and producer; a signature alone is not trust policy.
-- 06: require actual analysis; no displayed alert is not proof of no risk.
-- 07: own request and review; model agreement is not correctness.
-- 08: verify source and tool scope; retrieved text is not authority.
-- 09: correlate real delivery and receiver; local journal is not webhook proof.
-- 10: compare a recorded baseline; not all differences are bad drift.
-- 11: inventory hosted dependencies; clone is not complete migration.
-- 12: bind evidence to a candidate; several unrelated green runs do not add up.
+   If switching fails, stop. Only after it succeeds:
 
-For the manual quiz, ask: Can a previous candidate's test run approve this one?
-Can missing provenance be called passed? Does a read-only recommendation publish
-a release? Facilitator key: no to all. Written answers are equally valid.
+   ```bash
+   git rev-parse HEAD
+   ```
 
-## Mental model and facilitator clinic
+   Stop if `HEAD` differs from the approved SHA. Otherwise run:
 
-A release candidate is an exact revision and, when built, exact artifact bytes.
-Evidence is relevant only within its source, environment and trust boundaries.
-At 14-35, use **Read, Rule Out, Return**: read acceptance conditions, rule out
-unrelated evidence, return to the first unresolved release decision.
+   ```bash
+   npm test
+   ```
 
-1. Open the owner's actual candidate in GitHub, if supplied. Record full
-   candidate/base SHAs and inspect the diff. If absent, use your `wre-v1` SHA as
-   a clearly labeled local assessment candidate, not an actual hosted release.
-2. Read the actual test/check evidence and run `npm test` locally on your
-   baseline. A candidate at another SHA needs its own checkout/test evidence;
-   baseline success is not candidate success. Stop your own server with Ctrl-C
-   **before switching to the candidate**. Use an additional fresh local
-   branch at the observed candidate only if the code is available and within
-   your authorized target. Confirm the intended clone and record
-   `git rev-parse HEAD` after checkout, then run `npm test` for that candidate.
-3. Start `npm start` from the candidate checkout and reload the browser before
-   recording UI evidence. Backend edits do not reload automatically; after any
-   API edit, repeat the owned-server stop, clone/SHA confirmation and restart.
-   Inspect route -> **new quote** -> reservation. Existing quotes retain their
-   earlier persisted prices; keep `.data/` intact. Observe fictional price
-   arithmetic and displayed state. Explain which behavior tests cover versus
-   what was manually inspected, bound to the recorded candidate SHA.
-4. Inspect actual current merge requirements, analysis revision and release
-   artifact/provenance if available. Use GitHub's PR Checks, Security and Release
-   views; select real objects, never placeholder numbers. Missing evidence is
-   blocked, not an implied pass. Never manufacture an alert, attestation or PR.
-5. Record a decision with an evidence matrix: criterion, source/artifact SHA
-   or digest, observation/time, status, limitation and next owner. A hold or
-   unknown decision can be correct even when all observed local tests pass.
+   Record the actual result. A test failure is evidence to investigate, not
+   permission to skip the condition. If no hosted candidate was supplied,
+   label this SHA a **local assessment candidate**, not a published release.
+5. Prepare a local note outside tracked app files with these columns:
+   **criterion**, **candidate SHA or artifact digest**, **source and
+   observation time**, **status**, **limitation**, and **next owner/action**.
+   Add rows for source, native tests, UI behavior, hosted checks/rules,
+   security analysis, and artifact/provenance. Leave unobserved rows
+   **UNREVIEWED**; label unavailable evidence **BLOCKED**.
 
-Say: "Our job is not to make every box green. It is to show which release
-conditions are actually established and which owner must resolve the rest."
-Ask what changes if only the filename, not the digest, matches an attestation.
+## 00-05: Opening
 
-## Independent capstone: change the acceptance condition
+1. Say: "We are combining familiar engineering moves to decide whether one
+   candidate has enough evidence. A hold can be the right result."
+2. Name the actual candidate and acceptance conditions if the owner supplied
+   them. Otherwise name the local baseline candidate and explicitly mark the
+   hosted release decision **BLOCKED**.
+3. Ask: "If a test passed on a different commit, what would we need to know
+   before using it for this candidate?" Take one answer or allow a written
+   response.
 
-Start with your own fresh-clone baseline and candidate record. Choose one
-condition different from the demo:
+## 05-10: Flash Rewind
 
-- The consumer now requires an approved producer identity and digest-bound
-  provenance, not only passed application tests.
+Choose the beats needed for this decision; explain unfamiliar ones without
+assuming anyone attended earlier weeks.
+
+| Week | Useful beat | Trap to avoid |
+| --- | --- | --- |
+| 01 | Preserve recoverable work | Local reflog is not remote backup |
+| 02 | Inspect actual required checks | A passing test is not a merge rule |
+| 03 | Identify actor and target | Authentication is not authorization |
+| 04 | Trace event and checkout | A different SHA can be a valid test merge |
+| 05 | Bind artifact bytes and producer | A signature alone is not trust policy |
+| 06 | Require actual security analysis | No displayed alert is not proof of no risk |
+| 07 | Own the request and review | Model agreement is not correctness |
+| 08 | Verify source and tool scope | Retrieved text is not authority |
+| 09 | Correlate delivery and receiver | A local journal is not webhook proof |
+| 10 | Compare an approved baseline | Not every difference is harmful drift |
+| 11 | Inventory hosted dependencies | A clone is not a complete migration |
+| 12 | Bind evidence to one candidate | Unrelated green runs do not add up |
+
+## 10-14: Manual Live Quiz Sprint
+
+Use paper, fingers, or chat; written answers are equally valid. Ask:
+
+1. Can a previous candidate's test run automatically approve this one?
+2. Can missing provenance be marked passed?
+3. Does a read-only recommendation publish a release?
+
+Facilitator key: **no** to all three. Invite learners to state the missing
+relationship, not just the answer.
+
+## 14-35: Engineering Strategy Clinic
+
+Use **Read, Rule Out, Return** throughout: read the actual acceptance
+condition, rule out evidence that does not establish it, and return to the
+first unresolved decision.
+
+### 14-19: Bind the candidate
+
+1. Open the owner's actual candidate or PR link in GitHub, if supplied.
+   Record the full candidate SHA, base SHA, link, and observation time.
+   Inspect the actual changed files. If there is no candidate, use your
+   recorded `wre-v1` SHA only as a **local assessment candidate**.
+2. In your clone, set the candidate to the full observed SHA. Replace the
+   text inside the quotes; it is a placeholder, not a commit:
+
+   ```bash
+   CANDIDATE_SHA='PASTE_OBSERVED_FULL_SHA'
+   git rev-parse --verify "${CANDIDATE_SHA}^{commit}"
+   ```
+
+   If Git cannot resolve it locally, mark the local candidate test
+   **BLOCKED** and ask for an authorized accessible ref. Do not treat the
+   baseline test as a pass for a different candidate.
+
+### 19-25: Check local behavior at that SHA
+
+1. If your server is running, stop **your** server with Ctrl-C before
+   switching revisions. From the clone root, run `git status --short
+   --branch`. The `##` line is only a header; if other lines show work,
+   stop and preserve it rather than switching or resetting.
+2. After confirming the candidate commit exists and the worktree is clean:
+
+   ```bash
+   git switch --detach "$CANDIDATE_SHA"
+   ```
+
+   If the switch fails, stop. Only after it succeeds:
+
+   ```bash
+   git rev-parse HEAD
+   ```
+
+   Confirm the full SHA equals the candidate. Then run `npm test` and record
+   the actual result against that SHA. If it differs, do not claim a
+   candidate test.
+3. For an independent UI observation, choose an unused data directory for
+   this candidate. In a second terminal, replace `river-a1` with your own
+   attempt name:
+
+   ```bash
+   cd ~/wre-w12-river-a1
+   test ! -e "$HOME/wre-w12-data-river-a1"
+   ```
+
+   The `test` command prints nothing on success. If it fails, choose a new
+   unused data-directory name; do not delete the existing directory. Then:
+
+   ```bash
+   DATA_DIR="$HOME/wre-w12-data-river-a1" npm start
+   ```
+
+   If port 3000 is occupied, do not stop another process. After your failed
+   start has exited, use the same owned data directory with
+   `DATA_DIR="$HOME/wre-w12-data-river-a1" PORT=3001 npm start` and open
+   port 3001. Never point two running servers at the same data directory.
+4. Open `http://127.0.0.1:3000` or your chosen port. Select **SEA · Seattle**
+   to **DEN · Denver**, **1 passenger**, and **Find flights**. Choose **Review fare**,
+   then **Calculate fare**. Enter a unique fictional team callsign, choose
+   **Confirm fictional booking**, and open **View reservations**. Record
+   what the UI actually showed at the candidate SHA. If no flight appears,
+   try another destination. Never enter real passenger or payment details.
+   A UI observation is not a substitute for tests or hosted checks.
+
+After any backend edit, stop your own server, confirm the clone and SHA,
+restart it, and reload the browser. For pricing changes request a **new
+quote**; existing quotes keep their earlier prices. Preserve all data
+directories and never treat another instance's state as candidate evidence.
+
+### 25-32: Inspect hosted checks, security, and artifact
+
+1. Open the actual candidate's PR, if supplied. Select **Checks** and record
+   each relevant real check's name, status, conclusion, run link, and
+   revision. Inspect the event and checkout when possible: a PR test merge
+   may legitimately differ from the PR head. Missing logs or requirements
+   remain **BLOCKED** or **UNREVIEWED**, not passed.
+2. Open the available **Security** view or owner-supplied analysis record.
+   Record the analysis revision and visible result. If it is inaccessible
+   or absent, mark it **BLOCKED**. An empty alert list is not proof of no
+   vulnerabilities.
+3. If an actual release asset, candidate SHA, and independently approved
+   signer are available, open the owner's release link. Under **Assets**,
+   download the exact file selected by the owner and note its absolute
+   local path. Do not select an automatically generated source archive
+   unless that is the asset the owner intends to verify.
+4. The following example is valid **only if** the owner approved
+   `msfttoler/wre-flight-deck/.github/workflows/release.yml` as the signer.
+   In the terminal where `CANDIDATE_SHA` is set, replace the text inside the
+   quotes with the downloaded file's actual absolute path:
+
+   ```bash
+   ASSET='/ABSOLUTE/PATH/TO/DOWNLOADED/ASSET'
+   test -f "$ASSET"
+   ```
+
+   The test prints nothing on success. If it fails, stop and correct the
+   path. Run `gh attestation verify --help` and confirm that
+   `--signer-workflow` and `--source-digest` are available. If either is
+   absent, mark this verification **BLOCKED** rather than dropping a check.
+   Otherwise run:
+
+   ```bash
+   gh attestation verify "$ASSET" \
+     --repo msfttoler/wre-flight-deck \
+     --signer-workflow msfttoler/wre-flight-deck/.github/workflows/release.yml \
+     --source-digest "$CANDIDATE_SHA" \
+     --format json --jq '.[].verificationResult.statement.subject[] | {name,digest}'
+   ```
+
+   Record the actual result and verified subject digest. Success binds the
+   file to the specified source and signer checks; it does not itself
+   approve a deployment. If the file, attestation, signer approval, or
+   necessary access is missing, mark provenance **BLOCKED**. A matching
+   filename or a signature from an unapproved producer is not sufficient.
+
+### 32-35: Make the handoff
+
+1. Fill the evidence matrix with the actual observations and blocked cells.
+   For each row, say what it proves and what it does not.
+2. Say: "A passing local test cannot fill an unavailable provenance cell."
+   Ask which owner can resolve the first missing condition.
+3. At minute 35, start individual work even if hosted checks are pending.
+
+## 35-70: Independent Capstone Lab
+
+Work from your own fresh clone and one candidate record, not another week's
+solution. Choose **one** changed acceptance condition:
+
+- The consumer requires an approved producer and digest-bound provenance,
+  not only passing application tests.
 - A proposed pricing or booking-filter feature changes the acceptance rule;
-  the existing suite must be assessed for that new behavior before acceptance.
-- The candidate depends on a workflow/permission difference from a recorded
-  approved baseline, and its operational impact must be resolved.
+  determine whether existing tests cover the new behavior.
+- A workflow or permission differs from an approved baseline; its operational
+  impact must be resolved.
 
-Inspect real evidence, rule out one plausible but insufficient claim and make
-a release/hold/unknown recommendation. For a feature request, you may prepare
-a precise local change/test proposal; it is not implemented evidence unless
-you actually implement and test it. Do not stack another week's solution.
+1. Write the chosen condition and the full candidate SHA. If there is no
+   hosted candidate, label `wre-v1` as a local assessment candidate and
+   keep hosted release evidence **BLOCKED**.
+2. Identify the source or file relevant to your condition. Open it at the
+   candidate revision. Record the path and one concrete observation; do not
+   assume a proposed feature was implemented.
+3. Record the actual candidate-bound `npm test` result and any UI
+   observation you performed using the clinic steps. If a candidate cannot
+   be checked out, leave those cells **BLOCKED** instead of transferring the
+   baseline's result.
+4. Inspect the relevant real hosted check, analysis, workflow comparison,
+   or artifact if accessible. Record its link, revision or digest, result,
+   and limitation. If the needed evidence is absent, name the exact owner
+   and redacted record required.
+5. Rule out one plausible but insufficient claim. Examples: a previous run
+   tested a different commit; the same filename has different bytes; a
+   workflow file exists but has no observed run; or a feature is only a plan.
+6. Make a **release**, **hold**, or **unknown** recommendation for the
+   stated condition. Explain the evidence that supports it, the unresolved
+   risk, and the next responsible owner/action. Do not publish, change
+   policy, or dispatch a workflow to force a result.
+7. Save a one-page local decision outside tracked app files: candidate SHA,
+   condition, matrix, real test/UI observations, links or blocked cells,
+   counterexample, decision, and owner action. A proposal is not implemented
+   evidence unless you actually made and tested the change.
 
-Deliver a one-page local decision with candidate identity, scoped behavior,
-actual test/UI observations, hosted links or blocked cells, counterexample,
-remaining risk and next owner action. If no hosted candidate/data exists,
-mark those conditions **BLOCKED** and give a read-only/local assessment only.
-This is not a released candidate, completed deployment or final authorization.
+## 70-85: Close
 
-## Failure, recovery and debrief
+**70-75 - Self-check:** Verify every claimed pass is bound to the candidate
+or actual artifact and was performed. For mismatched SHAs, inspect the event,
+merge parents, and actual checkout before rejecting or accepting the
+relationship.
 
-- Evidence references another SHA: inspect event/merge parents and artifact
-  source before rejecting it; retain a mismatch if the relationship is absent.
-- Local runtime fails: preserve logs without secrets, identify the first cause
-  and record incomplete behavior verification. Do not delete state blindly.
-- Release evidence is missing: hold that acceptance condition and name its
-  owner. Do not dispatch a workflow or weaken acceptance for class completion.
+**75-81 - Facilitator debrief:** Ask which evidence changed a decision and
+which cell remains uncertain. If the runtime failed, retain the first
+useful error without secrets and mark behavior verification incomplete.
+If provenance is missing, hold that condition and name its owner; do not
+weaken the criterion.
 
-During 70-83, spend five minutes checking your matrix, six discussing which
-evidence changed decisions and two saving the final recommendation. No peer
-approval or automated score substitutes for your reasoning.
-At 83-85, name how the same record would help a customer distinguish authored
-quality from hosted validation. Recognize the completed investigation without
-claiming mastery. Classroom rehearsal and independent reviews are **UNREVIEWED**.
+**81-83 - Record:** Save the recommendation and the exact next owner/action.
+No automated score or peer approval substitutes for the learner's reasoning.
+
+**83-85 - Transfer and recognition:** Explain how the same record would help
+a customer distinguish authored quality from hosted validation. Recognize
+the completed investigation without claiming mastery or a release. Stop
+only your own server with Ctrl-C. Optional certification scheduling is
+separate from WRE; classroom rehearsal remains **UNREVIEWED**.

@@ -62,6 +62,9 @@ and CodeQL analysis succeeded:
 
 ## Independent source clarity review
 
+This section records the November 13 review. The later weekly-guide rewrites
+changed those files, so the earlier review does not certify their current text.
+
 All twelve weekly Markdown entry points and the contributing guide were
 reviewed. One substantive lifecycle omission was fixed: stop/restart the
 server after backend changes, bind candidate checks to the actual SHA, and
