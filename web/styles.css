@@ -122,7 +122,7 @@ main { padding: 36px 36px 0; min-width: 0; outline: none; }
 .first-run-steps strong { color: var(--cp-text); }
 .first-run-guide code { font-size: .9em; }
 .first-run-disclosure { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--cp-border); }
-.first-run-disclosure>summary, .first-run-extra summary { width: fit-content; min-height: 44px; display: flex; align-items: center; padding: 8px 0; font-size: 1rem; font-weight: 650; }
+.first-run-disclosure>summary, .first-run-extra summary { width: fit-content; min-height: 44px; display: list-item; padding: 10px 0; font-size: 1rem; font-weight: 650; }
 .first-run-note { margin: 8px 0 0; color: var(--cp-text-muted); font-size: 1rem; line-height: 1.5; }
 .first-run-extra { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--cp-border); }
 .first-run-extra ol { margin: 4px 0 0; }

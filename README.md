@@ -63,6 +63,10 @@ Every week starts from the same **`wre-v1` source baseline** with a clean clone
 and its own branch when editing is needed. No week imports another learner's
 work. Local application state is separate from Git history.
 
+The on-screen quick-start guide is on `main`. The approved `wre-v1` tag is an
+earlier baseline and does not include that guide; use the numbered steps above
+when running the app from `wre-v1`.
+
 | Week | Your engineering task |
 | --- | --- |
 | [01](docs/week-01.md) | Recover a useful change without rewriting shared history |
