@@ -21,19 +21,21 @@ recommendation, and a specific request for the facts an owner must supply.
 3. Create a fresh source clone. `river-a1` is an example; replace it in every
    command with your own non-sensitive, unused attempt name:
 
-   <pre tabindex="0"><code>cd ~
+   ```bash
+   cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w11-river-a1
-   </code></pre>
+   ```
 
    If cloning fails or the folder exists, stop and choose another name.
    After a successful clone:
 
-   <pre tabindex="0"><code>cd ~/wre-w11-river-a1
+   ```bash
+   cd ~/wre-w11-river-a1
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
    git rev-parse HEAD
-   </code></pre>
+   ```
 
    Confirm both remote URLs name `msfttoler/wre-flight-deck`. Do not share a
    URL containing credentials. The `##` line is a branch header; other
@@ -69,11 +71,12 @@ history or a dataset to upload for this exercise.
 
 1. **12-16 - Identify the source snapshot.** In your clone, run:
 
-   <pre tabindex="0"><code>git remote -v
+   ```bash
+   git remote -v
    git rev-parse HEAD
    git branch -a
    git tag --list
-   </code></pre>
+   ```
 
    Record the source repository, observed `HEAD`, visible branch/tag names,
    and observation time. A normal clone does not prove that every
@@ -81,9 +84,10 @@ history or a dataset to upload for this exercise.
    credential-bearing URLs into the inventory.
 2. **16-20 - Inventory tracked implementation.** From the clone root, run:
 
-   <pre tabindex="0"><code>git ls-files
+   ```bash
+   git ls-files
    git ls-files .github/workflows
-   </code></pre>
+   ```
 
    Open `package.json` and one path actually listed under
    `.github/workflows`. Record the actual runtime requirement, native test
@@ -145,9 +149,10 @@ Start independent work at minute 35 even if settings are unavailable.
    `.data/` boundary. For the last row, open `.gitignore` and run these
    commands from the clone root:
 
-   <pre tabindex="0"><code>git ls-files -- .data
+   ```bash
+   git ls-files -- .data
    git check-ignore -v .data/state.json
-   </code></pre>
+   ```
 
    Record the actual tracked-file listing and ignore rule separately. An
    ignore rule alone does not prove that no matching file was already tracked.

@@ -62,7 +62,10 @@ for every attempt. These names select workspaces; they do not provision access.
 Use a bash-compatible terminal; on Windows, Git Bash is one option. Run the
 commands in the stated order, and stop if a prerequisite fails. Git may open
 long output in a pager; press `q` to return to the prompt. Shell variables set
-in one terminal are not automatically available in another.
+in one terminal are not automatically available in another. On a narrow
+screen, GitHub may horizontally scroll a command block. Use its **Copy code
+to clipboard** button and paste into a plain-text editor with line wrapping
+to read the entire command before substituting placeholders or running it.
 
 `git switch -c ... wre-v1` creates a learner branch from the same intended tag,
 not from another learner's work. Record `git rev-parse HEAD` and
@@ -74,12 +77,14 @@ replacement tag. A published tag is not permission to move it.
 
 When the week's application task requires it, run `npm test` from the clone
 root for the real native Node test suite. Start `npm start` in a separate
-terminal only when the task needs the app, and visit `http://127.0.0.1:3000`.
-Stop your own server with Ctrl-C. Expected behavior is not recorded execution.
+terminal only when the task needs the app. Wait for your own server's
+startup message before visiting its reported local address; do not browse
+an unknown listener if the port is occupied. Stop your own server with
+Ctrl-C. Expected behavior is not recorded execution.
 `npm start` does not reload backend edits. Before browser checks after API
 changes, stop your own server with Ctrl-C, confirm the intended clone and record
 `git rev-parse HEAD`, then restart on the same selected port from that clone.
-Open the browser only after your server reports that it started. Stop the
+Reload the browser only after your server reports that it started. Stop the
 server before switching revisions and start it from the intended checkout.
 For pricing changes, request a **new quote**. Saved quote bytes retain their
 recorded prices, but a changed rule can cause the app to reject old state

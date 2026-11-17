@@ -28,27 +28,30 @@ administrator role, hosted write, or peer approval is needed.
    Node.js 24 or later. The commands use a bash-compatible terminal; on
    Windows, use Git Bash. These checks do not install anything:
 
-   <pre tabindex="0"><code>git --version
+   ```bash
+   git --version
    node --version
    npm --version
-   </code></pre>
+   ```
 
 3. Use a new folder under your home directory. `river-a1` is an example,
    not your required identity. Replace it in every command with your own
    non-sensitive, unused attempt name:
 
-   <pre tabindex="0"><code>cd ~
+   ```bash
+   cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w07-river-a1
-   </code></pre>
+   ```
 
    If cloning fails or the folder already exists, stop; use a different
    unused folder rather than overwriting work. Only after cloning succeeds:
 
-   <pre tabindex="0"><code>cd ~/wre-w07-river-a1
+   ```bash
+   cd ~/wre-w07-river-a1
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
-   </code></pre>
+   ```
 
    Confirm both remote URLs name `msfttoler/wre-flight-deck`, the worktree has
    no changes, and the tag SHA matches the owner's approved SHA. The `##`
@@ -58,26 +61,30 @@ administrator role, hosted write, or peer approval is needed.
 4. Create your own branch from that tag. If the branch name already exists,
    choose another unused name; do not reset it.
 
-   <pre tabindex="0"><code>git switch -c learner/w07-river-a1 wre-v1
-   </code></pre>
+   ```bash
+   git switch -c learner/w07-river-a1 wre-v1
+   ```
 
    If it succeeds, check the selected commit:
 
-   <pre tabindex="0"><code>git rev-parse HEAD
-   </code></pre>
+   ```bash
+   git rev-parse HEAD
+   ```
 
    Stop if `HEAD` differs from the approved tag SHA. Only then run:
 
-   <pre tabindex="0"><code>npm test
-   </code></pre>
+   ```bash
+   npm test
+   ```
 
    Record the actual baseline test result; investigate a failure before
    claiming a later change passed.
 5. In a **second terminal**, again replacing `river-a1` with your own name:
 
-   <pre tabindex="0"><code>cd ~/wre-w07-river-a1
+   ```bash
+   cd ~/wre-w07-river-a1
    npm start
-   </code></pre>
+   ```
 
    Wait for your terminal to print `Flight Deck: http://127.0.0.1:3000`
    and stay running before opening that address. If the port is occupied,
@@ -104,11 +111,12 @@ Keep the clone's `.data/` directory: it contains this workspace's local state.
 
 ## 00-12: Open and explain the task
 
-1. **00-05 - Open the problem.** Show Issue 1. Say: "Support needs a shorter
-   list. We will decide what the filter means, then check the change rather
-   than accepting an assistant's assurance." Ask: "Does hiding a booking
-   prevent someone from reading it?" The answer is no: a filter is not
-   authorization.
+1. **00-05 - Open the problem.** Show Issue 1. If it is unavailable, mark
+   the issue read **BLOCKED** and use the status-filter description above as
+   a local proposal. Say: "Support needs a shorter list. We will decide what
+   the filter means, then check the change rather than accepting an
+   assistant's assurance." Ask: "Does hiding a booking prevent someone from
+   reading it?" The answer is no: a filter is not authorization.
 2. **05-12 - Set the mental model.** Point to the local **Reservations**
    view. Explain that the browser requests data from `GET /api/bookings`;
    a server-side filter and a browser-only hiding rule are different changes.
@@ -126,9 +134,10 @@ untouched.
 
 1. **12-16 - Find the real implementation.** From the clone root, run:
 
-   <pre tabindex="0"><code>git grep -n -e 'api/bookings' -e 'bookings()' -- src web test
+   ```bash
+   git grep -n -e 'api/bookings' -e 'bookings()' -- src web test
    git grep -n -e 'confirmed' -e 'cancelled' -- src test
-   </code></pre>
+   ```
 
    Open the matching files. Locate the HTTP route in `src/server.mjs`, the
    booking list in `src/service.mjs`, the UI in `web/app.js`, and the actual
@@ -172,13 +181,14 @@ untouched.
 4. **25-30 - Inspect and test what actually happened.** Read the proposed
    changes, then run:
 
-   <pre tabindex="0"><code>git status --short
+   ```bash
+   git status --short
    git diff --check
    git diff
    git diff --cached --check
    git diff --cached
    npm test
-   </code></pre>
+   ```
 
    Open every untracked file listed by `git status --short` in the editor;
    expand any listed untracked directory. Inspect staged and unstaged changes
@@ -193,14 +203,19 @@ untouched.
    `npm start` there using the same port selected in preparation, and reload
    the browser only after your server reports that it started. In
    **Reservations**, apply and clear the new control; compare visible rows
-   and the empty state with the API response. After implementation, you can open
+   with the API response. To exercise the empty state, clear the filter,
+   cancel your remaining confirmed fictional booking, and apply the
+   **confirmed** filter again. Compare the UI and API response; record an
+   empty result or any unexpected rows. If cancellation or the filter is
+   unavailable, mark that check
+   **BLOCKED**. After implementation, you can open
    `http://127.0.0.1:3000/api/bookings?status=confirmed` in a browser to
    inspect that response; use your selected port if it is not 3000. Also open
    `http://127.0.0.1:3000/api/bookings?status=unknown` using that port and
-   record the actual structured error; do not call it observed before the
-   change exists. Check
-   that the existing booking and cancellation journey still works with a
-   fictional callsign. A generated label or successful result is not
+   predict a structured error, then record the actual response even if it is
+   unexpectedly successful. Check that the existing booking and
+   cancellation journey still works with a fictional callsign. A generated
+   label or successful result is not
    guaranteed. If time or a dependency prevents a check, record the missing
    evidence rather than claiming success. Never delete `.data/` to make the
    check pass.
@@ -240,8 +255,9 @@ team callsign, while keeping the unfiltered list unchanged."
 2. Find the route, list method, UI, and current tests using the two
    `git grep` commands above. Record the actual source revision:
 
-   <pre tabindex="0"><code>git rev-parse HEAD
-   </code></pre>
+   ```bash
+   git rev-parse HEAD
+   ```
 
 3. If an authorized Copilot surface is available, open Chat and select
    **Ask**. Enter the prompt below, replacing its four example decisions

@@ -23,9 +23,10 @@ different actor. A local app control is not GitHub authorization.
 Read [shared setup and evidence](sessions.md). In a terminal, if `gh` is
 available, run:
 
-<pre tabindex="0"><code>gh --version
+```bash
+gh --version
 gh auth status --help
-</code></pre>
+```
 
 Only if help lists **both** `--active` and `--no-refresh`, run
 `gh auth status --active --no-refresh --hostname github.com` privately.
@@ -33,8 +34,9 @@ Otherwise skip it and record CLI status as unknown. Do not display tokens or
 use a token-display option. If already authorized, this read identifies the
 CLI actor; run it privately, not on a shared screen:
 
-<pre tabindex="0"><code>gh api user --jq '.login'
-</code></pre>
+```bash
+gh api user --jq '.login'
+```
 
 If it fails, do not log in as someone else or broaden a credential. Record the
 actual error without secrets; use the public browser route and mark the CLI
@@ -47,28 +49,32 @@ actual result and limitation.
 From a parent you own, replace `YOUR-ID` with a non-sensitive unique handle
 and attempt suffix using only letters, digits and hyphens, such as `river-a1`:
 
-<pre tabindex="0"><code>git clone https://github.com/msfttoler/wre-flight-deck.git wre-w03-YOUR-ID
-</code></pre>
+```bash
+git clone https://github.com/msfttoler/wre-flight-deck.git wre-w03-YOUR-ID
+```
 
 Only if that succeeds, enter the new directory:
 
-<pre tabindex="0"><code>cd wre-w03-YOUR-ID
-</code></pre>
+```bash
+cd wre-w03-YOUR-ID
+```
 
 If `cd` fails, stop before Git. Otherwise check the target and tag:
 
-<pre tabindex="0"><code>git remote -v
+```bash
+git remote -v
 git status --short --branch
 git rev-parse 'wre-v1^{commit}'
-</code></pre>
+```
 
 Compare both origin URLs with `msfttoler/wre-flight-deck` without exposing
 credentials and the tag commit with the owner's approved SHA. A different
 target, dirty clone, missing tag or mismatch is **BLOCKED**. For optional
 read-only local source inspection, select the tag:
 
-<pre tabindex="0"><code>git switch --detach wre-v1
-</code></pre>
+```bash
+git switch --detach wre-v1
+```
 
 If the switch succeeds, run `git rev-parse HEAD` and confirm the approved
 SHA. If it fails, stop; do not discard work. Only a separately authorized
@@ -112,18 +118,20 @@ is local-only and unauthenticated, not a model of GitHub access.
    that comparison as **BLOCKED**, not as evidence of denial.
 3. If `gh` is authorized, run this read for the exact target:
 
-   <pre tabindex="0"><code>gh repo view msfttoler/wre-flight-deck --json nameWithOwner,isPrivate,viewerPermission
-   </code></pre>
+   ```bash
+   gh repo view msfttoler/wre-flight-deck --json nameWithOwner,isPrivate,viewerPermission
+   ```
 
    Note the actual visible permission value, or unknown if it is absent.
    A repository role is context, not proof that a particular token, branch
    rule or action will permit a push.
 4. Compare two readable resources **within the same repository**:
 
-   <pre tabindex="0"><code>PRACTICE_REPO='msfttoler/wre-flight-deck'
+   ```bash
+   PRACTICE_REPO='msfttoler/wre-flight-deck'
    gh api "repos/$PRACTICE_REPO/contents" --jq type
    gh api "repos/$PRACTICE_REPO/issues" --jq type
-   </code></pre>
+   ```
 
    `PRACTICE_REPO` is the explicit repository target; the commands read the
    root contents and issues endpoints and print only the response type.

@@ -25,23 +25,26 @@ Read [shared setup and evidence](sessions.md) and
 non-sensitive unique handle and attempt suffix using only letters, digits
 and hyphens, such as `river-a1`. From a parent directory you own, run:
 
-<pre tabindex="0"><code>git --version
+```bash
+git --version
 node --version
 npm --version
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-w02-YOUR-ID
-</code></pre>
+```
 
 Only if cloning succeeds, enter the new directory:
 
-<pre tabindex="0"><code>cd wre-w02-YOUR-ID
-</code></pre>
+```bash
+cd wre-w02-YOUR-ID
+```
 
 If `cd` fails, stop before Git. Otherwise check the target:
 
-<pre tabindex="0"><code>git remote -v
+```bash
+git remote -v
 git status --short --branch
 git rev-parse 'wre-v1^{commit}'
-</code></pre>
+```
 
 Compare both origin URLs with `msfttoler/wre-flight-deck` without exposing
 credentials. Compare the resolved tag commit with the owner's approved SHA.
@@ -50,15 +53,17 @@ not use `main` instead.
 
 Create a new local branch:
 
-<pre tabindex="0"><code>git switch -c learner/w02-YOUR-ID wre-v1
-</code></pre>
+```bash
+git switch -c learner/w02-YOUR-ID wre-v1
+```
 
 If it fails, choose an unused name and stop before editing. Only after it
 succeeds, run `git rev-parse HEAD` and confirm it equals the approved tag.
 Run `npm test` from the clone root and record the actual baseline result.
 
-To see the product, run `npm start` from that root and open
-`http://127.0.0.1:3000`. Under **Plan a journey**, choose actual **From** and
+To see the product, run `npm start` from that root. Wait for your terminal
+to print `Flight Deck: http://127.0.0.1:3000` and stay running before opening
+that address. Under **Plan a journey**, choose actual **From** and
 **To** airports and a passenger count, then **Find flights**. Select
 **Review fare** for an available itinerary, choose **1 bag / passenger**
 under **Checked bags**, and select **Calculate fare**. Read the base fare,
@@ -70,7 +75,8 @@ with Ctrl-C when finished.
 If no route is available, mark the quote comparison **BLOCKED** and use the
 source and tests for the boundary investigation. If the port is already in
 use, do not browse the unknown service or stop another person's process.
-When no process is using this clone's `.data`, try `PORT=3001 npm start`;
+After your failed start exits, if no process is using this clone's `.data`,
+try `PORT=3001 npm start`;
 open `http://127.0.0.1:3001` only if that start succeeds. Use another unused
 port if needed, one process per state directory, and never delete state.
 
@@ -136,9 +142,10 @@ edit is then claimed.
    As an optional read, replace `PR_NUMBER` with the observed numeric PR
    number:
 
-   <pre tabindex="0"><code>gh pr view PR_NUMBER --repo msfttoler/wre-flight-deck --json url,headRefOid,baseRefName,statusCheckRollup,mergeStateStatus
+   ```bash
+   gh pr view PR_NUMBER --repo msfttoler/wre-flight-deck --json url,headRefOid,baseRefName,statusCheckRollup,mergeStateStatus
    gh pr checks PR_NUMBER --repo msfttoler/wre-flight-deck
-   </code></pre>
+   ```
 
    These commands do not run CI. A nonzero checks command can reflect a
    pending or failing check; read its actual state.

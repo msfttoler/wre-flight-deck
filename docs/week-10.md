@@ -24,19 +24,21 @@ predicted impact.
 3. Make an independent clone. `river-a1` is an example; replace it in every
    command with your own non-sensitive, unused attempt name:
 
-   <pre tabindex="0"><code>cd ~
+   ```bash
+   cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w10-river-a1
-   </code></pre>
+   ```
 
    If cloning fails or the folder exists, stop and choose another name.
    After a successful clone:
 
-   <pre tabindex="0"><code>cd ~/wre-w10-river-a1
+   ```bash
+   cd ~/wre-w10-river-a1
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
    git rev-parse 'origin/main^{commit}'
-   </code></pre>
+   ```
 
    Confirm both remote URLs name `msfttoler/wre-flight-deck`. Do not share
    a URL containing credentials. The `##` status line is a branch header;
@@ -45,10 +47,10 @@ predicted impact.
    the owner's approved workflow baseline. If the `wre-v1` tag is missing
    but `origin/main` resolves, continue with the current-only inventory and
    request an approved baseline.
-4. Ask the owner which actual SHA and invariant to use. If no approved
-   baseline is supplied, mark **BLOCKED: baseline approval**. You can still
-   inventory the current workflow and request the missing decision; do not
-   claim that drift has been assessed.
+4. Ask the owner which actual SHA and invariant to use. If either the
+   approved baseline or invariant is missing, mark that approval
+   **BLOCKED**. You can still inventory the current workflow and request the
+   missing decision; do not claim that drift has been assessed.
 
 Optional product context: the [Flight Deck quick start](../README.md#get-airborne)
 shows the booking flow the tests support. Running the local app is not
@@ -69,25 +71,28 @@ evidence that a hosted workflow or branch rule executed.
 
 ## 12-30: Facilitator demonstration
 
-**If the approved baseline is missing:** In the same terminal, replace the
-placeholder with the full observed current SHA recorded during preparation:
+**If the approved baseline or invariant is missing:** In the same terminal,
+replace the placeholder with the full observed current SHA recorded during
+preparation:
 
-<pre tabindex="0"><code>CURRENT_SHA='PASTE_OBSERVED_FULL_SHA'
+```bash
+CURRENT_SHA='PASTE_OBSERVED_FULL_SHA'
 git rev-parse --verify "${CURRENT_SHA}^{commit}"
 git ls-tree -r --name-only "$CURRENT_SHA" -- .github/workflows
-</code></pre>
+```
 
 If the SHA does not resolve, stop and request an accessible immutable ref.
 If the listing contains `.github/workflows/ci.yml`, open that actual current
 file with:
 
-<pre tabindex="0"><code>git show "${CURRENT_SHA}:.github/workflows/ci.yml"
-</code></pre>
+```bash
+git show "${CURRENT_SHA}:.github/workflows/ci.yml"
+```
 
 Record its trigger, checkout and test command. If the file is absent, open
 another listed workflow or mark the source read **BLOCKED**. This inventory
 does not establish drift. Skip demo steps 1-3 and continue at step 4; keep
-**baseline approval BLOCKED**.
+the missing approval **BLOCKED**.
 
 1. **12-16 - Bind the two revisions.** In your clone, use the full SHA
    approved by the owner as the baseline and the full SHA of the actual
@@ -95,25 +100,28 @@ does not establish drift. Skip demo steps 1-3 and continue at step 4; keep
    the text between quotes with those observed SHAs; do not type placeholders
    as if they were commits.
 
-   <pre tabindex="0"><code>BASELINE_SHA='PASTE_APPROVED_FULL_SHA'
+   ```bash
+   BASELINE_SHA='PASTE_APPROVED_FULL_SHA'
    CURRENT_SHA='PASTE_OBSERVED_FULL_SHA'
-   </code></pre>
+   ```
 
    Confirm each commit exists locally:
 
-   <pre tabindex="0"><code>git rev-parse --verify "${BASELINE_SHA}^{commit}"
+   ```bash
+   git rev-parse --verify "${BASELINE_SHA}^{commit}"
    git rev-parse --verify "${CURRENT_SHA}^{commit}"
-   </code></pre>
+   ```
 
    Each command should print a full commit SHA. If either fails, stop the
    local comparison and ask for an accessible ref or use the owner's
    authorized immutable GitHub view. Do not substitute another branch.
 2. **16-20 - Find the real files and diff.** Run:
 
-   <pre tabindex="0"><code>git ls-tree -r --name-only "$BASELINE_SHA" -- .github/workflows
+   ```bash
+   git ls-tree -r --name-only "$BASELINE_SHA" -- .github/workflows
    git ls-tree -r --name-only "$CURRENT_SHA" -- .github/workflows
    git diff "$BASELINE_SHA" "$CURRENT_SHA" -- .github/workflows
-   </code></pre>
+   ```
 
    Read the path list before naming a file. If no workflow is present at a
    required revision, mark that comparison **BLOCKED** and ask the owner
@@ -123,9 +131,10 @@ does not establish drift. Skip demo steps 1-3 and continue at step 4; keep
    commit. For example, if both path lists include
    `.github/workflows/ci.yml`, run:
 
-   <pre tabindex="0"><code>git show "${BASELINE_SHA}:.github/workflows/ci.yml"
+   ```bash
+   git show "${BASELINE_SHA}:.github/workflows/ci.yml"
    git show "${CURRENT_SHA}:.github/workflows/ci.yml"
-   </code></pre>
+   ```
 
    Check the actual trigger/filter, checkout, runtime, test command,
    permissions, and job/check names as relevant to the owner's invariant.
@@ -146,7 +155,8 @@ does not establish drift. Skip demo steps 1-3 and continue at step 4; keep
    rule evidence can establish the current required check.
 
 If GitHub Actions access or logs are unavailable, mark execution evidence
-**BLOCKED** and continue with the local source comparison.
+**BLOCKED** and continue with the available source comparison or the
+current-only inventory.
 
 ## 30-35: Retrieval and handoff
 
@@ -158,9 +168,12 @@ If GitHub Actions access or logs are unavailable, mark execution evidence
 
 Facilitator key: **no** to all three.
 
-**33-35 - Read, Rule Out, Return.** Read the agreed invariant; rule out an
-unapproved baseline; return to the exact file difference and its consequence.
-Start independent work at minute 35 even if hosted evidence is unavailable.
+**33-35 - Read, Rule Out, Return.** If the invariant and baseline are
+approved, read the invariant, rule out an unapproved baseline, and return
+to the observed difference and its consequence. Otherwise read the proposed
+condition, summarize the current inventory, request the missing approval,
+and say no comparison was performed. Start independent work at minute 35 even
+if hosted evidence is unavailable.
 
 ## 35-70: Independent practice - assess another invariant
 
@@ -185,22 +198,24 @@ Start independent work at minute 35 even if hosted evidence is unavailable.
 5. Decide **accepted**, **requires owner decision**, or **unknown** for
    each observation. Name the downstream check, rule, event, or producer
    that could be affected, and separate a predicted consequence from an
-   observed result.
-6. If there is no real source difference, report that scoped result.
+   observed result. A proposed invariant remains **BLOCKED** for approval;
+   do not accept it as an owner-approved requirement.
+6. If you compared the revisions and found no source difference, report that
+   scoped result.
    Describe one clearly labeled *proposed* change, such as narrowing a
    trigger, and explain what its owner would need to check. Do not edit or
    push a workflow merely to manufacture drift.
-7. Save the two SHAs, file-specific observations, actual run link or blocked
-   cell, decision, and one precise owner question. If the approved baseline
-   is missing, submit a current-source inventory and evidence request as
-   partial work, not a drift verdict.
+7. Save the available SHAs, file-specific observations, actual run link or
+   blocked cell, decision, and one precise owner question. If the approved
+   baseline is missing, submit a current-source inventory and evidence
+   request as partial work, not a drift verdict.
 
 ## 70-85: Self-check, recovery, and close
 
 **70-75:** Check that every supplied SHA resolves to the intended commit and
-every claim identifies its file or run. If the approved baseline is missing,
-keep the comparison **BLOCKED**. An empty diff does not establish that a job
-ran or that settings are unchanged.
+every claim identifies its file or run. If the approved baseline or invariant
+is missing, keep the relevant approval **BLOCKED**. An empty diff does not
+establish that a job ran or that settings are unchanged.
 
 **75-81:** Discuss one observed or proposed difference. If a repair would
 restore an older runtime or pin, check current requirements before

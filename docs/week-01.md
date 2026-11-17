@@ -25,23 +25,26 @@ hyphens, such as `river-a1`; use it in both directory and branch names.
 In a terminal, from a parent directory you own, check the tools and create
 a fresh clone:
 
-<pre tabindex="0"><code>git --version
+```bash
+git --version
 node --version
 npm --version
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-w01-YOUR-ID
-</code></pre>
+```
 
 Only if the clone succeeds, enter it:
 
-<pre tabindex="0"><code>cd wre-w01-YOUR-ID
-</code></pre>
+```bash
+cd wre-w01-YOUR-ID
+```
 
 If `cd` fails, stop before running Git. Otherwise inspect the clone:
 
-<pre tabindex="0"><code>git remote -v
+```bash
+git remote -v
 git status --short --branch
 git rev-parse 'wre-v1^{commit}'
-</code></pre>
+```
 
 Compare the origin fetch and push URLs with `msfttoler/wre-flight-deck`,
 without sharing credentials. Compare the resolved tag commit with the owner's
@@ -49,8 +52,9 @@ approved SHA. A different target, dirty clone, missing tag or mismatch is
 **BLOCKED**; do not substitute `main`. Create an unused branch only after
 those checks:
 
-<pre tabindex="0"><code>git switch -c learner/w01-YOUR-ID wre-v1
-</code></pre>
+```bash
+git switch -c learner/w01-YOUR-ID wre-v1
+```
 
 If branch creation fails, stop and choose another unused name; do not edit an
 existing branch. Only after success, run `git rev-parse HEAD` and confirm it
@@ -62,8 +66,9 @@ in the shared evidence.
 
 From the clone root, run `npm test` and record the actual result. A failing
 baseline can still support Git recovery, but it is not a passing test.
-For the product context, run `npm start`, open `http://127.0.0.1:3000`,
-and select **Plan a journey**. Choose actual **From** and **To** airports and
+For the product context, run `npm start`. Wait for your terminal to print
+`Flight Deck: http://127.0.0.1:3000` and stay running before opening that
+address. Select **Plan a journey**. Choose actual **From** and **To** airports and
 **Passengers**, then **Find flights**. On an available itinerary, select
 **Review fare**, choose **Checked bags**, and select **Calculate fare**.
 Read the quote; do not enter real passenger data. Stop your own server with
@@ -74,7 +79,8 @@ itineraries, try another displayed route; if none works, mark the preview
 **BLOCKED** without inventing flight data.
 
 If the port is already in use, do not browse the unknown service or stop
-someone else's process. If no process is using this clone's `.data`, try
+someone else's process. After your failed start exits, if no process is using
+this clone's `.data`, try
 `PORT=3001 npm start` and open `http://127.0.0.1:3001` only if that start
 succeeds. Choose another unused port if needed; never run two servers against
 the same state directory or delete state to make room.
@@ -118,8 +124,9 @@ workspace. The following commands run from that clone's root.
 2. Run `git add docs/architecture.md`, then
    `git diff --cached -- docs/architecture.md`. Commit only that observation:
 
-   <pre tabindex="0"><code>git commit -m "Document quote observation"
-   </code></pre>
+   ```bash
+   git commit -m "Document quote observation"
+   ```
 
    If Git refuses the commit, keep the edit and resolve the author/signing
    requirement through the owner; do not disable a required signing policy.
@@ -129,31 +136,35 @@ workspace. The following commands run from that clone's root.
 3. Stop the local app if it is running. Create a different local branch from
    the approved tag:
 
-   <pre tabindex="0"><code>git switch -c recovery/w01-YOUR-ID wre-v1
-   </code></pre>
+   ```bash
+   git switch -c recovery/w01-YOUR-ID wre-v1
+   ```
 
    If the switch fails, stop before cherry-picking. After success, confirm
    `git branch --show-current` names your recovery branch, then run:
 
-   <pre tabindex="0"><code>git log --oneline --all -8
+   ```bash
+   git log --oneline --all -8
    git reflog -8
-   </code></pre>
+   ```
 
    The commit is absent from the recovery branch, but is still reachable from
    the original branch. The reflog is this clone's record and can expire.
 4. Replace `COMMIT_SHA` with the full SHA actually recorded in step 2:
 
-   <pre tabindex="0"><code>git cherry-pick COMMIT_SHA
-   </code></pre>
+   ```bash
+   git cherry-pick COMMIT_SHA
+   ```
 
    If cherry-pick stops or fails, use the failure guidance below before
    continuing. Only after it succeeds, run:
 
-   <pre tabindex="0"><code>git rev-parse HEAD
+   ```bash
+   git rev-parse HEAD
    git show --stat --oneline HEAD
    git diff wre-v1..HEAD -- docs/architecture.md
    npm test
-   </code></pre>
+   ```
 
    Read the actual diff and test result. Cherry-pick applies the commit's
    change to the selected branch; its resulting SHA may differ because parent
@@ -200,17 +211,19 @@ changed condition is a second, uncommitted edit. Do not push.
    Note why this second change is not contained in `COMMIT_SHA`.
 4. **50-55:** Preserve just that tracked edit, then identify the actual stash:
 
-   <pre tabindex="0"><code>git stash push -m "w01 unrelated observation" -- README.md
-   </code></pre>
+   ```bash
+   git stash push -m "w01 unrelated observation" -- README.md
+   ```
 
    If that fails, stop and preserve the edit. After success, run
    `git stash list` and find the entry with that message. Replace `N` in
    the next command with its observed number, keeping the quotes, and check
    its contents:
 
-   <pre tabindex="0"><code>git stash show -p 'stash@{N}'
+   ```bash
+   git stash show -p 'stash@{N}'
    git status --short
-   </code></pre>
+   ```
 
    If there is no matching entry or its patch does not contain your README
    edit, stop before switching. This path-limited stash does not save
@@ -230,15 +243,17 @@ changed condition is a second, uncommitted edit. Do not push.
    establish a merge. Run `git stash list` again and identify the same saved
    edit; its number can change. Apply it without dropping its backup:
 
-   <pre tabindex="0"><code>git stash apply 'stash@{N}'
-   </code></pre>
+   ```bash
+   git stash apply 'stash@{N}'
+   ```
 
    Replace `N` with the entry's current observed number. If apply reports a
    conflict, use the failure guidance before claiming success. Otherwise run:
 
-   <pre tabindex="0"><code>git status --short
+   ```bash
+   git status --short
    git diff -- README.md
-   </code></pre>
+   ```
 
    Verify the README edit is present and the recovered commit still contains
    only the intended change.

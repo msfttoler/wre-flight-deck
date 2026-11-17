@@ -14,8 +14,9 @@ owns each unresolved condition. WRE has no exam or required earlier lab.
 1. Read [shared setup and evidence rules](sessions.md). The owner supplies
    the approved `wre-v1` source SHA and, if available, one actual candidate
    SHA, its PR/run links, relevant security analysis, and its release
-   artifact and approved producer. No hosted candidate, check, alert, or
-   attestation is assumed.
+   artifact and approved producer. If available, provide the independently
+   approved asset SHA-256 through an approved independent channel for
+   practice. No hosted candidate, check, alert, or attestation is assumed.
 2. The local portion needs Git, Node.js 24 or later, a browser, and a
    bash-compatible terminal such as Git Bash on Windows. Artifact
    verification also needs an already available GitHub CLI and authorized
@@ -26,18 +27,20 @@ owns each unresolved condition. WRE has no exam or required earlier lab.
 3. Make a fresh clone. `river-a1` is an example; replace it in every command
    with your own non-sensitive, unused attempt name:
 
-   <pre tabindex="0"><code>cd ~
+   ```bash
+   cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w12-river-a1
-   </code></pre>
+   ```
 
    If cloning fails or the folder exists, stop and choose another name.
    After a successful clone:
 
-   <pre tabindex="0"><code>cd ~/wre-w12-river-a1
+   ```bash
+   cd ~/wre-w12-river-a1
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
-   </code></pre>
+   ```
 
    Confirm both remote URLs name `msfttoler/wre-flight-deck`, the worktree
    is clean, and the tag SHA matches the owner's approved SHA. The `##`
@@ -46,18 +49,21 @@ owns each unresolved condition. WRE has no exam or required earlier lab.
    mismatched, baseline entry is **BLOCKED**; do not substitute `main`.
 4. Select the clean baseline without creating a shared branch:
 
-   <pre tabindex="0"><code>git switch --detach wre-v1
-   </code></pre>
+   ```bash
+   git switch --detach wre-v1
+   ```
 
    If switching fails, stop. Only after it succeeds:
 
-   <pre tabindex="0"><code>git rev-parse HEAD
-   </code></pre>
+   ```bash
+   git rev-parse HEAD
+   ```
 
    Stop if `HEAD` differs from the approved SHA. Otherwise run:
 
-   <pre tabindex="0"><code>npm test
-   </code></pre>
+   ```bash
+   npm test
+   ```
 
    Record the actual result. A test failure is evidence to investigate, not
    permission to skip the condition. If no hosted candidate was supplied,
@@ -126,9 +132,10 @@ first unresolved decision.
 2. In your clone, set the candidate to the full observed SHA. Replace the
    text inside the quotes; it is a placeholder, not a commit:
 
-   <pre tabindex="0"><code>CANDIDATE_SHA='PASTE_OBSERVED_FULL_SHA'
+   ```bash
+   CANDIDATE_SHA='PASTE_OBSERVED_FULL_SHA'
    git rev-parse --verify "${CANDIDATE_SHA}^{commit}"
-   </code></pre>
+   ```
 
    If Git cannot resolve it locally, mark the local candidate test
    **BLOCKED** and ask for an authorized accessible ref. Do not treat the
@@ -142,13 +149,15 @@ first unresolved decision.
    stop and preserve it rather than switching or resetting.
 2. After confirming the candidate commit exists and the worktree is clean:
 
-   <pre tabindex="0"><code>git switch --detach "$CANDIDATE_SHA"
-   </code></pre>
+   ```bash
+   git switch --detach "$CANDIDATE_SHA"
+   ```
 
    If the switch fails, stop. Only after it succeeds:
 
-   <pre tabindex="0"><code>git rev-parse HEAD
-   </code></pre>
+   ```bash
+   git rev-parse HEAD
+   ```
 
    Confirm the full SHA equals the candidate. Then run `npm test` and record
    the actual result against that SHA. If it differs, do not claim a
@@ -157,15 +166,17 @@ first unresolved decision.
    this candidate. In a second terminal, replace `river-a1` with your own
    attempt name:
 
-   <pre tabindex="0"><code>cd ~/wre-w12-river-a1
+   ```bash
+   cd ~/wre-w12-river-a1
    test ! -e "$HOME/wre-w12-data-river-a1"
-   </code></pre>
+   ```
 
    The `test` command prints nothing on success. If it fails, choose a new
    unused data-directory name; do not delete the existing directory. Then:
 
-   <pre tabindex="0"><code>DATA_DIR="$HOME/wre-w12-data-river-a1" npm start
-   </code></pre>
+   ```bash
+   DATA_DIR="$HOME/wre-w12-data-river-a1" npm start
+   ```
 
    Wait for your terminal to print `Flight Deck: http://127.0.0.1:3000`
    and stay running before opening that address. If port 3000 is occupied,
@@ -186,7 +197,7 @@ After any backend edit, stop your own server and run `git status --short`
 and `git rev-parse HEAD` from the clone root. A changed or untracked file means
 the working tree is not the unchanged candidate, even if `HEAD` is the same.
 Either test a clean candidate or label the result **candidate plus local
-changes**, with the changed files. Restart on the same selected port and open
+changes**, with the changed files. Restart on the same selected port and reload
 the browser only after your server starts. For pricing changes request a
 **new quote**. Saved quote bytes retain their prices, but a new rule can cause
 startup to reject old state. Preserve the data directory; use a new, unused
@@ -212,24 +223,37 @@ instance's state as candidate evidence.
 4. The following example is valid **only if** the owner approved
    `msfttoler/wre-flight-deck/.github/workflows/release.yml` as the signer.
    In the terminal where `CANDIDATE_SHA` is set, replace the text inside the
-   quotes with the downloaded file's actual absolute path:
+   quotes with the downloaded file's actual absolute path if it contains no
+   single quote:
 
-   <pre tabindex="0"><code>ASSET='/ABSOLUTE/PATH/TO/DOWNLOADED/ASSET'
+   ```bash
+   ASSET='/ABSOLUTE/PATH/TO/DOWNLOADED/ASSET'
    test -f "$ASSET"
-   </code></pre>
+   ```
 
-   The test prints nothing on success. If it fails, stop and correct the
-   path. Run `gh attestation verify --help` and confirm that `--repo`,
+   If the path contains a single quote, instead type `ASSET=` without
+   pressing Enter, begin the absolute path and use the shell's Tab filename
+   completion to escape it. Inspect the completed path, then press Enter and
+   run `test -f "$ASSET"`. The test prints nothing on success; if it fails,
+   stop and correct the path.
+
+   Read the file's SHA-256 with `shasum -a 256 "$ASSET"`, or use
+   `sha256sum "$ASSET"` if `shasum` is unavailable. If the command fails or
+   neither exists, mark the separate digest read **BLOCKED**. Record the
+   actual digest for the later independent comparison.
+
+   Run `gh attestation verify --help` and confirm that `--repo`,
    `--signer-workflow`, `--source-digest`, `--format`, and `--jq` are
    available. If a needed option is absent, mark verification **BLOCKED**
    rather than dropping a check. Otherwise run:
 
-   <pre tabindex="0"><code>gh attestation verify "$ASSET" \
+   ```bash
+   gh attestation verify "$ASSET" \
      --repo msfttoler/wre-flight-deck \
      --signer-workflow msfttoler/wre-flight-deck/.github/workflows/release.yml \
      --source-digest "$CANDIDATE_SHA" \
      --format json --jq '.[].verificationResult.statement.subject[] | {name,digest}'
-   </code></pre>
+   ```
 
    Record the actual result and verified subject digest. Success binds the
    file to the specified source and signer checks; it does not itself
@@ -242,13 +266,14 @@ instance's state as candidate evidence.
    approved. Do not paste a value containing a single quote into the
    assignment. Then run:
 
-   <pre tabindex="0"><code>SOURCE_REF='PASTE_APPROVED_FULL_SOURCE_REF'
+   ```bash
+   SOURCE_REF='PASTE_APPROVED_FULL_SOURCE_REF'
    gh attestation verify "$ASSET" \
      --repo msfttoler/wre-flight-deck \
      --signer-workflow msfttoler/wre-flight-deck/.github/workflows/release.yml \
      --source-digest "$CANDIDATE_SHA" --source-ref "$SOURCE_REF" \
      --format json --jq '.[].verificationResult.statement.subject[] | {name,digest}'
-   </code></pre>
+   ```
 
    If the ref or option is missing, mark that policy condition **BLOCKED**.
    Do not claim the earlier command enforced a ref.
@@ -311,9 +336,10 @@ or actual artifact and was performed. For mismatched SHAs, inspect the event
 and actual checkout. If the observed checkout commit is available in your
 clone, replace the placeholder with its full SHA and inspect its parents:
 
-<pre tabindex="0"><code>CHECKOUT_SHA='PASTE_OBSERVED_FULL_CHECKOUT_SHA'
+```bash
+CHECKOUT_SHA='PASTE_OBSERVED_FULL_CHECKOUT_SHA'
 git show -s --format='%H %P' "$CHECKOUT_SHA"
-</code></pre>
+```
 
 If it is unavailable, mark the parent relationship **BLOCKED** rather than
 guessing whether a test merge is valid.

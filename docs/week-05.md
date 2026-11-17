@@ -10,8 +10,10 @@ valid signature alone are not production approval.
 - **Owner and facilitator:** Confirm the approved `wre-v1` learning baseline.
   If they exist, supply an actual release URL, exact asset name, source SHA,
   build-run URL and expected producer policy, including the approved workflow
-  and source ref. Supply existing read/download access. Do not create a
-  release, attestation or policy merely for class.
+  and source ref. If available, provide the independently approved asset
+  SHA-256 through an approved independent channel for practice. Supply
+  existing read/download access. Do not create a release, attestation or
+  policy merely for class.
 - **Learner, required for actual verification:** A browser, an empty directory
   you own outside any clone, network/read access to the actual release and
   attestation, and a `gh` version supporting release download and attestation
@@ -28,10 +30,11 @@ move, recreate or silently replace `wre-v1`.
 
 If `gh` is installed, check its actual help before using it:
 
-<pre tabindex="0"><code>gh --version
+```bash
+gh --version
 gh release download --help
 gh attestation verify --help
-</code></pre>
+```
 
 If using an authenticated CLI, follow the conditional `gh auth status` check
 in [sessions](sessions.md#choose-the-setup-your-task-needs). Do not display
@@ -43,9 +46,10 @@ Create a new evidence directory outside a clone. Replace `YOUR-ID` with a
 unique, non-sensitive handle and attempt suffix using only letters, digits
 and hyphens, such as `river-a1`:
 
-<pre tabindex="0"><code>EVIDENCE_DIR="$HOME/wre-w05-evidence-YOUR-ID"
+```bash
+EVIDENCE_DIR="$HOME/wre-w05-evidence-YOUR-ID"
 mkdir "$EVIDENCE_DIR"
-</code></pre>
+```
 
 If `mkdir` reports that it exists or fails, stop and choose another new path;
 do not overwrite or delete someone else's files. Keep a plain-text note
@@ -61,13 +65,15 @@ blank or unavailable, stop before downloading.
 
 From a parent directory you own, use a separate unused name:
 
-<pre tabindex="0"><code>git clone https://github.com/msfttoler/wre-flight-deck.git wre-w05-YOUR-ID
-</code></pre>
+```bash
+git clone https://github.com/msfttoler/wre-flight-deck.git wre-w05-YOUR-ID
+```
 
 Only if the clone succeeds, enter the new directory:
 
-<pre tabindex="0"><code>cd wre-w05-YOUR-ID
-</code></pre>
+```bash
+cd wre-w05-YOUR-ID
+```
 
 If `cd` fails, stop before Git. Run `git remote -v`,
 `git status --short --branch` and `git rev-parse 'wre-v1^{commit}'`.
@@ -76,13 +82,15 @@ Compare both origin URLs with
 with the owner's approved SHA. A different target, dirty clone, missing tag
 or mismatch blocks this optional path. In the clean clone, run
 `git switch --detach wre-v1`; if successful, confirm `git rev-parse HEAD`
-equals the approved SHA. From that root, run `npm start` and open
-`http://127.0.0.1:3000`. Under **Plan a journey**, choose actual airports
+equals the approved SHA. From that root, run `npm start`. Wait for your
+terminal to print `Flight Deck: http://127.0.0.1:3000` and stay running
+before opening that address. Under **Plan a journey**, choose actual airports
 and passengers, select **Find flights**, **Review fare** and **Calculate
 fare**. Stop your own server with Ctrl-C. Do not enter real passenger data.
 If the app cannot start or no route is available, mark only this optional
-preview **BLOCKED**. For a port conflict, do not stop another process: if no
-server is using this clone's `.data`, try `PORT=3001 npm start` and open
+preview **BLOCKED**. For a port conflict, do not browse the unknown service
+or stop another process. After your failed start exits, if no server is using
+this clone's `.data`, try `PORT=3001 npm start` and open
 `http://127.0.0.1:3001` only after a successful start. Never run two servers
 against the same state directory.
 
@@ -120,11 +128,12 @@ or execute a downloaded asset during this read-only exercise.
    evidence directory. Replace the two placeholder values with the observed
    tag and exact asset name:
 
-   <pre tabindex="0"><code>RELEASE_TAG='PASTE_OBSERVED_RELEASE_TAG'
+   ```bash
+   RELEASE_TAG='PASTE_OBSERVED_RELEASE_TAG'
    ASSET_NAME='PASTE_EXACT_ASSET_NAME'
    gh release download "$RELEASE_TAG" --repo msfttoler/wre-flight-deck --pattern "$ASSET_NAME" --dir "$EVIDENCE_DIR"
    ls -l "$EVIDENCE_DIR"
-   </code></pre>
+   ```
 
    `--pattern` is a glob, not an exact-name guarantee. Use it only when the
    observed name has no glob metacharacters and uniquely matches the selected
@@ -141,10 +150,11 @@ or execute a downloaded asset during this read-only exercise.
    file path instead of pasting it as shell syntax. For an ordinary name,
    set `ASSET_PATH` and inspect the digest:
 
-   <pre tabindex="0"><code>ASSET_PATH="$EVIDENCE_DIR/$ASSET_NAME"
+   ```bash
+   ASSET_PATH="$EVIDENCE_DIR/$ASSET_NAME"
    shasum -a 256 "$ASSET_PATH"
    gh attestation verify "$ASSET_PATH" --repo msfttoler/wre-flight-deck
-   </code></pre>
+   ```
 
    `shasum` is common on macOS; where available, Linux learners may use
    `sha256sum "$ASSET_PATH"` instead. If neither digest command is available,
@@ -163,7 +173,8 @@ or execute a downloaded asset during this read-only exercise.
    source ref, for example `refs/tags/v1.0.0` only if that is the approved
    ref. Do not paste a value containing a single quote into these assignments.
 
-   <pre tabindex="0"><code>SIGNER_WORKFLOW='msfttoler/wre-flight-deck/.github/workflows/release.yml'
+   ```bash
+   SIGNER_WORKFLOW='msfttoler/wre-flight-deck/.github/workflows/release.yml'
    SOURCE_SHA='PASTE_APPROVED_FULL_SOURCE_SHA'
    SOURCE_REF='PASTE_APPROVED_FULL_SOURCE_REF'
    gh attestation verify "$ASSET_PATH" \
@@ -172,7 +183,7 @@ or execute a downloaded asset during this read-only exercise.
      --source-digest "$SOURCE_SHA" \
      --source-ref "$SOURCE_REF" \
      --format json --jq '.[].verificationResult.statement.subject[] | {name,digest}'
-   </code></pre>
+   ```
 
    Check the actual command result and compare the verified subject digest
    with the separate SHA-256 reading. Record the exact restrictions and result.

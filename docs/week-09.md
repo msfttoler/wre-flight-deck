@@ -26,18 +26,20 @@ ask the owner for the exact missing record without changing an installation.
    Node.js 24 or later, and a bash-compatible terminal such as Git Bash on
    Windows. Replace `river-a1` with an unused, non-sensitive attempt name:
 
-   <pre tabindex="0"><code>cd ~
+   ```bash
+   cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w09-river-a1
-   </code></pre>
+   ```
 
    If cloning fails or the folder exists, stop and choose another name.
    After a successful clone:
 
-   <pre tabindex="0"><code>cd ~/wre-w09-river-a1
+   ```bash
+   cd ~/wre-w09-river-a1
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
-   </code></pre>
+   ```
 
    Confirm both remote URLs name `msfttoler/wre-flight-deck`, the worktree is
    clean, and the tag SHA is the owner's approved SHA. The `##` line is a
@@ -48,13 +50,15 @@ ask the owner for the exact missing record without changing an installation.
    local booking writes this app's own local state; it makes no hosted change.
    Select the baseline:
 
-   <pre tabindex="0"><code>git switch --detach wre-v1
-   </code></pre>
+   ```bash
+   git switch --detach wre-v1
+   ```
 
    If switching fails, stop. Only after it succeeds:
 
-   <pre tabindex="0"><code>git rev-parse HEAD
-   </code></pre>
+   ```bash
+   git rev-parse HEAD
+   ```
 
    Stop if `HEAD` differs from the approved SHA. Only then run `npm start`.
    Wait for your terminal to print `Flight Deck: http://127.0.0.1:3000`

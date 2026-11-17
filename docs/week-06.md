@@ -37,31 +37,35 @@ raw sensitive payloads or private account metadata.
 From a parent you own, replace `YOUR-ID` with a non-sensitive unique handle
 and attempt suffix using only letters, digits and hyphens, such as `river-a1`:
 
-<pre tabindex="0"><code>git --version
+```bash
+git --version
 node --version
 npm --version
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-w06-YOUR-ID
-</code></pre>
+```
 
 Only if cloning succeeds, enter the new directory:
 
-<pre tabindex="0"><code>cd wre-w06-YOUR-ID
-</code></pre>
+```bash
+cd wre-w06-YOUR-ID
+```
 
 If `cd` fails, stop before Git. Otherwise inspect the target and baseline:
 
-<pre tabindex="0"><code>git remote -v
+```bash
+git remote -v
 git status --short --branch
 git rev-parse 'wre-v1^{commit}'
-</code></pre>
+```
 
 Compare both origin URLs with `msfttoler/wre-flight-deck` without exposing
 credentials and the tag commit with the owner's approved SHA. A different
 target, dirty clone, missing tag or mismatch is **BLOCKED**; do not substitute
 `main`. For a read-only local test, select the approved tag:
 
-<pre tabindex="0"><code>git switch --detach wre-v1
-</code></pre>
+```bash
+git switch --detach wre-v1
+```
 
 If the switch fails, stop. Only after success, use `git rev-parse HEAD` and
 confirm the approved SHA. To make an authorized local test edit instead,
@@ -70,13 +74,15 @@ create an unused branch from the verified tag with
 fails or the SHA differs, stop before editing. Do not move `wre-v1`.
 
 If you choose to see the product, run `npm start` from the verified clone
-root, open `http://127.0.0.1:3000`, and under **Plan a journey** choose
+root. Wait for your terminal to print `Flight Deck: http://127.0.0.1:3000`
+and stay running before opening that address. Under **Plan a journey** choose
 actual airports and passengers. Select **Find flights**, **Review fare** and
 **Calculate fare**. Use only fictional data and stop your own server with
 Ctrl-C. The quote is local app behavior, not a CodeQL or GitHub result.
 If the app cannot start or no route is available, mark only this optional
-preview **BLOCKED**. For a port conflict, do not stop another process: if no
-server is using this clone's `.data`, try `PORT=3001 npm start` and open
+preview **BLOCKED**. For a port conflict, do not browse the unknown service
+or stop another process. After your failed start exits, if no server is using
+this clone's `.data`, try `PORT=3001 npm start` and open
 `http://127.0.0.1:3001` only after a successful start. Never run two servers
 against the same state directory.
 
@@ -115,8 +121,9 @@ available.
    establish which alert results are available for the target branch. With
    an authorized `gh`, an optional read is:
 
-   <pre tabindex="0"><code>gh run list --repo msfttoler/wre-flight-deck --workflow codeql.yml --limit 10
-   </code></pre>
+   ```bash
+   gh run list --repo msfttoler/wre-flight-deck --workflow codeql.yml --limit 10
+   ```
 
    If `gh` is used, follow the conditional status check in
    [sessions](sessions.md#choose-the-setup-your-task-needs). An unavailable
@@ -189,9 +196,10 @@ limit, but only the first is finding-specific triage.
      for the 16 KiB limit and exact boundary. In a verified clone, these
      native reads help locate them:
 
-     <pre tabindex="0"><code>git grep -n -e 'BODY_LIMIT' -e 'jsonBody' wre-v1 -- src/server.mjs
+     ```bash
+     git grep -n -e 'BODY_LIMIT' -e 'jsonBody' wre-v1 -- src/server.mjs
      git grep -n -e '16 KiB' -e 'chunked transfer' wre-v1 -- test/http.test.mjs
-     </code></pre>
+     ```
 
      If the tag or files are unavailable, mark this source review **BLOCKED**.
 3. **48-54:** Change one assumption and explain the decision:
@@ -207,8 +215,9 @@ limit, but only the first is finding-specific triage.
 4. **54-62:** If you have the verified local clone and Node 24+, run the
    relevant real tests from its root. For the body-limit fallback, use:
 
-   <pre tabindex="0"><code>node --test test/http.test.mjs
-   </code></pre>
+   ```bash
+   node --test test/http.test.mjs
+   ```
 
    For an actual alert, locate its relevant tests with `git ls-files test`
    and run the project's `npm test` instead; explain which assertions relate
