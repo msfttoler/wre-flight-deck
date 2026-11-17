@@ -168,12 +168,13 @@ current-only inventory.
 
 Facilitator key: **no** to all three.
 
-**33-35 - Read, Rule Out, Return.** If the invariant and baseline are
-approved, read the invariant, rule out an unapproved baseline, and return
-to the observed difference and its consequence. Otherwise read the proposed
-condition, summarize the current inventory, request the missing approval,
-and say no comparison was performed. Start independent work at minute 35 even
-if hosted evidence is unavailable.
+**33-35 - Read, Rule Out, Return.** Read the approved invariant or, if absent,
+the proposed condition; rule out an unapproved baseline. If the comparison
+found a difference, return to that difference and its possible consequence.
+If it found none, report the scoped empty diff. If no comparison was
+performed, summarize the current inventory and request the missing approval
+or accessible revision. Start independent work at minute 35 even if hosted
+evidence is unavailable.
 
 ## 35-70: Independent practice - assess another invariant
 

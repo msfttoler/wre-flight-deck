@@ -200,8 +200,8 @@ fictional information.
    unexpected work. Record actual output, not a predicted green result.
    After backend edits, stop **your** server with Ctrl-C, confirm the clone
    and `git rev-parse HEAD`, then restart on the **same selected port**
-   against the same `.data/`. The saved bytes remain, but the new rule may
-   reject the earlier quote and prevent startup. Record the actual result.
+   against the same `.data/`. The new rule may reject the earlier quote and
+   prevent startup. Preserve the directory and record the actual result.
    If you recorded a quote, reopen `.data/state.json` without editing it and
    compare its `id`, `coupon`, `flightIds`, and `totalCents` with your
    earlier note. Otherwise keep that comparison **BLOCKED**. If the server
