@@ -55,6 +55,36 @@ test("a real quote becomes a persisted booking and cancellation releases its sea
   expect(errors).toEqual([]);
 });
 
+test("the first-use guide gives exact booking steps and safe optional follow-ups", async ({ page }) => {
+  await page.goto("/");
+  const guide = page.locator("#first-run-guide");
+  await expect(guide.getByRole("heading", { name: "Start here: make and verify a fictional booking" })).toBeVisible();
+  const steps = guide.locator(".first-run-disclosure");
+  await expect(steps).not.toHaveAttribute("open", "");
+  await steps.locator(":scope > summary").click();
+  await expect(steps.locator(".first-run-steps > li")).toHaveCount(5);
+  await expect(guide).toContainText("SEA · Seattle");
+  await expect(guide).toContainText("DEN · Denver");
+  await expect(guide).toContainText("FIRSTFLIGHT");
+  await expect(guide).toContainText("TEAM-ORBIT-A1");
+  await expect(guide).toContainText("does not reserve a seat");
+  await expect(guide).toContainText("not a GitHub webhook or CI run");
+  await expect(guide.getByText("Optional: cancel only the booking you just made")).toBeVisible();
+  for (const theme of ["light", "dark"]) {
+    await page.goto(`/?scoutTheme=${theme}`);
+    const expandedGuide = page.locator("#first-run-guide");
+    const disclosure = expandedGuide.locator(".first-run-disclosure");
+    await disclosure.locator(":scope > summary").click();
+    const optionalSteps = expandedGuide.locator(".first-run-extra");
+    await optionalSteps.nth(0).locator(":scope > summary").click();
+    await expect(optionalSteps.nth(0)).toContainText("A12");
+    await optionalSteps.nth(1).locator(":scope > summary").click();
+    await expect(optionalSteps.nth(1)).toContainText("Confirm cancellation");
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  }
+});
+
 test("an invalid coupon reports the real API error without booking anything", async ({ page, request }) => {
   const before = (await (await request.get("/api/bookings")).json()).bookings.length;
   await chooseFlight(page);

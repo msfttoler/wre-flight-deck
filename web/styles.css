@@ -112,6 +112,20 @@ main { padding: 36px 36px 0; min-width: 0; outline: none; }
 .schedule-stamp .eyebrow { display: block; font-size: 9px; }
 .schedule-stamp strong { display: block; font-weight: 600; font-size: .9375rem; }
 .schedule-stamp>span:last-child { color: var(--cp-text-muted); font-size: .6875rem; }
+.first-run-guide { max-width: 92ch; margin: 0 0 28px; padding: 22px 24px; border: 1px solid var(--cp-border); border-radius: 12px; background: var(--cp-surface); }
+.first-run-guide h2 { font-size: 1.125rem; }
+.first-run-guide>p { max-width: 78ch; margin-top: 8px; color: var(--cp-text-muted); font-size: 1rem; line-height: 1.5; }
+.first-run-steps, .first-run-extra ol { padding-left: 1.5rem; }
+.first-run-steps { margin: 16px 0 0; }
+.first-run-steps li, .first-run-extra li { padding-left: .3rem; margin-top: 10px; font-size: 1rem; line-height: 1.5; }
+.first-run-steps li::marker, .first-run-extra li::marker { color: var(--cp-accent); font-weight: 650; }
+.first-run-steps strong { color: var(--cp-text); }
+.first-run-guide code { font-size: .9em; }
+.first-run-disclosure { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--cp-border); }
+.first-run-disclosure>summary, .first-run-extra summary { width: fit-content; min-height: 44px; display: flex; align-items: center; padding: 8px 0; font-size: 1rem; font-weight: 650; }
+.first-run-note { margin: 8px 0 0; color: var(--cp-text-muted); font-size: 1rem; line-height: 1.5; }
+.first-run-extra { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--cp-border); }
+.first-run-extra ol { margin: 4px 0 0; }
 .journey-steps { display: flex; padding: 0 0 18px; margin: 0 0 24px; list-style: none; gap: 36px; border-bottom: 1px solid var(--cp-border); }
 .journey-steps li { color: var(--cp-text-muted); display: flex; gap: 10px; align-items: center; font-size: .75rem; }
 .journey-steps li span { width: 25px; height: 25px; display: grid; place-items: center; border: 1px solid var(--cp-border-strong); border-radius: 50%; font: 10px Consolas, "Courier New", Courier, monospace; }

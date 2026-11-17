@@ -51,6 +51,37 @@
           <div><p class="eyebrow">JOURNEY PLANNING / WRE REGIONAL</p><h1 id="plan-title">A little further. A little simpler.</h1><p class="page-description">Find your connection. Review the fare. Get your team on board.</p></div>
           <div class="schedule-stamp"><span class="eyebrow">FICTIONAL SCHEDULE</span><strong id="scenario-date">Loading schedule…</strong><span>All departure times in UTC</span></div>
         </div>
+        <section id="first-run-guide" class="first-run-guide" aria-labelledby="first-run-title">
+          <h2 id="first-run-title">Start here: make and verify a fictional booking</h2>
+          <p>Quick path: search SEA to DEN, check the fare, book with a unique fictional team name, and verify the reservation. Open the guide for exact clicks and expected results.</p>
+          <details class="first-run-disclosure">
+            <summary>Open the exact 5 booking steps</summary>
+            <p class="first-run-note">The labels match this screen. Use fictional team names only; this local app does not issue real tickets or take payments.</p>
+            <ol class="first-run-steps">
+              <li><strong>Find flights.</strong> Set <strong>From</strong> to <strong>SEA · Seattle</strong>, <strong>To</strong> to <strong>DEN · Denver</strong>, and <strong>Passengers</strong> to <strong>1 passenger</strong>. Click <strong>Find flights</strong>. Wait for route options. If none appear, try fewer passengers or another destination.</li>
+              <li><strong>Choose an itinerary.</strong> Compare stops, UTC times, available seats, and base fare. Click <strong>Review fare</strong> on your choice. The fare form appears in <strong>Your fare, clearly</strong>.</li>
+              <li><strong>Check the full price.</strong> Set <strong>Checked bags</strong> to <strong>1 bag / passenger</strong>. Enter <code>FIRSTFLIGHT</code> in <strong>Coupon (optional)</strong>, then click <strong>Calculate fare</strong>. Read the price lines and <strong>Total · USD</strong>. The coupon discounts base fare, not bag fees. The quote expires after 15 minutes and does not reserve a seat.</li>
+              <li><strong>Confirm the booking.</strong> Enter a unique synthetic label, such as <code>TEAM-ORBIT-A1</code>, in <strong>Fictional team callsign</strong>. Click <strong>Confirm fictional booking</strong> once. Wait for <strong>BOOKING CONFIRMED</strong> and note the reference. Do not enter a person's name or payment details.</li>
+              <li><strong>Verify what was saved.</strong> Click <strong>View reservations</strong> in the confirmation, or choose <a href="#reservations">Reservations</a> in the workspace menu. Find your callsign; check its reference, route, total, and <strong>confirmed</strong> status.</li>
+            </ol>
+            <details class="first-run-extra">
+              <summary>Optional: update a departure and check its event</summary>
+              <ol>
+                <li>In your reservation, note a flight number. Choose <a href="#operations">Departures</a>. Find the same flight number and route, then click <strong>Edit</strong>. Only change a flight whose current status is <strong>Scheduled</strong> or <strong>Delayed</strong>; leave a departed flight alone.</li>
+                <li>Set <strong>Departure status</strong> to <strong>Boarding</strong>. Set <strong>Gate</strong> to <code>A12</code>, then click <strong>Save departure</strong>. Check that the row shows Boarding and A12. If the save reports a conflict, refresh the schedule and review the current values before trying again. This change persists in this local workspace.</li>
+                <li>Choose <a href="#journal">Event Journal</a>. Find the <code>flight.updated</code> event for that flight and inspect its request ID. This is evidence from the local app only, not a GitHub webhook or CI run.</li>
+              </ol>
+            </details>
+            <details class="first-run-extra">
+              <summary>Optional: cancel only the booking you just made</summary>
+              <ol>
+                <li>Open <a href="#reservations">Reservations</a> and find the unique callsign you entered.</li>
+                <li>Click <strong>Cancel reservation</strong>. Check the callsign in the confirmation prompt. Click <strong>Keep booking</strong> if you are unsure; otherwise click <strong>Confirm cancellation</strong>.</li>
+                <li>Check that the booking status is <strong>cancelled</strong>. Its seats are released. A booking cannot be cancelled after any flight leg has departed.</li>
+              </ol>
+            </details>
+          </details>
+        </section>
         <ol class="journey-steps" aria-label="Booking progress">
           <li id="step-find" aria-current="step"><span>01</span>Find a route</li>
           <li id="step-fare"><span>02</span>Review the fare</li>
