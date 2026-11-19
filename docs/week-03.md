@@ -5,6 +5,10 @@ and release automation to publish approved source packages. Does everyone need
 write access? Work through three customer questions using this repository's
 actual files and existing GitHub Actions runs.
 
+Too much authority can expand the impact of a compromised credential. Too
+little can block the operation the customer needs. The goal is to identify the
+right authority for each operation, using the evidence available.
+
 These are illustrative customer questions, not reported incidents. We resolve
 them by inspecting working controls and rejecting unnecessary grants. We do
 not manufacture a failed push or pretend to repair a broken release.
@@ -36,8 +40,10 @@ and skip local Git commands. Do not claim that a clone or local SHA was verified
 On a narrow screen, use GitHub's code-copy button and paste into a plain-text
 editor with line wrapping to read a complete command before running it.
 
-Open a terminal in a parent directory you own. Run `pwd` to see where you are.
-For example, on a Mac, `cd ~/Downloads` selects your Downloads folder. If that
+On Windows, open **Git Bash**; the commands below are not written for
+PowerShell or Command Prompt. On macOS or Linux, open a Bash or Zsh terminal.
+Start in a parent directory you own and run `pwd` to see where you are. For
+example, on a Mac, `cd ~/Downloads` selects your Downloads folder. If that
 folder is unavailable, choose another existing folder you own.
 
 Check that Git is available:
@@ -205,7 +211,7 @@ speaker notes and this guide off the shared screen. Use these cues:
 - **11-17:** Show slide 6, then switch to the prepared source and terminal for
   the public-clone question.
 - **17-23:** Show slide 7, then switch to CI source/run and release source/run.
-  Slide 8 is an optional recap within this same time.
+  Leave slide 8 as an optional recap outside the timed route.
 - **23-35:** Use slides 9-11 for the quiz, slide 12 for the decision clinic
   and slide 13 for the independent-practice handoff.
 - **35-70:** Leave slide 14 visible during individual practice.
@@ -213,24 +219,41 @@ speaker notes and this guide off the shared screen. Use these cues:
 
 In the matching HTML deck, click the slide area and press **O** for the
 numbered overview; select a slide to jump to it. Arrow keys move between
-slides. Leave **Reference slides: skipped** selected; slides 17-20 are optional.
+slides. Leave **Reference slides: skipped** selected; slide 8 and slides 17-20
+are optional.
 If the deck is unavailable, use the timed prompts below and run the quiz
 manually.
 
 ## 00-03: One team, three questions
 
 **Say:** "The airline wants engineers to inspect the code, tests to run, and
-one release job to publish. Those are different actions. We will check the
-authority each one needs rather than give everything write access."
+one release job to publish. Too much authority increases the blast radius if
+a credential is compromised. Too little can block a legitimate operation.
+We will check what each actor needs and what our evidence actually shows."
 
 Show the three questions in the opening list. Ask learners to predict which
-actor, if any, needs to write repository contents.
+actor, if any, needs to write repository contents. The presenter updates the
+visible four-row matrix below; each learner maintains the same rows in private
+notes and labels presenter observations separately from their own.
+
+| Actor | Operation | Credential or context | Observed authority | Evidence location / revision | What remains untested |
+| --- | --- | --- | --- | --- | --- |
+| Human | Read or potentially push source | To confirm | Pending | Pending | Push |
+| CI job | Validate changes | Job token | Pending | Pending | Pending |
+| Release job | Publish a release | Job token | Pending | Pending | Pending |
+| CodeQL job | Upload analysis | Job token | Pending | Pending | Pending |
+
+This is a blank working record, not a claim that any read, write or upload
+has happened. Record the browser read, CLI account and reported role separately;
+do not record credentials or assume the browser and CLI identities match. Add
+the source revision and separate declarations from run observations. When
+evidence is unavailable, record **BLOCKED** or unknown.
 
 ## 03-05: Decide what would count as evidence
 
-Make three columns in a note: **actor**, **action on a resource**, **evidence**.
-A person reading public source, a CI job checking out source and a release job
-publishing an asset are not the same actor or operation.
+Use the matrix to name the actor, operation and evidence needed for each
+decision. A person reading public source, a CI job checking out source and a
+release job publishing an asset are not the same actor or operation.
 
 **Ask:** "Would seeing your own repository role tell us the release job's
 permissions?" No. The workflow job has its own token.
@@ -278,9 +301,10 @@ credential was used or prove that an authenticated account can write.
 3. If the request fails or returns a different target, mark the role
    unobserved, treat the CLI actor as unverified, and skip subsequent affected
    `gh` reads. Otherwise confirm the name is `msfttoler/wre-flight-deck` and
-   read the actual visibility and permission value. Different accounts can
-   legitimately report different roles. Do not supply an expected role or
-   treat a missing value as a proven denial.
+   read the actual visibility and `viewerPermission`: the repository permission
+   GitHub reports for this authenticated CLI viewer, not a test of the Git
+   credential. Different accounts can legitimately report different roles.
+   Do not supply an expected role or treat a missing value as a proven denial.
 4. If the role request succeeded for the correct target, compare it with the
    private actor observation from preparation. The signed-in browser may use
    a different account; keep those contexts separate.
@@ -297,6 +321,8 @@ observations; neither depends on the other.
 Do not grant extra access merely because a future action has not been tested.
 If a real write task is needed, name the task and ask its owner about the
 smallest applicable grant. Do not attempt a push to manufacture a refusal.
+Update the human row with the actual read, reported role or unknown. Do not
+claim that public read verified the Git credential or push authority.
 
 ## 17-20: Question 2 - "Our tests need write access, right?"
 
@@ -338,6 +364,8 @@ smallest applicable grant. Do not attempt a push to manufacture a refusal.
 access for these tests. If the matching job log was accessible, name what it
 actually reported; otherwise keep the runtime result unobserved. Do not claim
 that a passing test proves all writes would be refused.
+Update the CI row with the inspected source and any correlated run, or its
+specific blocker.
 
 ## 20-23: Question 3 - "Should every job be a writer?"
 
@@ -382,6 +410,8 @@ that a passing test proves all writes would be refused.
 that needs it. Do not make all CI jobs writers to support one release action.
 We did not create a release, trigger a workflow, change permissions or
 approve promotion. A declaration alone does not prove that publishing ran.
+Update the release row with the job-specific declaration and any correlated
+run, or its specific blocker.
 
 ## 23-28: Live Quiz Sprint
 
@@ -417,6 +447,10 @@ repository access even when the account has a suitable role. Public reads do
 not demonstrate that restriction. A 404 can mean a hidden private resource or
 a wrong path; it does not diagnose revocation.
 
+Before opening the CodeQL workflow, ask learners to write a private prediction:
+does uploading analysis need the release job's `contents: write`, and what
+permission or source would they check instead? A prediction is not evidence.
+
 ## 32-35: Handoff to a different operation
 
 **Say:** "The customer asked about test and release-job authority. Now consider
@@ -430,13 +464,14 @@ enable scanning, obtain alerts or run a scan.
 
 ## 35-70: Independent practice - analysis is not a release
 
-1. **35-40:** Predict which authority the analysis job needs. Start an
-   action/resource matrix with four rows: human public clone/potential push,
-   CI validation, release publishing, and CodeQL analysis upload. Distinguish
-   the person's credential from each job's token. Mark a clone or read
-   unobserved if it did not occur.
-2. **40-48:** Open [codeql.yml at the full approved commit](https://github.com/msfttoler/wre-flight-deck/blob/59fae25ea3f18068e2140240d2fb606f35041974/.github/workflows/codeql.yml).
-   If you have a verified clone, run this from its root:
+1. **35-50:** Revisit your prediction about the authority the analysis job
+   needs. Continue your four-row action matrix and investigate the CodeQL row.
+   Distinguish the person's credential from each job's token. Label presenter
+   observations separately; mark your own clone or read unobserved if it did
+   not occur.
+2. Open [codeql.yml at the full approved commit](https://github.com/msfttoler/wre-flight-deck/blob/59fae25ea3f18068e2140240d2fb606f35041974/.github/workflows/codeql.yml).
+   If your own approved CLI actor and target remain verified and your
+   detached clone is verified, run this from its root:
 
    ```bash
    git --no-pager show HEAD:.github/workflows/codeql.yml
@@ -447,24 +482,40 @@ enable scanning, obtain alerts or run a scan.
    If source is available, locate workflow-level defaults, the analysis job's
    override, the checkout step and analysis action. Record the source SHA and
    exact declarations.
-3. **48-55:** Use the official
+3. Use the official
    [workflow permissions reference](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)
+   and [SARIF upload guidance](https://docs.github.com/en/code-security/how-tos/find-and-fix-code-vulnerabilities/integrate-with-existing-tools/upload-sarif-file)
    to explain `security-events: write` versus `contents: write`.
    Recommend whether to retain or change the declared authority. An observed,
    justified no-change decision is valid; do not invent a defect to repair.
    If the CodeQL source is blocked, record the missing evidence and next
-   authorized read instead of claiming a source-backed recommendation.
-4. **55-62:** Reject this proposed shortcut: "Give every job `contents: write`
-   so uploads work." Explain which permission addresses analysis upload,
-   which addresses release publishing and why the shortcut is not equivalent.
-   Account for event/policy restrictions without assuming a particular
-   forked-PR result. Do not run a scan, push or edit hosted settings.
-5. **62-67:** Check the human row against your clone and role observations,
+   authorized read instead of claiming a source-backed recommendation. Make
+   your initial decision before looking for optional logs.
+4. **50-55, optional:** If you inspected CodeQL source and your own approved
+   CLI actor and target remain verified, list existing runs:
+
+   ```bash
+   gh run list --repo github.com/msfttoler/wre-flight-deck \
+     --workflow codeql.yml --limit 5
+   ```
+
+   Correlate any authorized run's event, attempt, source, actual job checkout
+   and complete token block before attributing it to the baseline. A listing
+   alone is not proof of an upload or a permission. If the source is blocked,
+   skip runtime reads. Stop at minute 55; mark incomplete correlation unknown.
+5. **55-62:** If source was inspected, evaluate this proposed shortcut: "Give
+   every job `contents: write` so uploads work." Explain which permission
+   addresses analysis upload and which addresses release publishing. If
+   source is blocked, record the shortcut as an untested question instead of
+   a workflow-specific decision. Account for event and policy restrictions
+   without assuming a particular forked-PR result. Do not run a scan, push or
+   edit hosted settings.
+6. **62-66:** Check the human row against your clone and role observations,
    and each job row against its workflow declarations and any inspected log.
    Mark runtime analysis permissions **unobserved** unless you inspect an
    accessible real run for that source and event. A YAML declaration is not
    that observation; no alert or security-administrator access is required.
-6. **67-70:** Write a short customer handoff: the actor and action, minimum
+7. **66-70:** Write a short customer handoff: the actor and action, minimum
    proposed authority, rejected broader grant, exact source, actual
    observations and unresolved owner question. Mark any proposed change
    **unperformed**. Keep the note private and outside tracked files.
@@ -503,7 +554,11 @@ Do not silently pair another run with this baseline or dispatch a replacement.
   job contents write is not a substitute for the analysis permission.
 - **75-81:** Discuss: "Why does analysis upload differ from release
   publication?" and "What could an event or policy change about this job?"
-  Keep the human account separate from job-token authority.
+  Keep the human account separate from job-token authority. Then ask: "How
+  would you explain this matrix to the customer?" As a Cloud Solution
+  Architect (CSA), each learner gives or drafts a short customer explanation
+  naming the operation, the evidence, the least-authority recommendation and
+  the remaining unknown. No peer approval or role swap is needed.
 - **81-83:** Save the corrected customer answer and one unresolved evidence
   request. No peer approval or applied permission change is required.
 
