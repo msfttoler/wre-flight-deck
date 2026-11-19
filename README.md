@@ -71,7 +71,7 @@ when running the app from `wre-v1`.
 | --- | --- |
 | [01](docs/week-01.md) | Recover a useful change without rewriting shared history |
 | [02](docs/week-02.md) | Explain the difference between a test result and a merge gate |
-| [03](docs/week-03.md) | Identify the account, credential and effective repository access |
+| [03](docs/week-03.md) | Compare human, CI and release authority through three customer questions |
 | [04](docs/week-04.md) | Trace a real workflow run and its actual checkout |
 | [05](docs/week-05.md) | Verify a release asset and its producer |
 | [06](docs/week-06.md) | Investigate an accessible CodeQL finding, if one exists |

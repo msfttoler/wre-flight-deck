@@ -13,7 +13,7 @@ software, not live aviation information or a real booking service.
 |---|---|---|
 | [01](week-01.md) | Recover a useful Git change without discarding other work | Diff, commit and recovered branch |
 | [02](week-02.md) | Distinguish application tests from a required merge check | Assertion, exact run and current merge requirements |
-| [03](week-03.md) | Separate identity, repository access and application exposure | Current actor, target and visible permission limits |
+| [03](week-03.md) | Compare human, CI and release authority | Pinned workflow source, actual job-token logs and a least-access decision |
 | [04](week-04.md) | Investigate an actual Actions run | Event, checkout revision, job and first actionable cause |
 | [05](week-05.md) | Verify a release's actual provenance | Downloaded bytes, digest, attestation and trusted producer |
 | [06](week-06.md) | Triage a genuine CodeQL result, if present | Actual alert path and analysis revision; otherwise BLOCKED |
@@ -35,9 +35,11 @@ owner has aligned the materials.
 
 ## Choose the setup your task needs
 
-Weeks 03 and 04 can start with read-only GitHub investigation; neither needs
-an application server, Node, a learner branch or a clone just to inspect hosted
-evidence. Follow the week's guide for the actual target and permission. Hosted
+Week 03 starts with a fresh clone and three customer questions; its public
+browser fallback remains available. Week 04 can start with read-only GitHub
+investigation. Neither needs an application server, Node or a learner branch
+for the ordinary read-only work. Follow the week's guide for its actual target
+and permission. Hosted
 reads need existing authorized access; a public browser view does not prove a
 particular account's permissions.
 
@@ -126,11 +128,15 @@ Record blocked effects rather than trying them to obtain a denial.
 
 ## Shared 85-minute delivery
 
-Weeks 01-11 use: 00-05 customer problem; 05-12 mental model and setup;
+Weeks 01-11 except Week 03 use: 00-05 customer problem; 05-12 mental model and setup;
 12-30 facilitator demonstration; 30-33 manual **Live Quiz Sprint**;
 33-35 **Read, Rule Out, Return** and handoff; 35-70 individual practice;
 70-83 self-check/debrief; 83-85 transfer and close.
 Week 12 retains the six-part final-session route shown in its guide.
+Week 03 follows the aligned course timings in its own guide: three customer
+questions before minute 11, worked demonstrations at 11-23, quiz at 23-28,
+strategy at 28-32 and handoff at 32-35. It retains the same practice,
+self-check/debrief and close windows.
 
 Use paper, fingers or chat for the quiz; no quiz backend or speed ranking is
 needed. Offer written answers and time accommodations. Read the requirement,

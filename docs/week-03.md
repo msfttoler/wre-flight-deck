@@ -1,242 +1,371 @@
-# Week 03: Identify who may act, and on what
+# Week 03: Who needs permission to do what?
 
-The airline's engineer can read a public repository but needs to know whether
-an identity may change it. You will distinguish the current actor, the
-requested action and the target resource, then propose narrow access for a
-different actor. A local app control is not GitHub authorization.
+The airline's team wants engineers to inspect Flight Deck, CI to test changes,
+and release automation to publish approved source packages. Does everyone need
+write access? Work through three customer questions using this repository's
+actual files and existing GitHub Actions runs.
 
-## Before class
+These are illustrative customer questions, not reported incidents. We resolve
+them by inspecting working controls and rejecting unnecessary grants. We do
+not manufacture a failed push or pretend to repair a broken release.
 
-- **Owner and facilitator:** Confirm the approved `wre-v1` SHA and the
-  public repository target. Use an existing authorized account if available;
-  prepare a private way to compare account names without projecting them.
-  Do not create credentials or change permissions for this lesson.
-- **Learner, required for the full hosted investigation:** A browser, an
-  existing authorized GitHub account, and the GitHub CLI `gh`. Public source
-  reading can continue without an account or CLI, but account-specific CLI
-  evidence is then **BLOCKED**. No previous week, repository write access,
-  admin role or permission expansion is needed.
-- **Optional:** Git 2.23+ and a fresh clone for local source or
-  Git-configuration inspection. Node, an application server and a learner
-  branch are not needed for the ordinary read-only task.
+1. **"I can clone it. Can I push?"** Inspect public source, the CLI actor and
+   reported repository permission. A read is not proof of write authority.
+2. **"Our tests need write access, right?"** Inspect `ci.yml` and an existing
+   CI job's token-permission log. Testing does not justify repository write access.
+3. **"Release needs to publish. Should every job be a writer?"** Inspect
+   `release.yml` and its existing job log. Grant the needed authority to the
+   release job, not every job.
 
-Read [shared setup and evidence](sessions.md). In a terminal, if `gh` is
-available, run:
+## Before class: one fresh clone
+
+You need Git, a terminal, a browser and an existing authenticated GitHub CLI
+for account-specific evidence. Browser logs also require an existing GitHub
+sign-in. No administrator role, new token, application server, Node install
+or repository write access is needed. The public browser fallback is described
+below; it does not establish a missing account's permissions.
+
+Keep this version of the guide open in your browser. Inspect application/workflow
+source at `wre-v1`; that older tag intentionally does not contain this updated guide.
+
+### 1. Clone the named repository
+
+On a narrow screen, use GitHub's code-copy button and paste into a plain-text
+editor with line wrapping to read a complete command before running it.
+
+Start in a parent directory you own. Run:
 
 ```bash
-gh --version
-gh auth status --help
+git clone https://github.com/msfttoler/wre-flight-deck.git wre-week03
 ```
 
-Only if help lists **both** `--active` and `--no-refresh`, run
-`gh auth status --active --no-refresh --hostname github.com` privately.
-Otherwise skip it and record CLI status as unknown. Do not display tokens or
-use a token-display option. If already authorized, this read identifies the
-CLI actor; run it privately, not on a shared screen:
+Only if the clone succeeds, enter it:
 
 ```bash
-gh api user --jq '.login'
+cd wre-week03
 ```
 
-If it fails, do not log in as someone else or broaden a credential. Record the
-actual error without secrets; use the public browser route and mark the CLI
-actor **BLOCKED**. Keep an evidence note outside any clone with UTC time,
-target, account **role** rather than private account details, command or URL,
-actual result and limitation.
+If that directory already exists, stop and choose a new unused directory name
+in both commands. If `cd` fails, stop. Do not reset, delete or reuse somebody
+else's workspace.
 
-### Optional: inspect a local clone
+### 2. Confirm the source
 
-From a parent you own, replace `YOUR-ID` with a non-sensitive unique handle
-and attempt suffix using only letters, digits and hyphens, such as `river-a1`:
+Run these from the new clone root:
 
 ```bash
-git clone https://github.com/msfttoler/wre-flight-deck.git wre-w03-YOUR-ID
-```
-
-Only if that succeeds, enter the new directory:
-
-```bash
-cd wre-w03-YOUR-ID
-```
-
-If `cd` fails, stop before Git. Otherwise check the target and tag:
-
-```bash
-git remote -v
+git remote get-url origin
 git status --short --branch
 git rev-parse 'wre-v1^{commit}'
 ```
 
-Compare both origin URLs with `msfttoler/wre-flight-deck` without exposing
-credentials and the tag commit with the owner's approved SHA. A different
-target, dirty clone, missing tag or mismatch is **BLOCKED**. For optional
-read-only local source inspection, select the tag:
+The origin must be `https://github.com/msfttoler/wre-flight-deck.git`.
+The working tree must have no changed files. The approved tag resolves to:
+
+```
+59fae25ea3f18068e2140240d2fb606f35041974
+```
+
+Stop on a different target, changed files, missing tag or SHA mismatch. Ask the
+owner to confirm the intended source; do not move the tag or substitute `main`.
+Select the verified source for this read-only investigation:
 
 ```bash
 git switch --detach wre-v1
+git rev-parse HEAD
 ```
 
-If the switch succeeds, run `git rev-parse HEAD` and confirm the approved
-SHA. If it fails, stop; do not discard work. Only a separately authorized
-local edit needs a branch: from a clean approved clone, use
-`git switch -c learner/w03-YOUR-ID wre-v1`, then confirm `HEAD`. An existing
-branch name or mismatch means stop and choose a new attempt. The optional
-local app setup is in [sessions](sessions.md#for-application-or-local-edit-work-use-a-fresh-clone);
-it is not needed to establish repository permissions.
+Confirm the same full SHA. Detached HEAD is expected: we are reading a recorded
+revision, not preparing a push. No learner branch or local edit is required.
 
-## 00-05: The customer problem
+### 3. Identify the CLI actor privately
 
-**Say:** "A public read tells us very little about who can publish a change.
-We'll name the actor, action and resource before deciding what access is
-needed."
+```bash
+gh --version
+gh api user --jq '.login'
+```
 
-Ask: "Does being able to read a public repository prove that your account can
-push?" No. Some public reads can succeed without an authenticated account.
+Compare the returned account with your intended CLI account. Stop that
+account-specific investigation if it differs or the request fails. Do not
+switch to somebody else's account or broaden a credential for class.
 
-## 05-12: Model and setup
+The clone lets `gh repo view` infer the repository from its Git remote; there
+is no `PRACTICE_REPO` assignment. Browser, Git transport and `gh` can use
+different credentials. A personal-token settings page does not necessarily
+describe the OAuth or environment credential used by `gh`.
 
-**Authentication** identifies the actor presenting a credential.
-**Authorization** decides whether that actor may perform an action on a
-particular resource. Browser, `gh` and Git transport can use different
-credentials. Local Git author and committer fields identify a commit's
-recorded authors; they do not authenticate a GitHub push. A commit signature,
-if used, is a separate verification.
+If credential diagnosis is needed, privately read `gh auth status --help`.
+Only when it lists both `--active` and `--no-refresh`, use
+`gh auth status --active --no-refresh --hostname github.com`. Otherwise skip
+that status command. Do not display tokens or change authentication settings.
 
-Show the repository target and, privately, the facilitator's available browser
-and CLI contexts. A missing account or CLI does not prevent a public source
-read; it does block claims about that missing identity. Explain that the app
-is local-only and unauthenticated, not a model of GitHub access.
+### 4. Prepare the real GitHub pages
 
-## 12-30: Facilitator demo
+The facilitator opens these before delivery:
 
-1. Open `https://github.com/msfttoler/wre-flight-deck` in the browser. Under
-   **Code**, confirm the owner and repository name. If signed in, open the
-   profile menu and privately note the browser account. A visible public page
-   proves only that this browser could read that page.
-2. Compare the browser identity with the private `gh api user --jq '.login'`
-   result from preparation. They may differ. If either is unavailable, record
-   that comparison as **BLOCKED**, not as evidence of denial.
-3. If `gh` is authorized, run this read for the exact target:
+1. [Flight Deck source at wre-v1](https://github.com/msfttoler/wre-flight-deck/tree/wre-v1).
+2. [CI run 43515740797](https://github.com/msfttoler/wre-flight-deck/actions/runs/43515740797).
+3. [Release run 43515739191](https://github.com/msfttoler/wre-flight-deck/actions/runs/43515739191).
+
+Both named runs are historical examples for commit
+`59fae25ea3f18068e2140240d2fb606f35041974`, not claims about the newest run.
+They were inspected on November 19, 2026 UTC. The CI jobs reported
+`Contents: read` and `Metadata: read`; the release job reported
+`Contents: write`, `Attestations: write` and `Metadata: read`.
+Those are recorded observations. Read what the actual page or command returns
+today; logs can expire or become unavailable.
+
+Keep a private note outside the clone with source SHA, run URL, UTC observation
+time, account role, action, actual result and remaining unknown. Do not record
+credentials, private account details or unrelated log content.
+
+## 00-03: One team, three questions
+
+**Say:** "The airline wants engineers to inspect the code, tests to run, and
+one release job to publish. Those are different actions. We will check the
+authority each one needs rather than give everything write access."
+
+Show the three questions in the opening list. Ask learners to predict which
+actor, if any, needs to write repository contents.
+
+## 03-05: Decide what would count as evidence
+
+Make three columns in a note: **actor**, **action on a resource**, **evidence**.
+A person reading public source, a CI job checking out source and a release job
+publishing an asset are not the same actor or operation.
+
+**Ask:** "Would seeing your own repository role tell us the release job's
+permissions?" No. The workflow job has its own token.
+
+## 05-08: Flash Rewind
+
+**Ask:** "Which statement have you heard: 'I can sign in, so I have access,' or
+'the tests passed, so the bot can publish'?"
+
+Take a written prediction. Authentication identifies who is acting;
+authorization concerns an action on a resource. A local Git author/email
+records authorship, not the credential that authenticates a GitHub push.
+
+## 08-11: The mental model
+
+Explain three checks before running commands:
+
+1. **Name the actor.** Your human account and an Actions job token differ.
+2. **Name the operation and resource.** Reading source, uploading analysis and
+   publishing a release need different authority.
+3. **Compare declaration with observation.** YAML describes intended token
+   permissions. An existing job log describes that run. Neither proves an
+   unperformed push or permission change.
+
+Repository roles, credential limits, rules and applicable policy can all
+constrain an action. A successful public clone does not identify which
+credential was used or prove that an authenticated account can write.
+
+## 11-17: Question 1 - "I can clone it. Can I push?"
+
+1. In GitHub.com, open the pinned source page from preparation. Under **Code**,
+   confirm `msfttoler/wre-flight-deck` and the `wre-v1` tag. The source is public.
+2. From the verified clone root, run:
 
    ```bash
-   gh repo view msfttoler/wre-flight-deck --json nameWithOwner,isPrivate,viewerPermission
+   gh repo view --json nameWithOwner,isPrivate,viewerPermission
    ```
 
-   Note the actual visible permission value, or unknown if it is absent.
-   A repository role is context, not proof that a particular token, branch
-   rule or action will permit a push.
-4. Compare two readable resources **within the same repository**:
+3. Confirm the returned name is `msfttoler/wre-flight-deck`; stop on a different
+   target. Then read the actual visibility and permission value. Different
+   accounts can legitimately report different roles. Do not supply an expected
+   role or treat a missing value as a proven denial.
+4. Compare the private actor observation from preparation with this request.
+   The signed-in browser may use a different account; keep those contexts
+   separate.
+5. Record: "I observed a public source read and this CLI-reported permission.
+   I have not tested a push or inventoried every access path."
+
+**Resolve the customer's question:** cloning does not establish push authority.
+Do not grant extra access merely because a future action has not been tested.
+If a real write task is needed, name the task and ask its owner about the
+smallest applicable grant. Do not attempt a push to manufacture a refusal.
+
+## 17-20: Question 2 - "Our tests need write access, right?"
+
+1. On the pinned source page, open **.github > workflows > ci.yml**. In the
+   terminal, show the same file:
 
    ```bash
-   PRACTICE_REPO='msfttoler/wre-flight-deck'
-   gh api "repos/$PRACTICE_REPO/contents" --jq type
-   gh api "repos/$PRACTICE_REPO/issues" --jq type
+   git --no-pager show HEAD:.github/workflows/ci.yml
    ```
 
-   `PRACTICE_REPO` is the explicit repository target; the commands read the
-   root contents and issues endpoints and print only the response type.
-   Record each actual result or redacted error. A successful read does not
-   establish a write permission, and this is not a cross-repository test.
-5. In **Code**, open `docs/api-contract.md` and read **Runtime and
-   boundaries**. It describes an unauthenticated local app; reading that
-   contract is not a runtime test. If an approved local clone exists,
-   `git remote -v` shows its Git target and transport, not its effective
-   GitHub permissions. Otherwise mark local Git configuration unobserved.
-6. Make a small matrix with **actor**, **resource**, **action**, **observation**
-   and **unknown**. Include public source read, repository push, rules change
-   and local app write. Do not attempt a push or settings change to fill in
-   an unknown.
+2. Find `permissions: contents: read`, the checkout step,
+   `persist-credentials: false` and the native test commands. Explain that
+   running tests is not the same operation as changing repository contents.
+   Uploading a run artifact is not publishing a GitHub release.
+3. Open the prepared **Flight checks** run. Confirm its commit, select
+   **Native tests (Node 24)** and expand **Set up job > GITHUB_TOKEN Permissions**.
+   Read the actual entries. No repository Settings screen is needed.
+4. The CLI alternative reads the same historical run and selects just its
+   token-permission blocks:
 
-**Ask:** "Whose identity is in a commit, and what authenticates the push?"
-The local author/committer record and transport credential answer different
-questions. A valid credential can still lack authority for the action.
+   ```bash
+   gh run view 43515740797 --log | grep -A 3 'GITHUB_TOKEN Permissions'
+   ```
 
-## 30-33: Live Quiz Sprint
+   `grep` filters the displayed log, not the job or token. If the command errors
+   or no block is returned, record the observation as unavailable; absence is
+   not proof that the job lacked permission.
 
-Read aloud; learners may use paper, fingers, chat or private written answers,
-with additional response time and no speed ranking.
+**Resolve the customer's question:** the existing source and observed run
+support retaining read-only contents access for these tests. No permission
+repair is needed. Do not claim that a passing test proves all writes would be
+refused, or that `persist-credentials: false` removes the job's token.
 
-1. Does a public read prove push access? **No.**
-2. Does Git `user.email` authenticate `gh`? **No.**
-3. Is the local app a production authentication system? **No.**
+## 20-23: Question 3 - "Should every job be a writer?"
 
-## 33-35: Read, Rule Out, Return
+1. On the pinned source page, open **.github > workflows > release.yml**.
+   In the same terminal, run:
 
-**Read** the exact actor, action and repository. **Rule out** an identity-only
-or public-read observation as proof of write authority. **Return** to the
-least authority the action needs and the evidence still missing. Start
-individual work at minute 35, even if an account-specific read is blocked.
+   ```bash
+   git --no-pager show HEAD:.github/workflows/release.yml
+   ```
 
-## 35-70: Independent practice
+2. Compare workflow-level `contents: read` with the release job's own
+   `permissions` block. `contents: write` supports release publishing;
+   `attestations: write` supports storing attestations; `id-token: write`
+   permits requesting an OIDC identity token. These are different capabilities,
+   not three ways of granting repository administration.
+3. Open the prepared **Release provenance** run. Confirm the same commit,
+   select **release**, then expand **Set up job > GITHUB_TOKEN Permissions**.
+   The CLI alternative is:
 
-Investigate a different actor from the human account in the demo: a proposed
-build workflow that must read Flight Deck source and run tests, but must not
-publish releases. This is a proposal, not a new token or workflow execution.
+   ```bash
+   gh run view 43515739191 --log | grep -A 3 'GITHUB_TOKEN Permissions'
+   ```
 
-1. **35-40:** In your note, name the target
-   `msfttoler/wre-flight-deck`, the proposed workflow actor and its two
-   intended actions: read source and run the project's tests. Add a third
-   action, publish a release, and mark it **not needed**. A local test
-   process and a GitHub repository operation are different resources.
-2. **40-48:** In GitHub, open **Code** > branch/tag selector > **Tags** >
-   `wre-v1`. At the repository root, open the displayed commit and compare
-   the full SHA in its URL with the owner's approved baseline. Then open
-   `.github` > `workflows` > `ci.yml`. If the file or full baseline SHA is
-   unavailable or mismatched, mark the approved-source comparison **BLOCKED**
-   and do not treat that file as the approved baseline. In a verified file,
-   find the declared `permissions`, checkout step and test command. If you
-   have the verified clone, an alternative is
-   `git show wre-v1:.github/workflows/ci.yml`.
-3. **48-54:** Create an action matrix with one row per action. For each,
-   write the resource, proposed minimum authority, source evidence and
-   unknowns. For example, assess whether the file declares
-   `contents: read` for checkout; do not infer an observed token's complete
-   permissions from the declaration. Running local tests does not itself need
-   repository write access.
-4. **54-60:** Check the workflow's job-level overrides and event context as
-   visible in the selected file. Note that organization policy, token type,
-   fork/event restrictions and runtime conditions can change what actually
-   works. Reject an overbroad release-publishing grant for this task and
-   explain which action would require separate authority.
-5. **60-65:** Record your own current-actor observation from the browser and,
-   if available, the `gh` reads in the demo. Separate a successfully observed
-   source read from any untested push or rules change. If Settings or
-   account-specific evidence is inaccessible, mark that fact **BLOCKED**;
-   do not request broader credentials for class.
-6. **65-70:** Write a customer handoff: the proposed actor and resource,
-   minimum read need, rejected grant, actual observation, unknown effective
-   permissions and the exact redacted evidence an authorized owner could
-   provide. Keep identities and credentials out of the shared note.
+4. Compare actual contents/attestations entries with the declaration.
+   The recorded token-permission block did not list `id-token`; do not claim
+   it independently proved that capability. The workflow declaration and
+   individual step evidence answer different questions.
+
+**Resolve the customer's question:** keep the additional authority on the job
+that needs it. Do not make all CI jobs writers to support one release action.
+We inspected an existing release; we did not create one, trigger a workflow,
+change permissions or approve promotion. Applicable event restrictions and
+policy still matter.
+
+## 23-28: Live Quiz Sprint
+
+Use fingers, paper, chat or private written answers. Allow thinking time; do
+not rank learners by speed.
+
+1. Does cloning a public repository prove push access? **No.**
+2. Does your human repository role describe the CI job token? **No.**
+3. One release job needs to publish. Should the default for all jobs become
+   `contents: write`? **No; justify authority for the particular job/action.**
+
+Ask for the observation that ruled out the tempting answer.
+
+## 28-32: Read, Rule Out, Return
+
+**Read** the actor, action and resource. **Rule out** public-read success, a
+human role or a YAML declaration as proof of every allowed action.
+**Return** to the smallest required authority and the actual evidence.
+
+Use a counterexample: a fine-grained token can narrow a person's private
+repository access even when the account has a suitable role. Public reads do
+not demonstrate that restriction. A 404 can mean a hidden private resource or
+a wrong path; it does not diagnose revocation.
+
+## 32-35: Handoff to a different operation
+
+**Say:** "You have seen source reads and release publishing. Now investigate
+uploading security analysis. Does that operation need release authority?"
+
+Use the same verified clone and tag, not a second repository or somebody
+else's workspace. The CodeQL task below is a source-based permissions review,
+not an instruction to enable scanning, obtain alerts or run a scan.
+
+## 35-70: Independent practice - analysis is not a release
+
+1. **35-40:** Predict which authority the analysis job needs. Start an
+   action/resource matrix with four rows: human public clone/potential push,
+   CI validation, release publishing, and CodeQL analysis upload. Distinguish
+   the person's credential from each job's token.
+2. **40-48:** In GitHub.com at `wre-v1`, open
+   **.github > workflows > codeql.yml**. From the clone root, run:
+
+   ```bash
+   git --no-pager show HEAD:.github/workflows/codeql.yml
+   ```
+
+   Locate workflow-level defaults, the analysis job's override, the checkout
+   step and analysis action. Record the source SHA and exact declarations.
+3. **48-55:** Use the official
+   [workflow permissions reference](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)
+   to explain `security-events: write` versus `contents: write`.
+   Recommend whether to retain or change the declared authority. An observed,
+   justified no-change decision is valid; do not invent a defect to repair.
+4. **55-62:** Reject this proposed shortcut: "Give every job `contents: write`
+   so uploads work." Explain which permission addresses analysis upload,
+   which addresses release publishing and why the shortcut is not equivalent.
+   Account for event/policy restrictions without assuming a particular
+   forked-PR result. Do not run a scan, push or edit hosted settings.
+5. **62-67:** Check the human row against your clone and role observations,
+   and each job row against its workflow declarations and any inspected log.
+   Mark runtime analysis permissions **unobserved** unless you inspect an
+   accessible real run for that source and event. A YAML declaration is not
+   that observation; no alert or security-administrator access is required.
+6. **67-70:** Write a short customer handoff: the actor and action, minimum
+   proposed authority, rejected broader grant, exact source, actual
+   observations and unresolved owner question. Mark any proposed change
+   **unperformed**. Keep the note private and outside tracked files.
 
 ## If something fails
 
-- **`gh` is missing or unauthenticated:** Continue with the public browser
-  source if available. The CLI actor and account-specific API reads remain
-  **BLOCKED**; do not switch to another person's account.
-- **Either status flag is absent:** Skip the status command and record status
-  unknown. Do not use a token-display flag as a substitute.
-- **403, 404 or inaccessible Settings:** Verify the exact target and current
-  actor. A hidden private resource, policy or misspelled path can look alike;
-  do not infer deletion or deliberately try a write to test permission.
-- **Browser and CLI identities differ:** Record the separate contexts and use
-  only the one already authorized for each read. A narrower grant reduces
-  impact but may omit an action; resolve that with an action inventory, not
-  an automatic write grant.
+- **Clone directory exists or files are changed:** confirm the intended new
+  path and `git status`. Use a separate unused directory; never discard work.
+- **Tag, SHA or remote differs:** compare with preparation. Stop source
+  comparison and ask the owner; do not move a tag.
+- **CLI is missing, unauthenticated or using the wrong account:** check the
+  actual error and intended identity privately. Read public source in the
+  browser; account-specific evidence remains **BLOCKED**.
+- **Browser asks for sign-in to view logs:** use an existing authorized
+  browser sign-in or the already-authorized CLI read. If neither is available,
+  mark logs **BLOCKED**.
+- **Run/log is unavailable or has expired:** confirm repository, run ID and
+  source SHA. Retain source-only analysis, not a claim about runtime authority.
+- **A read returns 403/404:** record the exact target and status. Ask the
+  appropriate owner; do not infer cause, broaden credentials or attempt a write.
+
+If a historical run is no longer available, the facilitator can inspect
+**Actions > Flight checks** or **Actions > Release provenance** for an existing,
+authorized example and name its actual source revision. Do not silently pair
+its logs with `wre-v1` source. A source-only comparison is useful but leaves
+runtime behavior unobserved. Do not dispatch a replacement run for class.
 
 ## 70-83: Self-check and debrief
 
-- **70-75, self-check:** Does every permission claim name an actor, action,
-  target and actual observation or explicit unknown? Is the proposed workflow
-  distinct from your current human account?
-- **75-81, facilitator discussion:** Ask, "What changes if the same workflow
-  runs for a forked PR?" and "What would a public read fail to establish?"
-  Do not claim a particular policy outcome without event-specific evidence.
-- **81-83, record:** State the recommended narrow access and the owner
-  question. A matrix is not an applied permission change.
+- **70-75:** Check your matrix individually. Does each conclusion name the
+  actor, operation, resource, source revision and actual observation or unknown?
+- **75-81:** Discuss: "Why does analysis upload differ from release
+  publication?" and "What could an event or policy change about this job?"
+  Keep the human account separate from job-token authority.
+- **81-83:** Save the corrected customer answer and one unresolved evidence
+  request. No peer approval or applied permission change is required.
 
 ## 83-85: Transfer and close
 
-For a customer, separate repository, deployment and end-user authorization.
-Provide the action/resource matrix rather than a blanket grant. No hosted
-change was performed by this authored route; inaccessible settings are
-**BLOCKED** and native/classroom rehearsal is **UNREVIEWED**.
+**Say:** "Don't start with 'give the bot write access.' Start with the action
+it needs. We kept test jobs read-only, located release authority on its own
+job, and assessed a different upload permission. Existing working controls
+can answer the customer without changing production access."
+
+Read-only CLI/source/run observations are not a denied-operation test,
+offboarding review, executed access change or release approval. Native
+PowerPoint, screen-reader and classroom rehearsal remain **UNREVIEWED** until
+separately recorded. Shared evidence boundaries are in [sessions](sessions.md).
+
+## Official references
+
+- [Use GITHUB_TOKEN for authentication in workflows](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token)
+- [Workflow syntax and permissions](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)
+- [Managing personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+- [GitHub CLI environment and credential selection](https://cli.github.com/manual/gh_help_environment)
