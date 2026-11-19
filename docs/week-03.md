@@ -33,7 +33,17 @@ source at `wre-v1`; that older tag intentionally does not contain this updated g
 On a narrow screen, use GitHub's code-copy button and paste into a plain-text
 editor with line wrapping to read a complete command before running it.
 
-Start in a parent directory you own. Run:
+Open a terminal in a parent directory you own. Run `pwd` to see where you are.
+For example, on a Mac, `cd ~/Downloads` selects your Downloads folder. If that
+folder is unavailable, choose another existing folder you own.
+
+Check that Git is available:
+
+```bash
+git --version
+```
+
+Then clone once:
 
 ```bash
 git clone https://github.com/msfttoler/wre-flight-deck.git wre-week03
@@ -82,17 +92,18 @@ revision, not preparing a push. No learner branch or local edit is required.
 
 ```bash
 gh --version
-gh api user --jq '.login'
+gh api --hostname github.com user --jq '.login'
 ```
 
 Compare the returned account with your intended CLI account. Stop that
 account-specific investigation if it differs or the request fails. Do not
 switch to somebody else's account or broaden a credential for class.
 
-The clone lets `gh repo view` infer the repository from its Git remote; there
-is no `PRACTICE_REPO` assignment. Browser, Git transport and `gh` can use
-different credentials. A personal-token settings page does not necessarily
-describe the OAuth or environment credential used by `gh`.
+The commands below name the GitHub host and repository explicitly, so a
+different `GH_REPO` setting does not silently select another target. There is
+no `PRACTICE_REPO` assignment. Browser, Git transport and `gh` can use different
+credentials. A personal-token settings page does not necessarily describe the
+OAuth or environment credential used by `gh`.
 
 If credential diagnosis is needed, privately read `gh auth status --help`.
 Only when it lists both `--active` and `--no-refresh`, use
@@ -103,9 +114,35 @@ that status command. Do not display tokens or change authentication settings.
 
 The facilitator opens these before delivery:
 
-1. [Flight Deck source at wre-v1](https://github.com/msfttoler/wre-flight-deck/tree/wre-v1).
-2. [CI run 43515740797](https://github.com/msfttoler/wre-flight-deck/actions/runs/43515740797).
-3. [Release run 43515739191](https://github.com/msfttoler/wre-flight-deck/actions/runs/43515739191).
+1. [Flight Deck source at the approved commit](https://github.com/msfttoler/wre-flight-deck/tree/59fae25ea3f18068e2140240d2fb606f35041974).
+2. [CI workflow at the approved commit](https://github.com/msfttoler/wre-flight-deck/blob/59fae25ea3f18068e2140240d2fb606f35041974/.github/workflows/ci.yml).
+3. [CI run 43515740797](https://github.com/msfttoler/wre-flight-deck/actions/runs/43515740797).
+4. [Release workflow at the approved commit](https://github.com/msfttoler/wre-flight-deck/blob/59fae25ea3f18068e2140240d2fb606f35041974/.github/workflows/release.yml).
+5. [Release run 43515739191](https://github.com/msfttoler/wre-flight-deck/actions/runs/43515739191).
+
+On the CI run, open **Native tests (Node 24) > Set up job > GITHUB_TOKEN
+Permissions**. On the release run, open **release > Set up job > GITHUB_TOKEN
+Permissions**. Leave both blocks ready. If browser logs require sign-in, use an
+existing authorized session or the CLI alternatives below.
+
+If the CLI is authenticated, verify the run revisions before class. Each
+backslash continues the command on the next line; copy the whole block:
+
+```bash
+gh run view 43515740797 \
+  --repo github.com/msfttoler/wre-flight-deck \
+  --json headSha,status,conclusion,url
+```
+
+```bash
+gh run view 43515739191 \
+  --repo github.com/msfttoler/wre-flight-deck \
+  --json headSha,status,conclusion,url
+```
+
+Check each `headSha` against the full approved SHA in step 2. A missing,
+inaccessible or different-revision run cannot corroborate this baseline:
+use the source-only fallback below and record that runtime evidence is missing.
 
 Both named runs are historical examples for commit
 `59fae25ea3f18068e2140240d2fb606f35041974`, not claims about the newest run.
@@ -118,6 +155,28 @@ today; logs can expire or become unavailable.
 Keep a private note outside the clone with source SHA, run URL, UTC observation
 time, account role, action, actual result and remaining unknown. Do not record
 credentials, private account details or unrelated log content.
+
+## If using the matching Week 03 deck
+
+The steps below also work without slides. With the WRE Week 03 deck, keep
+speaker notes and this guide off the shared screen. Use these cues:
+
+- **00-11:** Slides 1-2 introduce the customer; slide 3 frames the questions;
+  slide 4 collects a prediction; slide 5 explains the actor/action model.
+- **11-17:** Show slide 6, then switch to the prepared source and terminal for
+  the public-clone question.
+- **17-23:** Show slide 7, then switch to CI source/run and release source/run.
+  Slide 8 is an optional recap within this same time.
+- **23-35:** Use slides 9-11 for the quiz, slide 12 for the decision clinic
+  and slide 13 for the independent-practice handoff.
+- **35-70:** Leave slide 14 visible during individual practice.
+- **70-85:** Use slide 15 for self-check and debrief, then slide 16 to close.
+
+In the matching HTML deck, click the slide area and press **O** for the
+numbered overview; select a slide to jump to it. Arrow keys move between
+slides. Leave **Reference slides: skipped** selected; slides 17-20 are optional.
+If the deck is unavailable, use the timed prompts below and run the quiz
+manually.
 
 ## 00-03: One team, three questions
 
@@ -164,11 +223,12 @@ credential was used or prove that an authenticated account can write.
 ## 11-17: Question 1 - "I can clone it. Can I push?"
 
 1. In GitHub.com, open the pinned source page from preparation. Under **Code**,
-   confirm `msfttoler/wre-flight-deck` and the `wre-v1` tag. The source is public.
+   confirm `msfttoler/wre-flight-deck` and commit `59fae25`. The source is public.
 2. From the verified clone root, run:
 
    ```bash
-   gh repo view --json nameWithOwner,isPrivate,viewerPermission
+   gh repo view github.com/msfttoler/wre-flight-deck \
+     --json nameWithOwner,isPrivate,viewerPermission,url
    ```
 
 3. Confirm the returned name is `msfttoler/wre-flight-deck`; stop on a different
@@ -188,8 +248,9 @@ smallest applicable grant. Do not attempt a push to manufacture a refusal.
 
 ## 17-20: Question 2 - "Our tests need write access, right?"
 
-1. On the pinned source page, open **.github > workflows > ci.yml**. In the
-   terminal, show the same file:
+1. Open the prepared **CI workflow** tab. Alternatively, on the pinned source
+   page, open **.github > workflows > ci.yml**. In the terminal, show the same
+   file:
 
    ```bash
    git --no-pager show HEAD:.github/workflows/ci.yml
@@ -206,7 +267,9 @@ smallest applicable grant. Do not attempt a push to manufacture a refusal.
    token-permission blocks:
 
    ```bash
-   gh run view 43515740797 --log | grep -A 3 'GITHUB_TOKEN Permissions'
+   gh run view 43515740797 \
+     --repo github.com/msfttoler/wre-flight-deck \
+     --log | grep -A 3 'GITHUB_TOKEN Permissions'
    ```
 
    `grep` filters the displayed log, not the job or token. If the command errors
@@ -220,8 +283,9 @@ refused, or that `persist-credentials: false` removes the job's token.
 
 ## 20-23: Question 3 - "Should every job be a writer?"
 
-1. On the pinned source page, open **.github > workflows > release.yml**.
-   In the same terminal, run:
+1. Open the prepared **Release workflow** tab. Alternatively, on the pinned
+   source page, open **.github > workflows > release.yml**. In the same
+   terminal, run:
 
    ```bash
    git --no-pager show HEAD:.github/workflows/release.yml
@@ -237,7 +301,9 @@ refused, or that `persist-credentials: false` removes the job's token.
    The CLI alternative is:
 
    ```bash
-   gh run view 43515739191 --log | grep -A 3 'GITHUB_TOKEN Permissions'
+   gh run view 43515739191 \
+     --repo github.com/msfttoler/wre-flight-deck \
+     --log | grep -A 3 'GITHUB_TOKEN Permissions'
    ```
 
 4. Compare actual contents/attestations entries with the declaration.
