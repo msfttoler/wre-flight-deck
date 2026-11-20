@@ -72,23 +72,29 @@ ask the owner for the exact missing record without changing an installation.
 No learner needs App-owner, organization-owner, or repository-administrator
 access. No previous session or existing learner workspace is needed.
 
-## 00-12: Open and explain the task
+## 00-10: Frame the customer question
 
-1. **00-05 - Open the problem.** Say: "The team says an integration received
-   an event. We need to know whether the right installation received it and
-   whether its receiver actually did the intended work." Ask what a delivery
-   response alone can establish.
-2. **05-12 - Draw the chain in words.** Name four distinct checks:
-   installation scope and permission; subscribed event; GitHub delivery and
-   response; receiver authentication, processing, and business effect.
-   A successful HTTP response is transport evidence, not proof of the effect.
-   Identify which owner-supplied records are actually available today.
-3. Tell learners that a local request ID and a GitHub delivery GUID belong to
-   different systems. Similar timestamps do not establish causation.
+**00-03 — Customer problem.** The platform engineer needs to know whether a
+GitHub App event reached the intended receiver and caused the expected work.
 
-## 12-30: Facilitator demonstration
+**03-05 — Three questions.** Ask learners to predict:
 
-1. **12-16 - Observe the local boundary.** If the local app is available,
+1. Is the App installed on the repository that owns the intended work?
+2. Does a successful delivery response prove the receiver processed it?
+3. Can Flight Deck's local event journal prove a GitHub webhook happened?
+   **No; it is a different system.**
+
+**05-07 — Flash Rewind.** Installation, delivery, receiver processing, and
+business effect are separate evidence links.
+
+**07-10 — Mental model and setup.** State which owner-supplied, read-only
+records are actually available. A local request ID and a GitHub delivery
+GUID identify different systems; similar timestamps do not establish
+causation. If a hosted record is missing, keep that link **BLOCKED**.
+
+## 10-28: One facilitator investigation
+
+1. **10-12 — Observe the local boundary.** If the local app is available,
    open **Plan a journey**, select **SEA · Seattle** to **DEN · Denver** and
    **1 passenger**,
    then choose **Find flights**. Choose **Review fare** on a listed option,
@@ -102,23 +108,24 @@ access. No previous session or existing learner workspace is needed.
    itself generate a GitHub event. If the app is unavailable, read the
    [event schema and runtime boundary](api-contract.md#runtime-and-boundaries)
    instead and say the local event was **not observed**.
-3. **16-21 - Identify the installation.** Open the owner's supplied
+3. **12-16 — Identify the installation.** Open the owner's supplied
    read-only link or redacted record. Record the observed App name, target
    repository, installation scope, relevant permission, and subscribed
    event/action. Mark any hidden field **BLOCKED**; an App name or badge
    alone does not establish access to this repository.
-4. **21-25 - Inspect a real delivery.** In that supplied view or record,
+4. **16-21 — Inspect a real delivery.** In that supplied view or record,
    locate the delivery GUID, event/action, repository, delivery time,
    response, and whether it was a redelivery. Record only what is visible;
    do not copy headers or payloads with secrets. Do not press a redeliver
    button. GitHub retains the same `X-GitHub-Delivery` GUID for a redelivery;
    distinguish the GUID from any separate delivery-record ID or timestamp.
-5. **25-30 - Follow the receiver.** Open the corresponding owner-supplied
+5. **21-26 — Follow the receiver.** Open the corresponding owner-supplied
    receiver log or durable result. Compare its correlation identifier and
    time with the delivery. Record separately whether reception, signature
    verification, duplicate handling, processing, and the intended effect
    are supported. A `2xx` response alone does not prove all five.
-6. If any link in the chain is missing, stop at that link. Say: "We can
+6. **26-28 — State the evidence boundary.** If any link in the chain is
+   missing, stop at that link. Say: "We can
    establish these earlier observations, but this effect is unknown." Ask
    for the exact redacted record needed; do not manufacture a substitute.
 
@@ -127,9 +134,9 @@ and [delivery GUID behavior](https://docs.github.com/en/webhooks/using-webhooks/
 The settings view may require the App owner or an App manager; it is not a
 learner prerequisite.
 
-## 30-35: Retrieval and handoff
+## 28-35: Retrieval and handoff
 
-**30-33 - Manual Live Quiz Sprint.** Invite written, finger, or chat answers:
+**28-31 - Manual Live Quiz Sprint.** Invite written, finger, or chat answers:
 
 1. Is Flight Deck's `/api/events` a GitHub webhook log?
 2. Does HTTP success prove the intended business effect?
@@ -137,48 +144,63 @@ learner prerequisite.
 
 Facilitator key: **no** to all three.
 
-**33-35 - Read, Rule Out, Return.** Read the intended integration effect;
+**31-33 - Read, Rule Out, Return.** Read the intended integration effect;
 rule out the unrelated local event as proof; return to the real correlated
-delivery and receiver evidence. Hand off the independent task.
+delivery and receiver evidence.
+
+**33-35 — Handoff.** Practice the narrower installation decision without
+changing the App or replaying a delivery. Start at minute 35 even if hosted
+evidence is blocked.
 
 ## 35-70: Independent practice - narrower installation scope
+
+When your core work is on track, use the [Week 09 investigation challenge](sessions.md#make-the-practice-time-useful).
 
 Work individually from the actual owner-supplied evidence. Your question:
 "Could this integration perform its observed action if its repository scope
 or permissions were narrowed?" You are assessing a proposal, not changing
 the installation.
 
-1. Write down the intended action and the target repository. Identify the
+1. **35-40:** Write down the intended action and the target repository. Identify the
    available installation record and the event/action it covers.
-2. Make a table with columns: **link in chain**, **source and observation
+2. **40-46:** Make a table with columns: **link in chain**, **source and observation
    time**, **what it establishes**, **status**, and **what is missing**.
    Add rows for installation, delivery, receiver authentication/processing,
    and business effect. Use **PASS**, **FAIL**, **BLOCKED**, or **UNREVIEWED**
    only for the specific criterion you actually assessed.
-3. Select one observed or proposed narrower repository/permission scope.
+3. **46-52:** Select one observed or proposed narrower repository/permission scope.
    For each action the integration needs, state whether the available
    evidence establishes it would still be authorized. If the owner has not
    supplied the necessary permission details, record **unknown**, not denied
    or allowed.
-4. Look for an actual delivery and its receiver record. Note the GUID and
+4. **52-58:** Look for an actual delivery and its receiver record. Note the GUID and
    observed response; correlate only fields the records support. Explain
    one counterexample: transport succeeds but later processing fails, or the
    installation does not include the intended repository.
-5. If the owner supplied records of a genuine redelivery, compare their
+5. **58-62:** If the owner supplied records of a genuine redelivery, compare their
    timestamps, record IDs, shared GUID, and receiver duplicate-handling
    evidence. Do not initiate a replay. If no such records exist, say
    **BLOCKED: retry evidence** rather than inventing an attempt.
-6. If no hosted App evidence is available at all, inspect the real
+6. **Fallback:** If no hosted App evidence is available at all, inspect the real
    [API contract](api-contract.md) and, if you have the clone, run
    `git ls-files .github/workflows` from its root. List what those sources
    do and do not establish, then write a specific request for the owner:
    installation scope, one redacted delivery, and the matching receiver
    outcome. This is a partial investigation, not an integration test.
-7. Save your table, recommendation, one counterexample, and next owner/action
+7. **62-70:** Save your table, recommendation, one counterexample, and next owner/action
    in a local note outside tracked app files. Do not save secret values or
    sensitive payloads.
 
-## 70-85: Self-check, recovery, and close
+### Progressive hints
+
+1. Record each link separately; do not use a successful HTTP response as the
+   receiver's result.
+2. Compare the installation repository and subscribed event with the actual
+   delivery target.
+3. Ask what durable receiver evidence would connect delivery to business
+   effect; if absent, hand off that exact gap.
+
+## 70-83: Self-check and debrief
 
 **70-75:** Check each table row has a source or an explicit blocked status.
 Do not label a dated owner record as your own live inspection.
@@ -191,7 +213,9 @@ does not match, record the mismatch; do not broaden permissions for class.
 **81-83:** Record the smallest owner request that would resolve the decision.
 An inaccessible settings page is an access limit, not proof a setting is absent.
 
-**83-85:** Transfer the chain to a customer integration: installation,
+## 83-85: Transfer and close
+
+Transfer the chain to a customer integration: installation,
 delivery, receiver, effect. Stop only your own local server with Ctrl-C.
 Live integration behavior and classroom rehearsal remain unreviewed unless
 actually observed.
