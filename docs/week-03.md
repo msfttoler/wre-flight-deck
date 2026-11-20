@@ -464,6 +464,8 @@ enable scanning, obtain alerts or run a scan.
 
 ## 35-70: Independent practice - analysis is not a release
 
+When your core work is on track, use the [Week 03 investigation challenge](sessions.md#make-the-practice-time-useful).
+
 1. **35-50:** Revisit your prediction about the authority the analysis job
    needs. Continue your four-row action matrix and investigate the CodeQL row.
    Distinguish the person's credential from each job's token. Label presenter

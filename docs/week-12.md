@@ -75,18 +75,26 @@ owns each unresolved condition. WRE has no exam or required earlier lab.
    security analysis, and artifact/provenance. Leave unobserved rows
    **UNREVIEWED**; label unavailable evidence **BLOCKED**.
 
-## 00-05: Opening
+## 00-10: Opening, frame, rewind, and model
 
-1. Say: "We are combining familiar engineering moves to decide whether one
-   candidate has enough evidence. A hold can be the right result."
-2. Name the actual candidate and acceptance conditions if the owner supplied
-   them. Otherwise name the local baseline candidate and explicitly mark the
-   hosted release decision **BLOCKED**.
-3. Ask: "If a test passed on a different commit, what would we need to know
-   before using it for this candidate?" Take one answer or allow a written
-   response.
+### 00-03: Opening
 
-## 05-10: Flash Rewind
+Say: "We are combining familiar engineering moves to decide whether one
+candidate has enough evidence. A hold can be the right result." Name the
+actual candidate and acceptance conditions if the owner supplied them.
+Otherwise name the local baseline candidate and mark the hosted release
+decision **BLOCKED**.
+
+### 03-05: Frame three customer questions
+
+Ask learners to predict:
+
+1. Which exact candidate does the release owner want assessed?
+2. Does the available check prove that this candidate's code ran?
+3. If an artifact exists, does it match the owner's accepted bytes and
+   producer policy?
+
+### 05-07: Flash Rewind
 
 Choose the beats needed for this decision; explain unfamiliar ones without
 assuming anyone attended earlier weeks.
@@ -106,7 +114,15 @@ assuming anyone attended earlier weeks.
 | 11 | Inventory hosted dependencies | A clone is not a complete migration |
 | 12 | Bind evidence to one candidate | Unrelated green runs do not add up |
 
-## 10-14: Manual Live Quiz Sprint
+### 07-10: Mental model
+
+The candidate, run, checked-out tree, analysis, artifact, and release
+authority are separate links. Evidence for one link cannot fill an unknown
+one elsewhere. Show the blank evidence matrix and state the actual target,
+account role, available tools, and allowed read-only effects. A missing
+hosted record remains **BLOCKED**.
+
+## 10-13: Manual Live Quiz Sprint
 
 Use paper, fingers, or chat; written answers are equally valid. Ask:
 
@@ -117,13 +133,19 @@ Use paper, fingers, or chat; written answers are equally valid. Ask:
 Facilitator key: **no** to all three. Invite learners to state the missing
 relationship, not just the answer.
 
-## 14-35: Engineering Strategy Clinic
+## 13-15: Strategy — Read, Rule Out, Return
+
+Read the owner's acceptance condition. Rule out evidence from a different
+candidate or an unrelated artifact. Return to the first unresolved link and
+name its owner. Use this method throughout the existing clinic.
+
+## 15-33: Engineering Strategy Clinic
 
 Use **Read, Rule Out, Return** throughout: read the actual acceptance
 condition, rule out evidence that does not establish it, and return to the
 first unresolved decision.
 
-### 14-19: Bind the candidate
+### 15-18: Bind the candidate
 
 1. Open the owner's actual candidate or PR link in GitHub, if supplied.
    Record the full candidate SHA, base SHA, link, and observation time.
@@ -141,7 +163,7 @@ first unresolved decision.
    **BLOCKED** and ask for an authorized accessible ref. Do not treat the
    baseline test as a pass for a different candidate.
 
-### 19-25: Check local behavior at that SHA
+### 18-23: Check local behavior at that SHA
 
 1. If your server is running, stop **your** server with Ctrl-C before
    switching revisions. From the clone root, run `git status --short
@@ -204,7 +226,7 @@ startup to reject old state. Preserve the data directory; use a new, unused
 one only for separately labeled further UI checks. Never treat another
 instance's state as candidate evidence.
 
-### 25-32: Inspect hosted checks, security, and artifact
+### 23-30: Inspect hosted checks, security, and artifact
 
 1. Open the actual candidate's PR, if supplied. Select **Checks** and record
    each relevant real check's name, status, conclusion, run link, and
@@ -278,15 +300,22 @@ instance's state as candidate evidence.
    If the ref or option is missing, mark that policy condition **BLOCKED**.
    Do not claim the earlier command enforced a ref.
 
-### 32-35: Make the handoff
+### 30-33: Choose a bounded recommendation
 
 1. Fill the evidence matrix with the actual observations and blocked cells.
    For each row, say what it proves and what it does not.
-2. Say: "A passing local test cannot fill an unavailable provenance cell."
-   Ask which owner can resolve the first missing condition.
-3. At minute 35, start individual work even if hosted checks are pending.
+2. Choose **release**, **hold**, or **unknown** for the stated condition.
+   Keep the recommendation bounded by the evidence actually available.
+
+## 33-35: Handoff
+
+Say: "A passing local test cannot fill an unavailable provenance cell."
+Name the owner who can resolve the first missing condition. Start individual
+work at minute 35 even if hosted checks are pending.
 
 ## 35-70: Independent Capstone Lab
+
+When your core work is on track, use the [Week 12 investigation challenge](sessions.md#make-the-practice-time-useful).
 
 Work from your own fresh clone and one candidate record, not another week's
 solution. Choose **one** changed acceptance condition:
@@ -298,38 +327,47 @@ solution. Choose **one** changed acceptance condition:
 - A workflow or permission differs from an approved baseline; its operational
   impact must be resolved.
 
-1. Write the chosen condition and the full candidate SHA. If you chose the
+1. **35-40:** Write the chosen condition and the full candidate SHA. If you chose the
    expected-digest condition, request the expected SHA-256 from the owner
    through an approved independent channel; do not derive it from the file
    you are evaluating. If it is unavailable, mark that condition **BLOCKED**.
    If there is no hosted candidate, label `wre-v1` as a local assessment
    candidate and keep hosted release evidence **BLOCKED**.
-2. Identify the source or file relevant to your condition. Open it at the
+2. **40-46:** Identify the source or file relevant to your condition. Open it at the
    candidate revision. Record the path and one concrete observation; do not
    assume a proposed feature was implemented.
-3. Record the actual candidate-bound `npm test` result and any UI
+3. **46-52:** Record the actual candidate-bound `npm test` result and any UI
    observation you performed using the clinic steps. If a candidate cannot
    be checked out, leave those cells **BLOCKED** instead of transferring the
    baseline's result.
-4. Inspect the relevant real hosted check, analysis, workflow comparison,
+4. **52-59:** Inspect the relevant real hosted check, analysis, workflow comparison,
    or artifact if accessible. For the expected-digest condition, compare
    the owner's expected SHA-256 with both the downloaded file's digest and
    the verified subject digest; a mismatch is a failed condition, not a pass.
    Record the link, revision or digest, result, and limitation. If the needed
    evidence is absent, name the exact owner and redacted record required.
-5. Rule out one plausible but insufficient claim. Examples: a previous run
+5. **59-63:** Rule out one plausible but insufficient claim. Examples: a previous run
    tested a different commit; the same filename has different bytes; a
    workflow file exists but has no observed run; or a feature is only a plan.
-6. Make a **release**, **hold**, or **unknown** recommendation for the
+6. **63-66:** Make a **release**, **hold**, or **unknown** recommendation for the
    stated condition. Explain the evidence that supports it, the unresolved
    risk, and the next responsible owner/action. Do not publish, change
    policy, or dispatch a workflow to force a result.
-7. Save a one-page local decision outside tracked app files: candidate SHA,
+7. **66-70:** Save a one-page local decision outside tracked app files: candidate SHA,
    condition, matrix, real test/UI observations, links or blocked cells,
    counterexample, decision, and owner action. A proposal is not implemented
    evidence unless you actually made and tested the change.
 
-## 70-85: Close
+### Progressive hints
+
+1. Bind every result to the candidate SHA or exact artifact before judging
+   it.
+2. If a PR check and candidate differ, inspect the event and actual checkout;
+   do not infer staleness from the SHA alone.
+3. Compare an artifact only with the acceptance conditions its owner actually
+   supplied; otherwise hold or mark the condition unknown.
+
+## 70-83: Debrief
 
 **70-75 - Self-check:** Verify every claimed pass is bound to the candidate
 or actual artifact and was performed. For mismatched SHAs, inspect the event
@@ -353,7 +391,9 @@ weaken the criterion.
 **81-83 - Record:** Save the recommendation and the exact next owner/action.
 No automated score or peer approval substitutes for the learner's reasoning.
 
-**83-85 - Transfer and recognition:** Explain how the same record would help
+## 83-85: Close
+
+Explain how the same record would help
 a customer distinguish authored quality from hosted validation. Recognize
 the completed investigation without claiming mastery or a release. Stop
 only your own server with Ctrl-C. Optional certification scheduling is

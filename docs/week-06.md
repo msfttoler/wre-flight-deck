@@ -16,6 +16,9 @@ a vulnerability to make the lesson run.
   to the relevant analysis and alert. No previous week, security-admin role,
   permission expansion or GitHub write access is needed. Without the actual
   finding or access, the finding-specific part is **BLOCKED**.
+- This is a read-and-proposal session. Do not edit a branch, dismiss an alert,
+  enable scanning, or start a new analysis. A local source/test review is a
+  separately labeled fallback, not CodeQL alert triage.
 - **Required for running local tests:** Git 2.23+, Node.js 24+, npm and a new
   local clone. **Optional for source-only review:** browse the approved tag
   in GitHub instead. The local app server, a learner branch and `gh` are
@@ -61,17 +64,15 @@ git rev-parse 'wre-v1^{commit}'
 Compare both origin URLs with `msfttoler/wre-flight-deck` without exposing
 credentials and the tag commit with the owner's approved SHA. A different
 target, dirty clone, missing tag or mismatch is **BLOCKED**; do not substitute
-`main`. For a read-only local test, select the approved tag:
+`main`. For read-only source review or tests, select the approved tag:
 
 ```bash
 git switch --detach wre-v1
 ```
 
 If the switch fails, stop. Only after success, use `git rev-parse HEAD` and
-confirm the approved SHA. To make an authorized local test edit instead,
-create an unused branch from the verified tag with
-`git switch -c learner/w06-YOUR-ID wre-v1`, then confirm `HEAD`. If creation
-fails or the SHA differs, stop before editing. Do not move `wre-v1`.
+confirm the approved SHA. Keep the worktree read-only; do not create a branch
+or edit source during this session.
 
 If you choose to see the product, run `npm start` from the verified clone
 root. Wait for your terminal to print `Flight Deck: http://127.0.0.1:3000`
@@ -86,17 +87,29 @@ this clone's `.data`, try `PORT=3001 npm start` and open
 `http://127.0.0.1:3001` only after a successful start. Never run two servers
 against the same state directory.
 
-## 00-05: The customer problem
+## 00-03: The customer problem
 
 **Say:** "A scanner result can point us to a path worth investigating. We
 still need the analyzed revision and deployment context before describing
 customer impact."
 
-Ask: "What could an empty alerts view mean besides a clean analysis?" The
-analysis might not have run, might cover another branch, or may be
-inaccessible. An empty view alone cannot choose among those explanations.
+## 03-05: Three questions, one investigation
 
-## 05-12: Model and setup
+Ask learners to predict:
+
+1. If a genuine alert shows a path, how does the value reach the operation?
+2. Which revision and ref did the analysis cover?
+3. What change, if any, would interrupt this particular flow?
+
+If no eligible alert is available, the finding-specific answers stay
+**BLOCKED**; the source/test fallback does not create an alert.
+
+## 05-07: Flash Rewind
+
+An empty alerts view can mean the analysis did not run, covered another
+branch or is inaccessible. It does not choose among those explanations.
+
+## 07-10: Model and setup
 
 Static analysis reasons about source without executing every possible input.
 An alert may describe data from an untrusted **source** reaching a sensitive
@@ -109,7 +122,7 @@ For local source, show the owner-approved tag and SHA. A workflow file is
 configuration, not proof that analysis completed or that its results are
 available.
 
-## 12-30: Facilitator demo
+## 10-28: One facilitator investigation
 
 1. Open `https://github.com/msfttoler/wre-flight-deck` > **Security** >
    **Code scanning** or **Code scanning alerts**, if accessible. Inspect the
@@ -136,7 +149,32 @@ available.
    actual full analyzed SHA, then open the displayed source and caller paths.
    If the SHA or source is inaccessible, mark that comparison **BLOCKED**.
    Explain source, sink and validation only where the alert and code support
-   them. A finding from another scanner is not a CodeQL alert.
+   them. A finding from another scanner is not a CodeQL alert. With an
+   already-authorized `gh`, inspect the matching alert instances and then
+   query analyses for the exact ref returned by the instance:
+
+   ```bash
+   REPO='msfttoler/wre-flight-deck'
+   ALERT='PASTE_OBSERVED_ALERT_NUMBER'
+   gh api "repos/$REPO/code-scanning/alerts/$ALERT/instances" --paginate \
+     --jq '.[] | {ref,commit_sha,analysis_key,state,location}'
+   ```
+
+   Copy the actual `ref` from the relevant instance; do not substitute the
+   current default branch. Then run:
+
+   ```bash
+   REF='PASTE_EXACT_INSTANCE_REF'
+   gh api "repos/$REPO/code-scanning/analyses" --method GET -f ref="$REF" --paginate \
+     --jq '.[] | {id,ref,commit_sha,analysis_key,created_at,tool:.tool.name,results_count}'
+   ```
+
+   Match the alert instance to an analysis by its actual ref, commit SHA,
+   analysis key, and tool. If the read is denied, the endpoint is unavailable,
+   or the rows do not identify a matching CodeQL analysis, record the
+   analysis link **BLOCKED** or unknown; an empty response is not proof that
+   no analysis exists. CLI output and the browser page are separate reads,
+   not a scan you ran.
 4. If there is no accessible actual alert, write **BLOCKED:
    finding-specific triage**. Instead open **Code** > branch/tag selector >
    **Tags** > `wre-v1`. At the repository root, open the displayed commit and
@@ -159,7 +197,7 @@ available.
 an empty view?" Require actual completion, target and result evidence. The
 independent task changes a caller or input condition without creating a flaw.
 
-## 30-33: Live Quiz Sprint
+## 28-31: Live Quiz Sprint
 
 Read aloud; learners may use paper, fingers, chat or private written responses.
 Allow additional response time and do not rank by speed.
@@ -168,14 +206,20 @@ Allow additional response time and do not rank by speed.
 2. Does an empty view prove analysis ran? **No.**
 3. Does a local unit test by itself clear an alert? **No.**
 
-## 33-35: Read, Rule Out, Return
+## 31-33: Read, Rule Out, Return
 
 **Read** the actual path and deployment assumption. **Rule out** an impact
 claim not supported by the analyzed revision. **Return** to the evidence
-needed for a repair or a source-only boundary review. Start practice at
+needed for a repair or a source-only boundary review.
+
+## 33-35: Handoff to independent triage
+
+Explain the finding-specific and source-only routes below. Start practice at
 minute 35 even if the alert is blocked.
 
 ## 35-70: Independent practice
+
+When your core work is on track, use the [Week 06 investigation challenge](sessions.md#make-the-practice-time-useful).
 
 Use the real CodeQL alert if one is accessible; otherwise use the real
 request-body boundary. Both routes require a decision and a clear evidence
@@ -212,8 +256,9 @@ limit, but only the first is finding-specific triage.
      byte count matters. Read the assertions for a valid 16384-byte body and
      an over-limit body; distinguish expected test behavior from an
      executed result. Do not send a new payload.
-4. **54-62:** If you have the verified local clone and Node 24+, run the
-   relevant real tests from its root. For the body-limit fallback, use:
+4. **54-62:** If you have the verified local clone and Node 24+, you may run
+   the existing native tests from its root as a baseline observation. For the
+   body-limit fallback, use:
 
    ```bash
    node --test test/http.test.mjs
@@ -224,24 +269,26 @@ limit, but only the first is finding-specific triage.
    to the finding rather than assuming the HTTP tests cover it.
    Record the actual result and `git rev-parse HEAD`. This is a test of the
    local baseline, not validation of an alert analyzed at a different SHA.
-   Without the runtime or clone, mark local execution **BLOCKED**. Optionally,
-   for the body-limit fallback, if existing assertions leave a justified gap,
-   add a benign regression test to `test/http.test.mjs` on your own verified
-   learner branch. For example, inspect whether an exactly 16384-byte valid
-   JSON request sent in chunks is covered; use the existing `raw` helper and
-   valid quote test data rather than a new runner. Run `npm test` and inspect
-   `git diff` and `git diff --check`. Do not weaken the boundary or claim an
-   unrun test passed.
-5. **62-67:** For an actual finding, write a bounded repair and test proposal
-   only if the behavior and path are understood; otherwise list the missing
-   fact and owner. A separately authorized local repair must be tied to the
-   relevant source revision and tested; a test result is not a CodeQL rescan.
+   Do not add a test or modify the worktree. Without the runtime or clone,
+   mark local execution **BLOCKED**.
+5. **62-67:** For an actual finding, write a bounded source-specific change
+   proposal and a permitted-input test plus an adversarial test only if the
+   observed flow justifies them. Otherwise list the missing fact and owner.
+   Do not edit, dismiss, rescan, or report remediation. A proposed test is
+   not an executed test, and a local baseline test is not a CodeQL rescan.
    For the fallback, state what the body-limit tests cover and what they do
    not establish about production exposure or a scanner finding.
 6. **67-70:** Finish the note with analysis/finding status, exact source
    revision, observed or proposed behavior, one decision-changing assumption,
    actual test result or block, and the next responsible owner. Never label
    the fallback a remediated alert.
+
+### Progressive hints
+
+1. Start with the actual alert and its instance, not a local code example.
+2. Match an analysis to the instance's exact ref and commit SHA.
+3. Keep the fix and tests as a proposal tied to the observed source-to-sink
+   path; no edit or rescan is part of this session.
 
 ## If something fails
 

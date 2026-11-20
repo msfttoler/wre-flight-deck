@@ -94,16 +94,26 @@ this clone's `.data`, try `PORT=3001 npm start` and open
 `http://127.0.0.1:3001` only after a successful start. Never run two servers
 against the same state directory.
 
-## 00-05: The customer problem
+## 00-03: The customer problem
 
 **Say:** "A consumer needs the exact file the airline intended to publish.
 We'll verify its bytes and then ask whether the producer matches the
 consumer's policy."
 
-Ask: "Would an authentic statement from a different workflow be enough?"
-Not when the recorded policy requires a particular producer.
+## 03-05: Three questions, one investigation
 
-## 05-12: Model and setup
+Ask learners to predict:
+
+1. Does a release title alone identify the producer?
+2. What did the verifier check against the owner's policy?
+3. What changes if the same bytes came from an unapproved producer?
+
+## 05-07: Flash Rewind
+
+The file, the statement and the producer policy answer different questions.
+An authentic statement from a different workflow may still fail the policy.
+
+## 07-10: Model and setup
 
 A **digest** is a fingerprint of bytes. An **attestation** is a signed
 statement about an artifact and its build. Verification binds the downloaded
@@ -116,7 +126,7 @@ Show the actual owner-provided policy and release, or say which is missing.
 The release's source revision is not automatically `wre-v1`. Do not unpack
 or execute a downloaded asset during this read-only exercise.
 
-## 12-30: Facilitator demo
+## 10-28: One facilitator investigation
 
 1. In `https://github.com/msfttoler/wre-flight-deck`, open **Releases**
    from the repository's **Code** page. Select the owner-supplied actual
@@ -187,6 +197,28 @@ or execute a downloaded asset during this read-only exercise.
 
    Check the actual command result and compare the verified subject digest
    with the separate SHA-256 reading. Record the exact restrictions and result.
+   For a negative comparison, first confirm the same asset passed this
+   owner-approved policy and its actual verified signer. The approved
+   `wre-v1` source contains `.github/workflows/ci.yml`; use it as the
+   contrasting signer only if the release owner confirms that this existing
+   workflow is not an allowed producer for the selected release. If the
+   baseline does not pass, the policy is unknown, or the owner cannot confirm
+   the alternate, mark the wrong-signer case **BLOCKED**. Do not invent a
+   workflow name or call an arbitrary CLI error a policy refusal.
+
+   ```bash
+   WRONG_SIGNER='msfttoler/wre-flight-deck/.github/workflows/ci.yml'
+   gh attestation verify "$ASSET_PATH" \
+     --repo msfttoler/wre-flight-deck \
+     --signer-workflow "$WRONG_SIGNER" \
+     --source-digest "$SOURCE_SHA" \
+     --source-ref "$SOURCE_REF"
+   ```
+
+   This repeats the canonical verifier against the same approved target and
+   bytes, changing only the expected signer. Count a refusal only when the
+   actual diagnostic identifies signer identity mismatch; missing evidence,
+   access, network, or source-ref errors are inconclusive.
    The signed statement's predicate can contain workflow-controlled metadata;
    do not treat it alone as independently trusted producer identity. Open the
    owner's actual run URL, or select **Actions**, the observed release
@@ -209,7 +241,7 @@ or execute a downloaded asset during this read-only exercise.
 subject digest must bind the exact bytes. Next, add an independently approved
 expected digest to the actual evidence, not an invented second artifact.
 
-## 30-33: Live Quiz Sprint
+## 28-31: Live Quiz Sprint
 
 Read aloud; use paper, fingers, chat or private written responses. Allow
 additional response time and do not rank by speed.
@@ -218,14 +250,20 @@ additional response time and do not rank by speed.
 2. Is a valid signature alone enough for a specific producer policy? **No.**
 3. Does provenance prove the tests or product are sufficient? **No.**
 
-## 33-35: Read, Rule Out, Return
+## 31-33: Read, Rule Out, Return
 
 **Read** the consumer's accepted producer and source. **Rule out** a
 statement for different bytes or an unapproved workflow. **Return** to the
-actual digest, verified identity and remaining unknowns. Start independent
-work at minute 35 even if verification is blocked.
+actual digest, verified identity and remaining unknowns.
+
+## 33-35: Handoff to independent verification
+
+Explain the independent digest condition below. Start practice at minute 35
+even if the demonstration's verification is blocked.
 
 ## 35-70: Independent practice
+
+When your core work is on track, use the [Week 05 investigation challenge](sessions.md#make-the-practice-time-useful).
 
 Use the real asset from the demo, or a different actual asset if one is
 available. The changed condition adds an **independently approved expected
@@ -277,6 +315,14 @@ invent an asset, edit a statement or generate provenance.
 6. **66-70:** Finish a note with the file path, actual digest if read,
    verifier command/result, each policy row, source and run links, decision
    and next owner. Do not claim verification for a proposal or a local app.
+
+### Progressive hints
+
+1. Keep the downloaded file fixed while comparing verifier policies.
+2. Ask the owner which producer is allowed; do not infer policy from a
+   signature or workflow filename.
+3. Count a negative result only when the verifier identifies the changed
+   signer condition as the reason for refusal.
 
 ## If something fails
 

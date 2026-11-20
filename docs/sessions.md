@@ -14,7 +14,7 @@ software, not live aviation information or a real booking service.
 | [01](week-01.md) | Recover a useful Git change without discarding other work | Diff, commit and recovered branch |
 | [02](week-02.md) | Distinguish application tests from a required merge check | Assertion, exact run and current merge requirements |
 | [03](week-03.md) | Compare human, CI and release authority | Pinned workflow source, actual job-token logs and a least-access decision |
-| [04](week-04.md) | Investigate an actual Actions run | Event, checkout revision, job and first actionable cause |
+| [04](week-04.md) | Investigate an Actions run and assess a job timeout | Event, checkout revision, actual durations and timeout decision |
 | [05](week-05.md) | Verify a release's actual provenance | Downloaded bytes, digest, attestation and trusted producer |
 | [06](week-06.md) | Triage a genuine CodeQL result, if present | Actual alert path and analysis revision; otherwise BLOCKED |
 | [07](week-07.md) | Turn a Copilot-assisted feature request into a reviewed change | Request, plan, diff, tests and personal review |
@@ -26,8 +26,11 @@ software, not live aviation information or a real booking service.
 
 No previous week, completed lab, existing learner branch or persistent app state
 is a prerequisite. Week 01 and Week 02 are included here as new app entry points.
-The published Week 02 course remains unchanged; this companion does not inherit
-its approval or claim an equivalent required-check gate.
+The published Week 02 course remains unchanged. This companion points learners
+to its approved checkout case in `msfttoler/wre-week-02`; it does not move that
+source into Flight Deck or claim that a current check or merge gate was
+observed. The Flight Deck baggage-fare example is a different scenario and is
+not equivalent.
 These Flight Deck guides are standalone companions, not replacements for the
 existing WRE decks, notes or labs. In particular, the existing Week 07/08
 materials use a different scenario. Do not mix the routes until the course
@@ -128,15 +131,26 @@ Record blocked effects rather than trying them to obtain a denial.
 
 ## Shared 85-minute delivery
 
-Weeks 01-11 except Week 03 use: 00-05 customer problem; 05-12 mental model and setup;
-12-30 facilitator demonstration; 30-33 manual **Live Quiz Sprint**;
-33-35 **Read, Rule Out, Return** and handoff; 35-70 individual practice;
-70-83 self-check/debrief; 83-85 transfer and close.
-Week 12 retains the six-part final-session route shown in its guide.
+Weeks 04-11 use one common route: 00-10 customer framing, rewind and mental
+model; one existing facilitator investigation from 10-28; retrieval, quiz,
+strategy and handoff from 28-35; individual practice from 35-70;
+self-check/debrief from 70-83; transfer and close from 83-85. Weeks 04-06
+and 10 divide 28-35 into quiz 28-31, **Read, Rule Out, Return** 31-33 and
+handoff 33-35. Weeks 07-09 and 11 put the same retrieval/strategy/handoff
+sequence within 28-35.
+
+Weeks 01 and 02 retain the opening and demonstration timings in their own
+guides. Week 02 frames its approved checkout case at 00-12, investigates the
+existing `wre-week-02` target at 12-30, uses retrieval/handoff at 30-35, and
+keeps individual practice, debrief and close in the shared final windows.
 Week 03 follows the aligned course timings in its own guide: three customer
 questions before minute 11, worked demonstrations at 11-23, quiz at 23-28,
-strategy at 28-32 and handoff at 32-35. It retains the same practice,
-self-check/debrief and close windows.
+strategy at 28-32 and handoff at 32-35.
+
+Week 12 uses its own final-session order: opening/frame/rewind/model 00-10,
+manual quiz 10-13, strategy 13-15, the existing investigation/strategy clinic
+15-33, handoff 33-35, capstone practice 35-70, debrief 70-83 and close
+83-85. It adds no new demonstration.
 
 Use paper, fingers or chat for the quiz; no quiz backend or speed ranking is
 needed. Offer written answers and time accommodations. Read the requirement,
@@ -147,6 +161,32 @@ At 35 minutes, start independent work even if CI is pending. Protect all 35
 practice minutes. During 70-83, spend five minutes checking your own evidence,
 six on facilitator discussion and two recording the decision and remaining gap.
 No peer review or approval dependency is part of the lab.
+
+### Make the practice time useful
+
+The checkpoints are planning estimates, not evidence that a session has
+actually lasted 85 minutes. At 43 and 55 minutes, check the learner's target,
+prediction, available evidence and next decision. Plan four to six minutes
+inside practice for the relevant challenge below only when enough time remains
+to finish the core decision and handoff before minute 70. Otherwise skip it
+and prioritize that decision and handoff. A
+written answer is enough; do not extend a blocked product step,
+invent a result, change shared resources, or require another learner's review.
+
+| Week | Further investigation using the same case |
+|---|---|
+| 01 | Compare the original and recovered commit's file snapshots and parent histories. Explain why matching content does not mean they are the same commit, and what happens to the saved edit if the original machine is lost. |
+| 02 | For the proposed $60 rule, independently trace $59.99, $60 and $60.01 through the existing code and proposed assertion. Identify which old expectations would change. This is a source-based proposal, not a test result. |
+| 03 | For each matrix row, name one action the actor needs and one broader permission that is unnecessary. Explain what an actual runtime log could add and what the source alone cannot prove. |
+| 04 | Compare two accessible completed job durations for the same selected job, if available. Explain why a single fast run is not enough to set a timeout; if a second run is missing, name the exact additional evidence needed. |
+| 05 | For the selected asset, distinguish matching bytes, a verified statement, and an approved producer. Explain which decision changes if the independently supplied digest is unavailable or differs; do not alter the asset. |
+| 06 | For the actual alert, identify any input covered by available evidence and an uncovered or unknown input. For the body-limit fallback, compare the inputs in the existing tests. Explain what a local test would establish and why it would not itself establish a hosted scan result. |
+| 07 | For the callsign request, write acceptance examples for an omitted, blank and unmatched filter. Compare them with an owner-approved callsign request if one exists; otherwise label the semantics as proposed and compare them with the observed source. Do not substitute this for the blocked boundary case. |
+| 08 | Trace the one-bag decision at 24,999 and 25,000 cents through the pinned source, separately from the proposed coupon rule. Cite the line or test for each conclusion and state what a source read cannot prove about runtime or an MCP trace. |
+| 09 | For the actual evidence chain, distinguish a delivered response from receiver processing and the business effect. Write the smallest redacted record request that could resolve the first missing link. |
+| 10 | Compare the chosen invariant at the approved baseline and current revision, then describe one proposed change that would affect it. Without an approved baseline or invariant, use the current-only inventory, mark the comparison **BLOCKED** and name the owner evidence needed. Separate an actual diff from the proposal. |
+| 11 | Choose a second inventory category from the same authorized source and explain how its acceptance check differs from the first. This is additional source analysis, not a substitute for the blocked second-repository transfer. |
+| 12 | Challenge the same candidate with one other existing acceptance condition. Bind available evidence to the same SHA or artifact and explain whether the recommendation changes; keep missing conditions blocked. |
 
 ## Evidence and status
 

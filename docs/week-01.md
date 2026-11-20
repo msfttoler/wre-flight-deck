@@ -193,6 +193,8 @@ start practice at minute 35 even if the demo encountered a block.
 
 ## 35-70: Independent practice
 
+When your core work is on track, use the [Week 01 investigation challenge](sessions.md#make-the-practice-time-useful).
+
 Work in your verified `wre-w01-YOUR-ID` clone, not the facilitator's. The
 changed condition is a second, uncommitted edit. Do not push.
 

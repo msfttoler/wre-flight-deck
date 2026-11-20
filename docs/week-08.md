@@ -1,313 +1,281 @@
-# Week 08: Ground a pricing change without granting tool authority
+# Week 08: Read-only MCP investigation of a pricing boundary
 
-The airline's pricing engineer wants a minimum-spend rule for `FIRSTFLIGHT`.
-Use an already-authorized context tool to inspect the actual source, then
-make and verify a local change. A tool result is information, not permission
-to run commands or disclose credentials.
+The pricing owner asks whether `FIRSTFLIGHT` should require at least 20,000
+cents of combined party **base fare**, excluding bags and tax. Inspect the
+request and the pinned source; do not implement it. The source at `wre-v1`
+does not already enforce this proposed minimum. A prior bag-inclusive lab
+policy is a distinct, incompatible counterexample, not Issue 2's acceptance.
 
-**By the end:** identify the source revision and tool authority, describe the
-pricing boundary, and distinguish a tested local change from an unverified
-MCP call or hosted result.
+**By the end:** compare the issue's 19,999/20,000-cent boundary with the
+source, then analyze the separate question of whether a 19,000-cent base fare
+plus a 2,500-cent bag meets a base-fare-only minimum. Establish each statement
+with a real read-only MCP trace and native Git corroboration, or record the
+MCP work **BLOCKED**. This session makes no code, application-state, server,
+or hosted changes.
 
 **Product request:** [Issue 2: FIRSTFLIGHT minimum combined base fare](https://github.com/msfttoler/wre-flight-deck/issues/2).
-The requested demo policy uses a 20000-cent combined party base fare, excluding
-bags and tax. It is new behavior, not a defect already present in `wre-v1`.
-The learner's bag-inclusive policy below is a separate proposal.
-This standalone Flight Deck companion uses a different scenario from the
-existing Week 08 course materials; do not pair them until the owner aligns them.
+The request is proposed behavior, not a defect already present at the pinned
+baseline. The bag-inclusive threshold question is a distinct counterexample:
+Issue 2 excludes bags, so a charged bag cannot turn 19,000 cents of base fare
+into 20,000 eligible base-fare cents.
 
-## Before class: prepare an independent workspace
+## Target, role, tools, and effects
 
-1. The owner confirms the approved `wre-v1` SHA, the Copilot surface and
-   entitlement, an **already configured and authorized** MCP server, its
-   available read tools, and how the client restricts tool use. Do not
-   install a server, create a token, expand permissions, or assume a tool name.
-   If the read boundary cannot be enforced, MCP execution is **BLOCKED**.
-2. Read [shared setup and evidence rules](sessions.md) and
-   [the pricing contract](api-contract.md). The commands below use a
-   bash-compatible terminal; on Windows, use Git Bash. Check:
+- **Target:** `msfttoler/wre-flight-deck` at the owner's approved full `wre-v1`
+  SHA. GitHub.com is for reading Issue 2 and its acceptance. An already
+  authorized, read-only MCP tool must retrieve the same repository and exact
+  SHA. Native Git `show` corroborates the returned files.
+- **Role:** repository and issue reader only. No administrator, owner,
+  reviewer, app write, workflow dispatch, PR, issue comment, or hosted
+  mutation is needed or authorized.
+- **MCP:** use only an already configured and authorized client/server.
+  Inspect its actual tool inventory and effective allowlist, including the
+  official GitHub MCP read-only route. Do not install or configure a server,
+  create credentials, expand scopes, or infer a tool name. If the read-only
+  boundary, target repository, or immutable SHA cannot be verified, do not
+  call the tool; record MCP **BLOCKED**.
+- **Effects:** read Issue 2, the pinned source and tests; record a private
+  learning note. Do not edit files, create a branch, run tests, start an app,
+  create quotes, or change local/remote state. A read-only native Git
+  comparison is partial evidence, not an MCP trace.
 
-   ```bash
-   git --version
-   node --version
-   npm --version
-   ```
+## Before class: verify a read-only target
 
-   The local feature needs Git and Node.js 24 or later. No administrator,
-   earlier lab, peer approval, or hosted write is needed.
-3. Use a new folder under your home directory. `river-a1` is an example;
-   replace it in every command with your own non-sensitive, unused attempt
-   name. Run:
+1. The owner confirms the approved full `wre-v1` SHA and the already
+   authorized MCP server, client, read tools, target restrictions, and
+   observable tool-call history. Check the actual signed-in identity,
+   entitlement, policy, installed client version and help. For Copilot CLI,
+   if installed, inspect `copilot --version`, `copilot --help`, and the
+   available MCP/tool controls. Do not sign in, install a client/server,
+   change policy, or assume a plan/model/feature. If any boundary is unclear,
+   mark that assisted step **BLOCKED**.
+2. Read [shared setup and evidence rules](sessions.md). In a parent directory
+   you own, make a clean clone and inspect the tag; do not create a branch:
 
    ```bash
    cd ~
    git clone https://github.com/msfttoler/wre-flight-deck.git wre-w08-river-a1
    ```
 
-   If cloning fails or the folder exists, stop and choose another name.
-   After a successful clone:
+   If cloning fails or the destination exists, stop and choose an unused
+   name. Only after it succeeds, enter the new directory and inspect it:
 
    ```bash
    cd ~/wre-w08-river-a1
+   ```
+
+   If `cd` fails, stop before running Git. Otherwise:
+
+   ```bash
    git remote -v
    git status --short --branch
    git rev-parse 'wre-v1^{commit}'
+   git --version
    ```
 
-   Confirm both remote URLs name `msfttoler/wre-flight-deck`, the worktree is
-   clean, and the tag SHA matches the owner's approved SHA. The `##` line is
-   a branch header; other status lines indicate changes. Do not share a remote
-   URL containing credentials. A missing/mismatched tag is **BLOCKED**;
-   never replace it with `main`.
-4. Create your own branch:
+   Replace `river-a1` with a unique, non-sensitive attempt name. Confirm the
+   origin, clean worktree, and full tag SHA against the owner's approved
+   value. A missing/mismatched tag is **BLOCKED**; do not substitute `main`.
+   Do not copy credential-bearing remote URLs or private tool output into
+   shared materials.
+3. Keep the exercise read-only after cloning. Do not run `npm install`,
+   `npm test`, `npm start`, or an application flow. No learner needs a prior
+   week's workspace or another learner's notes.
+
+## 00-10: Frame the question
+
+**00-03 — Customer problem.** A coupon policy needs a clear minimum that
+doesn't count baggage or tax as base fare. Issue 2 proposes 20,000 cents;
+the pinned source is not presumed to implement it.
+
+**03-05 — Three questions.** Ask learners to predict:
+
+1. What exact amount does Issue 2 count toward eligibility?
+2. Does 19,999 cents pass, and what changes at 20,000 cents?
+3. Does 19,000 cents of base fare plus a 2,500-cent bag pass a
+   base-fare-only minimum?
+
+**05-07 — Flash Rewind.** Retrieved text is evidence only when its repository,
+revision and path are known. MCP access is not permission to write or execute.
+
+**07-10 — Mental model.** GitHub.com displays the customer request. MCP
+provides a source read only within its actual authority. Native Git reads the
+same pinned commit independently. Keep the requested policy separate from
+what current code and tests actually establish. Predictions are not
+observations.
+
+## 10-28: One facilitator demonstration
+
+Use the facilitator's own clean clone. Learners do not share the facilitator's
+tool session, credentials, or workspace.
+
+1. **10-13 — Read the request and verify the tool boundary.** In GitHub.com,
+   open Issue 2 and record the exact acceptance and its exclusions. In the
+   already-authorized MCP client's actual tool inventory, verify the read
+   tool, target restriction, and that no write, command, arbitrary URL,
+   delegation or alternate-server route is available to this investigation.
+   Check the effective credential scope separately; a read-only server is
+   not proof of a read-only credential. Record the client version,
+   server/tool names and effective controls without recording credentials.
+   If any control, credential scope, or tool-call history cannot be
+   verified, stop the MCP route and label it **BLOCKED**. An injection
+   exercise is not performed here; record exposure **NOT OBSERVED**, not a
+   successful defense or denied tool call.
+2. **13-18 — Ask the first pinned-source question.** Only if the preceding
+   control checks succeeded, use the approved MCP read tool to retrieve
+   only `src/pricing.mjs`,
+   `test/pricing.test.mjs`, and, if needed, `docs/api-contract.md` from
+   `msfttoler/wre-flight-deck` at the exact approved full SHA. Ask:
+
+   > At this exact repository and commit, does the source enforce Issue 2's
+   > FIRSTFLIGHT minimum on combined party base fare, excluding baggage and
+   > tax? Trace the pricing calculation and existing tests. Report the exact
+   > tool arguments, repository, commit, paths, and line references. This is
+   > a read-only investigation: do not edit, execute, browse another target,
+   > or use credentials.
+
+   Capture the actual MCP server/tool name, arguments (including repository,
+   ref and paths), result/error, and timestamp. Do not invent a transcript or
+   substitute a prompt for an observed tool call. If the call omits or cannot
+   bind the immutable SHA, stop and mark the MCP read **BLOCKED**.
+3. **18-22 — Corroborate the first answer with native Git.** From the clean
+   clone, substitute the full verified SHA:
 
    ```bash
-   git switch -c learner/w08-river-a1 wre-v1
+   BASE_SHA='PASTE_APPROVED_FULL_WRE_V1_SHA'
+   git show "${BASE_SHA}:src/pricing.mjs"
+   git show "${BASE_SHA}:test/pricing.test.mjs"
+   git show "${BASE_SHA}:docs/api-contract.md"
    ```
 
-   If branch creation fails, stop and use another unused branch name.
-   Only after it succeeds, check the selected commit:
+   Compare the exact paths and evidence, not just the summary. At the
+   inspected `wre-v1` baseline the pricing source calculates base fare,
+   baggage, discount, tax and total but contains no 20,000-cent minimum;
+   the pricing tests cover other pricing rules, not Issue 2's boundary. This
+   is a source observation, not an executed test or a runtime result. If
+   native Git and MCP disagree, report the discrepancy and stop short of a
+   conclusion.
+4. **22-26 — Investigate the independent counterexample.** If the MCP
+   boundary is verified, make a second read-only MCP call, still pinned to
+   the same SHA, for the pricing source,
+   API contract and only the tests needed to check the separate
+   bag-inclusive policy:
+
+   > Compare two hypothetical party fares against Issue 2's base-fare-only
+   > 20,000-cent minimum: (A) 19,000 cents base fare plus a 2,500-cent
+   > charged bag, and (B) 20,000 cents base fare with no bag. Does baggage
+   > change eligibility under Issue 2? Distinguish the requested rule from
+   > current code, cite exact source paths/lines, and make no edits or calls
+   > beyond read-only source retrieval.
+
+   Capture the actual call and result separately. Corroborate the same
+   source paths with native `git show` at `BASE_SHA`. The acceptance-based
+   conclusion is that A is below the requested base-fare minimum and B is at
+   it; do not claim the pinned application actually rejects or accepts
+   either quote, because the rule is absent. The older bag-inclusive lab
+   policy is a different, conflicting proposal.
+5. **26-28 — State the finding and limits.** Identify what the issue asks,
+   what the source and tests show, and what the source does not establish.
+   If MCP was unavailable, a native read can still support a source
+   assessment, but label MCP evidence **BLOCKED**. No actual MCP result means
+   no claim that MCP was exercised. Do not run code or infer runtime
+   behavior.
+
+## 28-35: Retrieval and handoff
+
+**28-31 — Manual Live Quiz Sprint.**
+
+1. Does a 2,500-cent bag make 19,000 cents of base fare meet Issue 2's
+   threshold? **No.**
+2. Does the source's lack of a minimum prove that a live quote was rejected?
+   **No; no such runtime check was performed.**
+3. Does a native `git show` prove an MCP tool call occurred? **No.**
+
+**31-33 — Read, Rule Out, Return.** Read the acceptance; rule out a bag or tax
+as base fare and a source read as runtime evidence; return to the actual
+MCP trace and pinned Git source.
+
+**33-35 — Handoff.** The independent exercise changes the boundary input and
+asks learners to substantiate the comparison without editing. Start at
+minute 35 even if MCP is **BLOCKED**; use native reads only as explicitly
+partial evidence.
+
+## 35-70: Independent read-only practice — inspect bag inclusion
+
+When your core work is on track, use the [Week 08 investigation challenge](sessions.md#make-the-practice-time-useful).
+
+Use your own clean clone, approved SHA, and independently authorized
+read-only MCP session. Do not inherit the facilitator's trace. Issue 2 also
+requires preserving existing bag inclusion. Investigate that separate source
+question: how does one requested bag change at **24,999 versus 25,000 cents
+per passenger**, and does the coupon change that inclusion threshold?
+
+1. **35-40:** In GitHub.com, reread Issue 2's preserved baggage requirement. Predict
+   the inclusion result at each per-passenger amount and whether the coupon
+   changes it. A prediction is not an application observation.
+2. **40-46:** In your own clone root, assign your own approved full SHA and resolve it:
 
    ```bash
-   git rev-parse HEAD
-   ```
-
-   If `HEAD` does not match the approved tag, stop before editing. Otherwise:
-
-   ```bash
-   npm test
-   ```
-
-   Record the real test result; a baseline failure needs investigation.
-5. In a second terminal, again replacing `river-a1` with your own name:
-
-   ```bash
-   cd ~/wre-w08-river-a1
-   npm start
-   ```
-
-   Wait for your terminal to print `Flight Deck: http://127.0.0.1:3000`
-   and stay running before opening that address. If port 3000 is occupied,
-   do not stop another process or browse its listener. After your failed
-   start exits, use `PORT=3001 npm start` and open port 3001 only after your
-   server reports that it started. Remember the chosen port for restarts.
-   A missing runtime or app blocks the local UI, not an available source read.
-6. In **Plan a journey**, select **SEA · Seattle** to **DEN · Denver** and
-   **1 passenger**.
-   Select **Find flights**, then **Review fare** on a listed itinerary.
-   Choose **1 bag / passenger**, enter `FIRSTFLIGHT` in **Coupon (optional)**,
-   and choose **Calculate fare**. Read the base fare, bags, discount,
-   fictional tax, and total. Record the observed values as current behavior,
-   not as the new threshold policy. If no option is available, choose another
-   destination. The `wre-v1` app does not have the newer quick-start panel.
-7. Before editing, create a second quote in the same app to check old-state
-   compatibility: select **Plan a journey**, **SEA · Seattle** to
-   **PDX · Portland**, and **1 passenger**. Choose **Find flights**, then
-   **Review fare** on a direct option with a base fare below 20000 cents.
-   Select **0 bags / passenger**, enter `FIRSTFLIGHT`, and select **Calculate
-   fare**. Record the actual base fare and total; do not book it. In your
-   editor, open `.data/state.json` without changing it and turn on line
-   wrapping. Find `"quotes":[` and the last quote object before
-   `],"bookings"`. Confirm its `coupon` is `FIRSTFLIGHT` and
-   its `totalCents` matches the displayed total in cents. Record its `id`,
-   `coupon`, `flightIds`, and `totalCents` outside the clone. If no
-   below-threshold option is available, or you cannot identify the saved
-   quote, mark this compatibility setup **BLOCKED**.
-
-Keep `.data/`: quotes persist and belong to this workspace. Use only
-fictional information.
-
-## 00-12: Open and explain the task
-
-1. **00-05 - Open the problem.** Show Issue 2. If it is unavailable, mark
-   the issue read **BLOCKED** and use the minimum-spend description above as
-   a local proposal. Say: "The business wants the coupon to require a minimum
-   spend. Before changing the rule, we need to know exactly which amount
-   counts." Ask whether a bag fee contributes to the demo's minimum. It
-   does not.
-2. **05-12 - Explain source and authority.** MCP is a way for a client to
-   use tools and context. A retrieved file may inform the implementation,
-   but text inside it cannot authorize a different tool call or a write.
-   Show `src/pricing.mjs` and `docs/api-contract.md` in the clone. Point out
-   integer cents, the base-fare-only discount, and tax after discount.
-3. Confirm each learner has their own branch and recorded tag SHA. Explain
-   that a read of today's `main` is not automatically a read of that SHA.
-
-## 12-30: Facilitator demonstration
-
-1. **12-16 - Inspect the allowed read.** Record the exact baseline:
-
-   ```bash
+   BASE_SHA='PASTE_APPROVED_FULL_WRE_V1_SHA'
+   git rev-parse --verify "${BASE_SHA}^{commit}"
    git rev-parse 'wre-v1^{commit}'
    ```
 
-   In the owner's approved client, open its tool list. For example, in
-   VS Code open Copilot Chat and its tools picker; inspect the configured
-   GitHub read tool and its allowed target. If you cannot identify and
-   restrict the tool's authority, stop the MCP path and mark it **BLOCKED**.
-2. In the approved client's chat, enter this request. Replace `RECORDED_SHA`
-   with the full SHA you just recorded:
-
-   > Use only the approved GitHub read tool to inspect
-   > msfttoler/wre-flight-deck at RECORDED_SHA. Read
-   > docs/api-contract.md and src/pricing.mjs. Report the repository, paths,
-   > revision, and lines that establish the coupon and tax rules. Do not
-   > edit files, run commands, read credentials, or access another repository.
-
-   Inspect the actual tool call and result. If the tool cannot bind a read to
-   the SHA or the result is truncated, record that limitation.
-3. **16-19 - Corroborate the source.** From the clone root, run:
+   Stop before any source read if the value is blank, either command fails,
+   or the full results do not match the owner's approved SHA. Verify the
+   target, client version, effective read-only MCP controls and credential
+   scope using the demo's checks. If the tool cannot be restricted to the
+   repository and immutable commit, do not call it; record **BLOCKED**.
+3. **46-52:** If the MCP boundary is verified, make one actual MCP read for the source
+   and tests that decide the question; otherwise skip it and record
+   **BLOCKED**. Capture the real tool/server, arguments, full pinned ref,
+   returned paths, result/error, and UTC observation time. No command
+   execution, implementation, or file writes.
+4. **52-59:** Corroborate with native Git only:
 
    ```bash
-   git show 'wre-v1:docs/api-contract.md'
-   git show 'wre-v1:src/pricing.mjs'
-   git show 'wre-v1:test/pricing.test.mjs'
+   git show "${BASE_SHA}:src/pricing.mjs"
+   git show "${BASE_SHA}:test/pricing.test.mjs"
+   git show "${BASE_SHA}:docs/api-contract.md"
    ```
 
-   Compare the returned paths and rule with the local tag. A native Git read
-   can support the plan but does **not** prove an MCP call happened. A
-   mismatch means stop and reselect the authorized source; don't trust a
-   plausible-looking answer from another revision.
-4. **19-23 - Specify the change.** Say: "With `FIRSTFLIGHT`, combined party
-   base fare must be at least 20000 cents; charged bags and tax do not count.
-   Below that, return an explicit structured coupon error that the browser
-   presents accessibly. Omitted coupon and eligible pricing retain their
-   existing behavior." Request a source-cited plan before edits. Require
-   tests at 19999, 20000, and 20001 cents, multiple passengers, charged
-   and included bags, an omitted coupon, and tax ordering.
-5. **23-27 - Check saved data before editing.** Open `src/store.mjs` and find
-   how saved quotes are validated against pricing. Ask what happens if a
-   previously valid below-threshold coupon quote is still in `.data/` after
-   the rule changes. Do not delete it or assume old records remain valid.
-   The plan must address compatibility and a test for reopening existing
-   state, or mark that part unresolved. Do not silently rewrite the existing
-   API contract without the maintainer's ownership.
-6. **27-30 - Show a bounded change and evidence.** Permit only understood
-   local edits and the native test runner; inspect any proposed command.
-   From the clone root run:
+   Do not run tests or the app. If the MCP read is unavailable or
+   uninspectable, these commands are partial source evidence only.
+5. **59-65:** Record the source-backed bag-inclusion conclusion and cite the source and
+   existing tests you actually read. At the pinned baseline, inclusion is
+   based on fare per passenger before the coupon, with the first bag included
+   at 25,000 cents. This source observation does not establish an executed
+   quote or a test run. Keep Issue 2's proposed minimum separate from the
+   existing bag-inclusion rule.
+6. **65-70:** Save a brief note outside the clone's tracked files: approved SHA, issue
+   acceptance, actual MCP trace or **BLOCKED** reason, native paths read,
+   both comparisons, limits, and next owner. Do not save credentials or
+   copy private/internal tool data into public artifacts.
 
-   ```bash
-   git status --short
-   git diff --check
-   git diff
-   git diff --cached --check
-   git diff --cached
-   npm test
-   ```
+### Progressive hints
 
-   Open every untracked file listed by status in the editor, expanding any
-   listed directory. Inspect staged and unstaged changes separately; preserve
-   unexpected work. Record actual output, not a predicted green result.
-   After backend edits, stop **your** server with Ctrl-C, confirm the clone
-   and `git rev-parse HEAD`, then restart on the **same selected port**
-   against the same `.data/`. The new rule may reject the earlier quote and
-   prevent startup. Preserve the directory and record the actual result.
-   If you recorded a quote, reopen `.data/state.json` without editing it and
-   compare its `id`, `coupon`, `flightIds`, and `totalCents` with your
-   earlier note. Otherwise keep that comparison **BLOCKED**. If the server
-   started, reload the browser. Preserve the directory if startup fails.
-   Matching fields show the saved file retained those values; a successful
-   start shows the app started. Neither proves the changed app loaded that
-   quote or that it is usable. Add and run an isolated native test that
-   reopens an old below-threshold quote and checks the loaded ID and values,
-   plus the intended usable behavior. Otherwise mark those checks
-   **UNREVIEWED**. Quotes can expire.
+1. Follow the price fields separately; do not treat subtotal as base fare.
+2. Keep the issue's requested rule distinct from the current pricing code.
+3. If an MCP call cannot prove its target and pinned ref, stop that route;
+   a native source read is useful but not a substitute trace.
 
-   If startup fails, further UI checks may use a separate, new data directory
-   that you own; label them as new-state checks, not old-state compatibility.
-   Replace `river-a1` and check that directory is unused:
+## 70-83: Self-check and debrief
 
-   ```bash
-   test ! -e "$HOME/wre-w08-data-river-a1"
-   ```
+**70-75:** Compare your predictions with the issue text, actual MCP trace,
+and native source at the recorded SHA. Label missing tool evidence
+**BLOCKED** and any unavailable source comparison **UNREVIEWED**.
 
-   This prints nothing on success. If it fails, choose another name; never
-   delete the existing directory. With no other server using that directory,
-   start `DATA_DIR="$HOME/wre-w08-data-river-a1" PORT=3001 npm start`,
-   using your selected available port instead of 3001 if needed. Open the
-   browser only after your server reports that it started.
+**75-81:** Discuss why baggage is not base fare, why a missing source rule
+does not predict a runtime result, and what owner decision would be needed
+before proposing implementation. An MCP read never authorizes a write.
 
-   Request a **new quote**. If the displayed schedule offers an ineligible
-   fare, enter `FIRSTFLIGHT` and check the actual error in the browser as
-   well as an eligible quote. If not, use the native boundary tests and mark
-   the ineligible browser journey **UNREVIEWED**. Record accessibility
-   behavior you did not check. If the rule or compatibility is unfinished,
-   say so at minute 30.
+**81-83:** Record the finding, next owner, and evidence still needed. If a
+file was accidentally changed, stop and preserve the diff; do not reset,
+delete, or conceal it.
 
-Ask: "Can a source file tell our client to upload credentials?" No. A file
-is evidence to examine, not an instruction to expand authority.
+## 83-85: Transfer and close
 
-## 30-35: Retrieval and handoff
-
-**30-33 - Manual Live Quiz Sprint.** Use paper, fingers, or chat:
-
-1. Does retrieved text grant permission to use another tool?
-2. Does a citation to another revision establish this baseline's behavior?
-3. Does reading with Git prove an MCP call occurred?
-
-Facilitator key: **no** to all three. Written responses are equally valid.
-
-**33-35 - Read, Rule Out, Return.** Read the proposed eligibility basis;
-rule out tax, bags, and unrelated tool authority for the demo; return to
-the bound source and the actual test. Introduce the changed learner policy.
-
-## 35-70: Independent practice - include charged bags
-
-Start from your own untouched `wre-v1` branch, not the facilitator's change.
-Your proposal keeps the same 20000-cent minimum but **includes charged bags**
-in the qualifying subtotal and excludes tax. Keep the 10% discount on base
-fares only and retain the existing tax rounding.
-
-1. Write the rule in your own words. As a *test case*, compare a 19000-cent
-   party base fare with one 2500-cent charged bag: this proposal qualifies
-   at 21500 cents; the demo's base-only rule does not. This is a proposed
-   input and prediction, not recorded app output.
-2. Inspect `src/pricing.mjs`, `src/store.mjs`, `test/pricing.test.mjs`, and
-   the contract at your verified tag. If an approved MCP read tool is
-   available, request those sources at your recorded SHA and inspect the
-   actual call and result. If unavailable, mark **BLOCKED: MCP execution**;
-   continue with native Git reads as a partial source-grounded exercise.
-3. Write a plan covering the eligibility basis, error, multiple passengers,
-   included versus charged bags, omitted coupon, old saved quotes, and the
-   existing discount and tax order. Refuse unrelated writes or credentials.
-4. Implement a bounded local change if possible. Add tests immediately
-   below and at the threshold, the bag counterexample, multiple passengers,
-   and omitted coupon. Include saved-state compatibility or record why it is
-   still unresolved. Run the status, unstaged/staged diff and test commands
-   in demo step 6. Open every untracked file reported by status.
-5. Stop your own server, confirm the clone and `git rev-parse HEAD`, and
-   restart it on the same selected port against the same state. Recheck
-   your recorded saved quote fields as in demo step 6, if available, and
-   reload the UI only if your server starts. Make a **new** quote and compare
-   what you can actually observe with your rule. If old-state startup fails,
-   preserve it and follow the demo's separately labeled new-directory route.
-   Add and run an isolated old-quote compatibility test, or mark usability
-   **UNREVIEWED**.
-   Not every boundary input need exist in the fictional schedule; use the
-   native tests for those inputs.
-6. Save a note outside tracked app files: source SHA, real tool and arguments
-   if used, accepted plan, diff, actual test/UI observations, the 19000-cent
-   counterexample, and any blocked or unimplemented behavior. Do not copy
-   tokens, private payloads, or an invented transcript.
-
-## 70-85: Self-check, recovery, and close
-
-**70-75:** Check the recorded repository, SHA, tool scope, arithmetic, and
-actual test result. Mark missing MCP or UI access **BLOCKED**; mark checks
-you did not perform **UNREVIEWED**.
-
-**75-81:** Discuss the two policies. A bag can change eligibility in the
-learner policy while the discount still applies only to base fare. If a
-rounding test fails, inspect integer-cent operations and their order; do not
-change the fictional tax to make the coupon test pass.
-
-**81-83:** Record one customer-facing decision and the owner of any saved
-quote compatibility gap. If a tool requests broader scope, decline and keep
-the work local. A read result is not a new authorization.
-
-**83-85:** Explain how you would agree source and tool boundaries with a
-customer before automation. Stop only your own server with Ctrl-C. Assisted
-execution, hosted verification, and classroom rehearsal are not established
-unless actually performed.
-
-Reference: [GitHub's current MCP overview](https://docs.github.com/en/copilot/concepts/customizations/mcp).
+Transfer the issue acceptance, pinned-source observations, two fare
+comparisons, actual MCP evidence or blocker, and next owner. No app, tests,
+saved quotes, or hosted effects were performed by this lab. Do not claim
+runtime enforcement, classroom rehearsal, or hosted behavior.

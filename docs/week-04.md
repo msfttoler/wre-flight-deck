@@ -1,23 +1,23 @@
 # Week 04: Investigate the run that actually happened
 
-The airline's engineer needs to decide whether an Actions failure implicates
-the application, workflow or environment. You will trace an actual run to
-its event, checkout and first actionable result, then propose a bounded next
-diagnostic. A successful run can teach tracing but is not a fabricated failure.
+The airline's engineer needs a workflow that tests the intended change without
+running longer than necessary. You will connect the workflow definition to an
+actual run and its checkout, then assess a job's timeout using real evidence.
+A successful run can teach tracing but is not a fabricated failure.
 
 ## Before class
 
-- **Owner and facilitator:** Confirm the approved `wre-v1` SHA and provide an
-  accessible, actual Actions run URL if one exists. A failure is not
+- **Owner and facilitator:** Approve `msfttoler/wre-flight-deck` as the
+  exercise target, confirm the approved `wre-v1` SHA and provide an
+  accessible, actual Actions run URL if one exists. Without target approval,
+  the target-dependent investigation is **BLOCKED**. A failure is not
   guaranteed. If no run is visible, prepare to inspect the baseline workflow
   and mark hosted investigation **BLOCKED**; do not trigger or rerun one.
 - **Learner, required for the full hosted route:** A browser and existing
   read-only access to the selected run and logs. No previous week, local app,
   Node, learner branch, repository write or admin role is required.
-- **Optional:** An already authorized `gh` for run reads; Git 2.23+ and a
-  new clone for local source comparison; Node and npm only for an optional
-  local test. A local test cannot reproduce hosted permissions or runner
-  conditions.
+- **Optional:** An already authorized `gh` for run reads, and Git 2.23+ and
+  a new clone for local source comparison. No local edit or app is needed.
 
 Read [shared setup and evidence](sessions.md). If using `gh`, run
 `gh --version` and `gh auth status --help`. Only if help lists both
@@ -68,88 +68,128 @@ workflow files from the verified tag, not the clone's default branch:
 git ls-tree -r --name-only wre-v1 -- .github/workflows
 ```
 
-For an optional local edit, create an unused branch with
-`git switch -c learner/w04-YOUR-ID wre-v1`. If that fails, stop before
-editing. Only after success, use `git rev-parse HEAD` and confirm the approved
-SHA. For read-only local app or test work instead, use
-`git switch --detach wre-v1` in the clean clone, check `HEAD`, then follow
-[application setup](sessions.md#for-application-or-local-edit-work-use-a-fresh-clone).
-Do not switch away from existing work. The app is local and is not an Actions
-runner or hosted evidence.
+This investigation reads the tag directly; it does not need a learner branch,
+application server or local edit. A local app is not an Actions runner or
+hosted evidence.
 
-## 00-05: The customer problem
+## 00-03: The customer problem
 
-**Say:** "A failed run is a clue, not yet a diagnosis. If checkout failed,
-we still do not know whether the pricing tests would pass."
+**Say:** "A green check is useful only if it tested the change we care about.
+And a timeout is useful only if it gives normal work enough time to finish."
 
-Ask: "What would you need before telling the airline to change application
-code?" A specific error and its context, not merely a red summary.
+## 03-05: Three questions, one investigation
 
-## 05-12: Model and setup
+Write a prediction for each question before opening the evidence:
+
+1. What events, permissions and checkout does the workflow declare?
+2. Which event and source does an actual run report?
+3. Did the run test the intended change, and how long did its job take?
+   Use an actual completed, non-skipped job's duration, or record it as
+   **unknown**, before deciding whether its timeout is justified.
+
+## 05-07: Flash Rewind
+
+An event, the workflow definition and the code checked out are related, but
+they are not interchangeable. A green badge alone does not identify each one.
+
+## 07-10: Model and setup
 
 An eligible **event**, subject to filters and conditions, can start a
-workflow. A run contains jobs; jobs contain steps on a runner. Record the run
-attempt as well as the job and step. The workflow-source revision, run head
-SHA and checked-out code are separate questions. A pull request may test a
-merge commit, not the PR head. A later error may follow an earlier failure.
+workflow. Its **permissions** constrain the job token; **checkout** selects
+the code the job uses. A run contains jobs; jobs contain steps on a runner.
+The workflow-source revision, run head SHA and checked-out code are separate
+questions. A pull request may test a merge commit, not the PR head.
 
 Show the actual run list or, if unavailable, the baseline workflow source.
 State whether a failure, a successful run or no run is available. Do not call
-an expected observation a recorded result.
+an expected observation a recorded result. Before timeout analysis, read the
+duration of an actual completed, non-skipped job from its timestamps or mark
+duration **unknown**; do not estimate from the workflow run's total time.
 
-## 12-30: Facilitator demo
+## 10-28: One facilitator investigation
 
-1. In GitHub, open **Actions** > an actual workflow or **All workflows** >
-   an observed run. In its summary, record the run URL, workflow, event,
-   branch, head SHA, attempt, time and conclusion wherever displayed. If a
-   field is not visible, record unknown. Choose the current attempt; do not
-   start a new one.
-2. Select an actual job under **Jobs**, then expand its checkout, setup and
+1. In GitHub, open **Code** > branch/tag selector > **Tags** > `wre-v1`.
+   Open the displayed commit and compare its full SHA with the owner's
+   approved baseline. If it is unavailable or mismatched, mark the baseline
+   comparison **BLOCKED**. Otherwise open `.github/workflows` and the
+   selected workflow. Inspect its triggers, workflow and job permissions,
+   and checkout step, including any explicit ref. If permissions are omitted,
+   record effective defaults and policy as unknown. This baseline does not
+   establish which workflow revision executed.
+2. With the already-authorized CLI, list actual runs:
+
+   ```bash
+   gh run list --repo msfttoler/wre-flight-deck --limit 10
+   ```
+
+   Browser-only fallback: open **Actions** > an actual workflow or **All
+   workflows**. If no run is accessible, mark run evidence **BLOCKED**, skip
+   steps 3-5 and explain what the source alone cannot answer. Otherwise
+   choose the current attempt of an observed run; do not start a new one.
+   Record its URL, workflow, event, branch, head SHA, attempt, time and
+   conclusion wherever displayed. If a field is not visible, record unknown.
+3. Select an actual job under **Jobs**, then expand its checkout, setup and
    test steps as available. Record the step outcome and checkout ref/SHA
    shown in the logs. The run's displayed head SHA is not automatically
    the code checked out. If logs are missing or expired, retain the
    metadata and mark checkout and cause **BLOCKED**.
-3. If there is a failing step, read its first actionable error and preceding
+   For the CLI route, replace `RUN_ID` with the actual numeric run ID:
+
+   ```bash
+   gh run view RUN_ID --repo msfttoler/wre-flight-deck --json databaseId,attempt,event,headBranch,headSha,status,conclusion,workflowName,url,jobs
+   gh run view RUN_ID --repo msfttoler/wre-flight-deck --json jobs \
+     --jq '.jobs[] | {name,status,startedAt,completedAt,conclusion}'
+   gh run view RUN_ID --repo msfttoler/wre-flight-deck --log
+   ```
+
+   From that same selected run attempt, record the actual job name, status,
+   conclusion, `startedAt` and `completedAt`. Calculate elapsed time only
+   when that job is completed, is not skipped, and both timestamps are
+   valid, nonzero and in order; otherwise record duration **unknown**. A
+   failed or cancelled job may have an actual elapsed duration, but label it
+   non-representative of normal successful work. Do not use the workflow
+   run's total duration as a job duration. Inspect logs privately and record
+   only redacted evidence. For an older attempt, replace `ATTEMPT_NUMBER`
+   with the actual attempt shown in the run history and select it explicitly:
+
+   ```bash
+   gh run view RUN_ID --attempt ATTEMPT_NUMBER --repo msfttoler/wre-flight-deck \
+     --json databaseId,attempt,event,headBranch,headSha,status,conclusion,workflowName,url,jobs
+   gh run view RUN_ID --attempt ATTEMPT_NUMBER --repo msfttoler/wre-flight-deck \
+     --json jobs --jq '.jobs[] | {name,status,startedAt,completedAt,conclusion}'
+   gh run view RUN_ID --attempt ATTEMPT_NUMBER --repo msfttoler/wre-flight-deck --log
+   ```
+
+   If CLI access is unavailable, inspect the same available evidence in
+   GitHub instead.
+4. If there is a failing step, read its first actionable error and preceding
    context. Distinguish an assertion from runner provisioning, dependency
    retrieval, checkout, permission refusal or cancellation. A warning or
    later cascading error is not automatically the cause. If the run
    succeeded, describe its actual trace and say failure diagnosis is
    **BLOCKED: no failing run supplied**.
-4. Compare workflow source only when its revision is established. In GitHub,
-   open **Code** > branch/tag selector > **Tags** > `wre-v1`. At the
-   repository root, open the displayed commit and compare the full SHA in its
-   URL with the owner's approved baseline; if unavailable or mismatched,
-   baseline comparison is **BLOCKED** and you must not treat the file as
-   approved. Otherwise open `.github/workflows` > the relevant file. Inspect
-   the executed workflow-source revision separately if it can be identified.
-   Today's default branch, the run head and the checkout SHA are not
-   automatically that revision. Mark an unavailable comparison unknown.
-5. If the checked-out commit is visible, replace `CHECKOUT_SHA` in
+5. Inspect the executed workflow-source revision separately if it can be
+   identified. Today's default branch, the run head and the checkout SHA
+   are not automatically that revision. Mark an unavailable comparison
+   unknown. If the checked-out commit is visible, replace `CHECKOUT_SHA` in
    `https://github.com/msfttoler/wre-flight-deck/tree/CHECKOUT_SHA` with that
    actual full SHA and open the relevant source path. For a test-merge
    checkout, open `https://github.com/msfttoler/wre-flight-deck/commit/CHECKOUT_SHA`
    and examine its actual parent links before declaring a mismatch stale. If
-   the commit or parents are inaccessible, mark them unknown. Name the
-   smallest next read or local diagnostic, its owner and authority needs. A
-   local `npm test` at the baseline is evidence about that local revision only.
-
-For an optional CLI read, replace `RUN_ID` with the numeric ID of the actual
-run; it is not a fixed course ID:
-
-```bash
-gh run view RUN_ID --repo msfttoler/wre-flight-deck --json databaseId,attempt,event,headBranch,headSha,status,conclusion,workflowName,url,jobs
-gh run view RUN_ID --repo msfttoler/wre-flight-deck --log
-```
-
-The log can contain sensitive details: inspect it privately and record only
-redacted evidence. If investigating an older attempt, consult
-`gh run view --help` and select the observed attempt explicitly.
+   the commit or parents are inaccessible, mark them unknown. Before
+   proposing a timeout decision, answer the third question: compare the
+   actual checkout with the intended change and record the selected
+   completed, non-skipped job's elapsed time, or **unknown**. Name the answer
+   to all three questions using only observed evidence. Name the smallest
+   next read, its owner and authority needs. A local `npm test` at the
+   baseline is evidence about that local revision only.
 
 **Ask:** "What would distinguish a failing assertion from an unavailable
 runner?" Look for the step that actually started and the error it reported.
-The next task changes the hypothesis, not the run.
+Practice now asks a separate question: do observed job durations justify
+its timeout?
 
-## 30-33: Live Quiz Sprint
+## 28-31: Live Quiz Sprint
 
 Read aloud; use paper, fingers, chat or private written responses. Allow
 additional response time and do not rank by speed.
@@ -158,45 +198,38 @@ additional response time and do not rank by speed.
 2. Does today's workflow file prove what ran in an older run? **No.**
 3. Is a test-merge SHA inherently stale? **No**; inspect event and parents.
 
-## 33-35: Read, Rule Out, Return
+## 31-33: Read, Rule Out, Return
 
-**Read** the actual event and actionable result. **Rule out** an unrelated
-green run or an assumption about the checkout. **Return** to the cause chain
-and smallest safe diagnostic. Begin practice at minute 35 even without a run.
+**Read** the actual event and result, or record that they are unavailable.
+**Rule out** an unrelated green run or an assumption about the checkout.
+**Return** to the evidence and smallest safe next read.
+
+## 33-35: Handoff to a timeout decision
+
+The demo traced what the available evidence can tell us about tested code.
+Now investigate a separate question in a job: is its timeout justified?
+Start practice at minute 35 even if run evidence is unavailable.
 
 ## 35-70: Independent practice
 
-Choose a different job or step in the actual run, or a second real run if one
-is available. Investigate a different hypothesis from the demo, such as a
-runtime mismatch rather than a checkout failure. Do not manufacture a failure.
+When your core work is on track, use the [Week 04 investigation challenge](sessions.md#make-the-practice-time-useful).
 
-1. **35-40:** In **Actions**, open the chosen real run and write its URL,
-   event, branch, head, attempt and conclusion as displayed. If no run is
-   accessible, mark **BLOCKED: hosted run** and go to step 4.
-2. **40-48:** Open the selected job and expand the relevant setup, checkout
-   and execution steps. Record actual step names, checkout ref/SHA, runtime
-   evidence and the first actionable error **or successful result**. If the
-   logs do not establish one of these, write unknown; do not infer it from
-   a job name.
-3. **48-54:** Write a cause chain: event -> workflow-source revision ->
-   checkout -> observed step result -> effect on the release decision.
-   Identify one competing explanation and the evidence that rules it out;
-   if no evidence rules it out, keep it as an open hypothesis. With a
-   successful run, describe coverage and limits rather than claiming a
-   failure investigation.
-4. **54-60:** In **Code** > branch/tag selector > **Tags** > `wre-v1`, open
-   `.github/workflows` and the selected workflow, or use the verified local
-   clone. If no run was selected, use `.github/workflows/ci.yml` as the
-   source-only example, after verifying the tag SHA; if it is unavailable,
-   mark that read **BLOCKED**. Read its triggers, conditions, checkout and
-   relevant job. Compare it with the executed source only if that source
-   revision is known. If neither run nor workflow is available, mark both
-   **BLOCKED** and name the owner preparation needed.
-5. **60-66:** If the course asks about a job timeout, inspect the selected
-   job's actual `timeout-minutes` at the approved tag. The recorded baseline
-   already contains job-level timeouts in the CI, CodeQL and release
-   workflows; confirm the selected file instead of removing one. For an
-   observed numeric run ID, this optional read lists job timestamps:
+Work independently on a normal job with `runs-on`. Decide whether to retain
+its timeout or ask the owner to investigate; do not remove or change an
+existing limit. A supported hold is a valid result.
+
+1. **35-40:** On the verified `wre-v1` tag, open `.github/workflows` and
+   select a workflow and job. If no run is available, use
+   `.github/workflows/ci.yml` as a source-only example. Record the path, job,
+   event, checkout and `timeout-minutes`, or mark unavailable source
+   **BLOCKED**.
+2. **40-48:** Find actual completed runs for the selected workflow and job
+   if accessible. Record the run URLs, attempts, conclusions, workflow
+   revisions and relevant workloads. If no run is available, mark duration
+   evidence **BLOCKED**; do not invent a number.
+3. **48-54:** Compare valid start and completion times with the existing
+   limit. For an observed numeric run ID, this optional read lists job
+   timestamps:
 
    ```bash
    RUN_ID='PASTE_ACTUAL_RUN_ID'
@@ -205,17 +238,29 @@ runtime mismatch rather than a checkout failure. Do not manufacture a failure.
 
    Replace the placeholder with the ID from the actual run page. Calculate a
    duration only for a completed, non-skipped job with valid start and end
-   timestamps. A failed or cancelled job may not represent normal runtime;
-   one run is not a distribution. Retaining the limit or requesting more
-   evidence can be the right decision. Without timestamps, record unknown.
-   If a timeout is not relevant, use these minutes to name the exact log step
-   or artifact that could test your remaining hypothesis and the role needed
-   to read it; mark unavailable evidence **BLOCKED**.
-6. **66-70:** Record the actual run/attempt, source and checkout revisions,
-   relevant log evidence, ruled-out or open hypothesis, proposed next
-   diagnostic and responsible owner. If a repair is justified, describe the
-   smallest local proposal; do not claim a hosted repair. An authorized local
-   edit must be tested and reported separately.
+   timestamps (not empty or zero-time placeholders). Failed or cancelled
+   jobs may not represent normal runtime; one run is not a distribution.
+   Record unknown where evidence is missing.
+4. **54-60:** Compare the observed durations, current limit and operating
+   needs. If the approved workflow already has a timeout, do not remove it
+   for practice. Decide
+   whether to retain the limit or ask the owner to investigate. Explain both
+   the cost of runaway work and the risk of cancelling legitimate work.
+5. **60-66:** If evidence is insufficient, name the additional normal runs,
+   workload context and owner tolerance needed. If recommending a future
+   change, describe how an authorized sandbox could validate the event,
+   checkout and timeout, including runner and cost approval. A plan is not a
+   successful hosted run.
+6. **66-70:** Record the selected job, source revision, real run links and
+   durations or gaps, decision, owner and next authorized check. Keep the
+   existing limit intact and do not dispatch a workflow.
+
+### Progressive hints
+
+1. First bind the exact workflow and job to an approved source revision.
+2. Count a duration only from a completed job with valid start and end times.
+3. One short run is not a typical-runtime estimate; name the missing owner
+   tolerance or additional workload evidence instead of guessing.
 
 ## If something fails
 
@@ -232,19 +277,19 @@ runtime mismatch rather than a checkout failure. Do not manufacture a failure.
 
 ## 70-83: Self-check and debrief
 
-- **70-75, self-check:** Can another engineer follow your run URL, attempt,
-  job, actual checkout and first actionable result? Mark every unobserved
-  link unknown rather than copying the run head into it.
-- **75-81, facilitator discussion:** Ask, "Which evidence would make you
-  change the application instead of the workflow?" Contrast an assertion
-  failure with a checkout or runner failure. Local reproduction is useful
-  but does not prove hosted token permissions or event filtering.
-- **81-83, record:** State the next diagnostic, its owner and whether the
-  run or failure investigation is blocked.
+- **70-75, self-check:** Can another engineer follow the job, current limit,
+  observed durations and run links, or see exactly what is unknown?
+- **75-81, facilitator discussion:** Ask, "What evidence would justify a
+  different timeout?" Contrast stopping runaway work with cancelling a
+  legitimate long run. A single run cannot establish a typical duration.
+- **81-83, record:** State retain or investigate, the owner and any missing
+  evidence. Keep a proposed sandbox check separate from an observed run.
 
 ## 83-85: Transfer and close
 
-Give the customer a revision-bound cause chain and a next owner, not "rerun
-until green." A local app or source file is not proof of a hosted run.
-Missing run evidence is **BLOCKED**; native and classroom rehearsal of this
-guide remain **UNREVIEWED**.
+Give the customer a revision-bound explanation and a next owner, not "rerun
+until green." A source file is not proof of a hosted run. Missing run evidence
+is **BLOCKED**; native and classroom rehearsal remain **UNREVIEWED**.
+
+References: [GitHub CLI `gh run view` manual](https://cli.github.com/manual/gh_run_view);
+[REST API workflow-job fields](https://docs.github.com/en/rest/actions/workflow-jobs).

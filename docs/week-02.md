@@ -1,265 +1,229 @@
 # Week 02: Tell a useful test from a required check
 
-The airline's pricing engineer must protect a fare promise, not merely obtain
-a green badge. You will trace a bag-inclusion boundary from the contract to a
-test, then decide what an available PR check actually establishes. This Flight
-Deck companion is independent of, and does not replace or inherit approval
-from, the separately published Week 02 course.
+A checkout team promises free shipping on orders of $50 or more. A change to
+that threshold can make a $49 order free. Trace the customer rule to the
+assertion and the merge check, then propose how the team should assess a new
+$60 policy.
+
+**By the end:** explain what a failing test and a required check each establish,
+and write a test-and-code proposal for a changed business requirement without
+claiming it was implemented.
+
+## Scope and target
+
+This is the approved Week 02 checkout case, hosted in the Flight Deck learner
+guide. The exercise target is the separate public classroom repository
+[`msfttoler/wre-week-02`](https://github.com/msfttoler/wre-week-02), not the
+Flight Deck app's unrelated baggage-fare boundary. The two pricing examples
+are not equivalent and must not be presented as parity.
+
+The learner route is read-only. Learners need browser access to the public
+repository; `gh` is optional and uses only already-authorized reads. The
+facilitator may make the bounded correction to PR #2 only if the repository
+owner has authorized that ordinary write and the actual starting state is
+preflighted. No learner edits the shared repository. No one changes branch
+rules, reruns a workflow, merges, or depends on a second person's approval.
+The customer's data-residency question is a separate architecture decision:
+this public repository cannot prove where a customer's data is stored.
 
 ## Before class
 
-- **Owner and facilitator:** Confirm the approved `wre-v1` SHA and prepare a
-  separate facilitator clone. If available, supply a real PR URL and
-  read-only access to its check and target-branch requirements. Do not assume
-  a check name, PR, rule or enforced gate; missing hosted evidence is
-  **BLOCKED**, not a reason to create a PR or alter rules.
-- **Learner, required for the local route:** Git 2.23+ with `git switch`,
-  Node.js 24+, npm, a browser and a new directory you can write to. No
-  previous week or GitHub write, admin or reviewer access is required.
-- **Optional:** An already authorized GitHub account and `gh` for inspecting
-  an actual PR. Source reading and the local test plan can continue without
-  them. No hosted check is then claimed.
+- The owner and facilitator confirm that `msfttoler/wre-week-02` is the
+  approved target and inspect the current state of PR #2, the `Checkout tests`
+  check, and the target branch's required-check status. A URL or an old
+  observation is not current execution evidence. If the starting failure or
+  merge gate is absent, mark that part **BLOCKED**; do not recreate it.
+- If a presenter correction is planned, the owner separately authorizes that
+  one ordinary write to the existing demo branch. Otherwise the demonstration
+  remains read-only and the correction is **BLOCKED**.
+- Learners use their actual GitHub account with public read access only.
+  Record role as read-only or unknown; a public page does not reveal the
+  account's private permissions. An installed `gh` is optional. Do not
+  request broader credentials.
+- Keep any evidence note outside the repository. Record the observed target,
+  role, URL, full SHA when available, UTC time, actual result, and limits.
+  Do not copy tokens, private account details, or raw sensitive payloads.
 
-Read [shared setup and evidence](sessions.md) and
-[the pricing contract](api-contract.md). Replace `YOUR-ID` with a
-non-sensitive unique handle and attempt suffix using only letters, digits
-and hyphens, such as `river-a1`. From a parent directory you own, run:
+## 00-12: Customer questions and mental model
 
-```bash
-git --version
-node --version
-npm --version
-git clone https://github.com/msfttoler/wre-flight-deck.git wre-w02-YOUR-ID
-```
+### 00-05: Three customer questions
 
-Only if cloning succeeds, enter the new directory:
+Frame one checkout decision with three questions:
 
-```bash
-cd wre-w02-YOUR-ID
-```
+1. **Where does the customer's data live?** This public class repository
+   cannot answer that; the customer needs separate deployment and data-flow
+   evidence from its authorized owners.
+2. **What protects this change?** A useful test checks the promised price;
+   a configured required check can make that result a merge condition.
+3. **What evidence supports the decision?** The actual assertion, run for the
+   current proposed revision, and visible merge requirement answer different
+   parts of the question.
 
-If `cd` fails, stop before Git. Otherwise check the target:
+The first question is deliberately out of scope for the checkout demo. Do not
+turn it into a second scenario or claim that repository visibility proves
+residency.
 
-```bash
-git remote -v
-git status --short --branch
-git rev-parse 'wre-v1^{commit}'
-```
+### 05-12: The mechanism
 
-Compare both origin URLs with `msfttoler/wre-flight-deck` without exposing
-credentials. Compare the resolved tag commit with the owner's approved SHA.
-A different target, dirty clone, missing tag or mismatch is **BLOCKED**; do
-not use `main` instead.
+The original promise is free shipping from $50. An assertion just below the
+boundary can catch a threshold that is too low; a check matters to merge only
+when the target branch actually requires it. A template describes useful
+context, and `CODEOWNERS` identifies responsibility; neither alone enforces
+approval.
 
-Create a new local branch:
+Open the approved repository and its PR only after confirming the target.
+The demonstration may use GitHub.com for the decision and the optional CLI
+reads below to inspect the same PR. No command output or current result is
+assumed in this guide.
 
-```bash
-git switch -c learner/w02-YOUR-ID wre-v1
-```
+## 12-30: One facilitator demonstration
 
-If it fails, choose an unused name and stop before editing. Only after it
-succeeds, run `git rev-parse HEAD` and confirm it equals the approved tag.
-Run `npm test` from the clone root and record the actual baseline result.
+Use the real PR #2 at
+[`msfttoler/wre-week-02/pull/2`](https://github.com/msfttoler/wre-week-02/pull/2).
+If its current source or check differs from the approved starting case, stop
+at the difference and report it; do not recreate a failure.
 
-To see the product, run `npm start` from that root. Wait for your terminal
-to print `Flight Deck: http://127.0.0.1:3000` and stay running before opening
-that address. Under **Plan a journey**, choose actual **From** and
-**To** airports and a passenger count, then **Find flights**. Select
-**Review fare** for an available itinerary, choose **1 bag / passenger**
-under **Checked bags**, and select **Calculate fare**. Read the base fare,
-bag line and total. If the schedule has suitable choices, repeat with a
-different fare; do not change flight data to create a boundary. A quote is
-local fictional data, not evidence of CI or a merge rule. Stop your server
-with Ctrl-C when finished.
+1. **12-14 — Bind the customer promise.** In GitHub, read PR #2's description
+   and the actual change on `demo/free-shipping` targeting `main`. Identify
+   the stated $50 boundary and predict the result for $49 and $50 before
+   opening the check.
+2. **14-17 — Read the assertion and gate.** Open **Checks** > the actual
+   `Checkout tests` run and inspect the first relevant assertion. If a
+   failure is present, record its exact input, expected and actual result,
+   run URL, attempt, and PR head SHA. Then return to the PR overview and read
+   its current merge status and unmet required check. If the current failure
+   or gate cannot be seen, mark it **BLOCKED**; do not rely on an older run.
 
-If no route is available, mark the quote comparison **BLOCKED** and use the
-source and tests for the boundary investigation. If the port is already in
-use, do not browse the unknown service or stop another person's process.
-After your failed start exits, if no process is using this clone's `.data`,
-try `PORT=3001 npm start`;
-open `http://127.0.0.1:3001` only if that start succeeds. Use another unused
-port if needed, one process per state directory, and never delete state.
-
-Keep a note outside the clone with the target, role, baseline SHA, UTC time,
-commands/URLs, actual results and limits. Do not copy credentials or raw
-private account data.
-
-## 00-05: The customer problem
-
-**Say:** "A correct fare matters to the airline even if a badge is green.
-We'll check the actual price assertion, then ask whether this PR is required
-to pass that check before merge."
-
-Ask: "If one passenger's base fare is below the inclusion threshold, should
-adding more passengers make their first bag free?" No: the rule is per
-passenger, not the party's combined subtotal.
-
-## 05-12: Model and setup
-
-The current contract includes one bag when the sum of an itinerary's base
-fares **per passenger** is at least 25000 cents, before the passenger
-multiplier or coupon. A charged bag is 2500 cents per passenger per
-itinerary. `FIRSTFLIGHT` discounts base fares, not bag charges; tax is
-calculated once after the discount using the documented integer rounding.
-
-A **test** checks an assertion. A workflow **job** executes steps for a
-particular event and revision. A **required check** is a merge condition on a
-target branch. None automatically proves the other. Show the separate
-facilitator clone's approved SHA; if the clone or runtime is unavailable,
-mark that local work **BLOCKED** rather than showing invented results. If the
-approved source is accessible in GitHub, learners can still read the contract
-and test file there and prepare the proposed boundary table; no local test or
-edit is then claimed.
-
-## 12-30: Facilitator demo
-
-1. In the verified facilitator clone, open `docs/api-contract.md` at
-   **Write endpoints**, then `src/pricing.mjs` and
-   `test/pricing.test.mjs` in an editor. Or locate files from the clone root
-   with `git ls-files 'src/*pricing*' 'test/*pricing*'`. Find where the
-   per-passenger fares are summed, where the inclusion comparison occurs,
-   and which price line holds bag charges.
-2. Read the actual assertions for 24999 and 25000 cents, passenger count
-   and a connecting itinerary. Predict the bag charge for two passengers,
-   each with one bag, on either side of the current boundary. Run `npm test`
-   and record the actual result and revision. A passing suite establishes
-   only what its executed assertions cover; it is not a PR gate.
-3. If an owner-supplied PR is visible, open
-   `https://github.com/msfttoler/wre-flight-deck`, select **Pull requests**,
-   and open that PR. In **Files changed**, identify the affected files. On
-   **Overview** (called **Conversation** in some versions), inspect the
-   target branch and visible **Merge status** or expanded checks. The status
-   may not be at the bottom of the page. Open **Commits** and the latest
-   commit link for its full SHA if needed. Record the PR URL, head SHA and
-   base branch actually shown. If no PR is accessible, record
-   **BLOCKED: PR/check evidence** and continue to step 5.
-4. On that PR, select **Checks**, then an actual check/job and its details.
-   Record the run URL, event, conclusion and checkout revision if visible.
-   Compare the check with the current merge requirements shown on the PR.
-   If required-rule details or the exact checkout are not visible, record
-   them as unknown. Do not rerun, change settings, approve or merge.
-
-   As an optional read, replace `PR_NUMBER` with the observed numeric PR
-   number:
+   Optional native reads, from any directory with existing authorized
+   `gh` access:
 
    ```bash
-   gh pr view PR_NUMBER --repo msfttoler/wre-flight-deck --json url,headRefOid,baseRefName,statusCheckRollup,mergeStateStatus
-   gh pr checks PR_NUMBER --repo msfttoler/wre-flight-deck
+   gh pr checks 2 --repo msfttoler/wre-week-02
+   gh pr view 2 --repo msfttoler/wre-week-02 \
+     --json url,headRefOid,baseRefName,statusCheckRollup,mergeStateStatus
    ```
 
-   These commands do not run CI. A nonzero checks command can reflect a
-   pending or failing check; read its actual state.
-5. In GitHub **Code**, select **Tags** > `wre-v1`, then open
-   `.github/workflows/ci.yml` if present. Its declared triggers and jobs are
-   source configuration, not evidence that a particular run happened or that
-   a branch requires it. If the file or hosted data is absent, identify the
-   owner-supplied PR, run and rule evidence needed next.
+   A nonzero command exit is not by itself a diagnosis. Read the returned
+   check state and, in GitHub, inspect the actual job and assertion.
+3. **17-20 — Find the responsible line.** In **Files changed**, connect the
+   threshold in `shipping.py` to the test and stated promise. Read the base
+   branch's `.github/CODEOWNERS` entry for that path. Explain that ownership
+   routing is separate from required approval; this case does not require a
+   second reviewer.
+4. **20-23 — Apply the approved demonstration change, if authorized.** Only
+   the pre-authorized presenter may change the threshold on the existing
+   `demo/free-shipping` branch from 4000 to 5000 cents. Leave the assertion,
+   rules, and unrelated files unchanged. If authorization or the actual
+   preflighted state is missing, do not edit; mark the change **BLOCKED**.
+5. **23-27 — Check the new candidate.** If the correction was made, inspect
+   the new run on that PR head, its complete relevant test result, and the
+   current merge status. Queued or running is **PENDING**, not passed. If
+   no authorized correction occurred, do not describe a new run. Never merge.
+6. **27-30 — State the evidence boundary.** Record what the assertion,
+   workflow result, and branch requirement each establish. A passing result
+   covers the executed tests on that revision; it is not proof of every
+   order amount, data residency, or production readiness.
 
-**Ask:** "Why does a test only at 25000 miss the wrong lower boundary?"
-The check at 24999 distinguishes `>=` from a boundary that includes too much.
-Even a useful test cannot establish which merge gate is enforced.
+**Question:** If the $50 case passes, what would distinguish a threshold that
+is too low? The adjacent lower case can expose it; the actual current test and
+merge status still need to be read.
 
-## 30-33: Live Quiz Sprint
+## 30-35: Retrieval and handoff
 
-Read aloud and offer paper, fingers, chat or private written responses; allow
-additional response time without a speed ranking.
+### 30-33: Live Quiz Sprint
 
-1. Does a workflow file by itself enforce a merge gate? **No.**
-2. Does `CODEOWNERS` alone establish required approval? **No.**
-3. Does a green local baseline prove the current PR passed? **No.**
+Use paper, fingers, chat, or a written answer without ranking by speed.
 
-## 33-35: Read, Rule Out, Return
+1. Does a passing application test by itself prove the branch requires it?
+   **No.**
+2. Does `CODEOWNERS` by itself require an approval? **No.**
+3. Does an old green run prove the current PR head passed? **No.**
 
-**Read** the per-passenger fare promise and the PR target. **Rule out** a
-test result from a different revision as proof of this PR. **Return** to the
-actual assertion, run and visible merge condition. Start the independent task
-at minute 35 even if hosted evidence is unavailable.
+### 33-35: Read, Rule Out, Return
 
-## 35-70: Independent practice
+**Read** the stated boundary, the actual assertion, and the current merge
+condition. **Rule out** an unrelated run or an assumption that ownership
+enforces approval. **Return** to the first missing link and name its owner.
+The independent task now changes the business rule, not the demo defect.
 
-Work in your own verified clone. The changed condition is a **proposed**, not
-approved, increase of the first-bag threshold to 30000 cents per passenger.
-Keep the current `wre-v1` tag, pricing contract and behavior unchanged unless
-the owner separately approves a product change. A proposal is not an
-implemented feature.
+## 35-70: Independent practice — assess the $60 requirement
 
-If the clone is blocked, use GitHub **Code** > branch/tag selector > **Tags**,
-then select `wre-v1`. At the repository root, open the displayed commit and compare its
-full URL SHA with the owner's approved baseline before reading the three
-files in step 1. If the SHA is missing or mismatched, the approved-source
-read is **BLOCKED**. With the verified browser source, complete the proposal
-and hosted reads that are available, but mark local edits and tests **BLOCKED**.
+When your core work is on track, use the [Week 02 investigation challenge](sessions.md#make-the-practice-time-useful).
 
-1. **35-40:** In `docs/api-contract.md`, write down the current threshold,
-   bag price, coupon scope and tax treatment. In `src/pricing.mjs`, identify
-   the expression that applies the threshold. In `test/pricing.test.mjs`,
-   locate the existing below/at-threshold and multi-passenger assertions.
-   Note the approved SHA and any actual baseline `npm test` result.
-2. **40-48:** Write the proposed rule in your own words: sum the itinerary
-   base fare per passenger before coupon and passenger multiplication; include
-   the first bag only at or above 30000 cents. Keep the existing coupon and
-   rounding rules. Independently choose a fare not covered by the existing
-   cases that would distinguish the two policies; record your current and
-   proposed predictions before checking them. For **two passengers with one
-   bag each**, also calculate the total bag charge under both rules at 24999,
-   25000, 29999 and 30000 cents. These are expected values for a proposal,
-   not observed app outputs.
-3. **48-54:** Design two boundary tests using real `priceItinerary` inputs:
-   one two-leg itinerary totaling 29999 cents per passenger and another
-   totaling 30000. After recording your predictions, check the proposed-rule
-   arithmetic: the first charges 5000 cents for two bags and the second zero.
-   Include a `FIRSTFLIGHT` case and explain why the threshold is checked
-   before discount. Identify which existing assertions would need a deliberate
-   update if the proposal were approved; do not simply remove failing tests.
-4. **54-60:** If you have the verified clone and Node, optionally add an
-   assertion for the **current** contract to `test/pricing.test.mjs`: use two
-   legs totaling 24999 cents, two passengers, one bag each and `FIRSTFLIGHT`;
-   inspect the existing tests for the import and assertion style. The current
-   expected bag line is 5000 cents. Run `npm test`, `git diff --check` and
-   `git diff` from the clone root. Record the actual result. If you did not
-   edit or could not run the suite, label the assertion proposal or execution
-   **UNREVIEWED** or **BLOCKED** as appropriate; do not say it passed.
-5. **60-66:** Independently inspect the real PR from the demo, or another
-   owner-supplied PR, using **Pull requests** > the PR > **Overview**
-   (or **Conversation**) and **Checks**. Note its actual head/base, check,
-   run, event, checkout and visible required status. If no PR or rule
-   evidence is accessible, inspect the `wre-v1` workflow source instead and
-   write exactly what an owner must supply; mark the hosted gate **BLOCKED**.
-6. **66-70:** Finish a note with three separate rows: **local test and SHA**;
-   **hosted job, run and revision**; **required-gate status and evidence**.
-   Include the proposed boundary table, the decision-changing test cases,
-   any actual diff and the remaining unknowns. No push, PR creation or review
-   by another learner is needed.
+The business now proposes free shipping at $60 or more, retaining the $5 fee
+below the threshold and existing negative-input behavior. This is the
+approved independent practice. It is not the Flight Deck baggage-pricing
+proposal, and learners do not edit or push to the shared repository.
+
+Start from the correct `main` baseline identified by the approved case:
+[`daedf31ac8d5fa4be8e4a3d37330bf2faf558a20`](https://github.com/msfttoler/wre-week-02/tree/daedf31ac8d5fa4be8e4a3d37330bf2faf558a20).
+Confirm the repository and full SHA in GitHub before using it. If the ref,
+files, or approved starting point do not match, stop and mark the affected
+comparison **BLOCKED**; do not silently substitute another branch.
+
+1. **35-40 — Predict first.** Read `test_shipping.py` and list its existing
+   cases before opening `shipping.py`. Choose an order amount not already
+   covered. Write the current expected fee and the fee required by the new
+   policy, and explain why this input can distinguish the two.
+2. **40-48 — Trace current behavior.** Read `shipping.py` at the same
+   immutable revision. Follow your selected amount through the actual
+   condition. Compare that result with your prediction; preserve both in
+   your notes. Do not infer the new behavior from the old green suite.
+3. **48-54 — Challenge the old evidence.** Inspect the actual baseline tests
+   and, if available, the Actions run associated with that baseline. Identify
+   which current assertions describe the old $50 promise and which should
+   remain unchanged. If the run or a log is unavailable, mark that evidence
+   **BLOCKED**; source reading is not a recorded test.
+4. **54-60 — Propose the smallest coherent change.** Write the new assertion
+   for your independently chosen input, the smallest implementation change,
+   and any existing expected fees that must change because the business rule
+   changed. Keep unrelated behavior and the required check intact. This is a
+   proposal, not an edit or test execution.
+5. **60-66 — Name the verification.** State which native test command should
+   run after an authorized implementation, what result would support the
+   proposal, and which check must report for the current PR before a merge
+   decision. Do not claim either ran for this new policy.
+6. **66-70 — Hand off.** Record the target, full source SHA, chosen input,
+   prediction, observed source behavior, proposed assertion and code change,
+   available baseline evidence, missing evidence, and responsible owner.
+
+### Progressive hints
+
+1. List the existing inputs before choosing yours.
+2. Trace your input through the real condition; do not start by editing.
+3. A changed requirement may justify changing an old expectation. Explain
+   why before proposing it.
 
 ## If something fails
 
-- **Tests pass but a case is absent:** A passing suite does not cover every
-  input. Propose or add a genuine assertion; never force a failure to make
-  the lesson interesting.
-- **Tests fail:** Preserve the diff and actual error. Compare the failing
-  assertion with the unchanged contract; do not weaken the test to get green.
-- **Check missing, pending or skipped:** Record that state. Inspect the event,
-  workflow filters and revision if visible; do not call it a pass or rerun it.
-- **Checkout SHA differs from PR head:** It may be a PR test merge. Inspect
-  the event, actual checkout and merge parents before calling it stale.
-  Inaccessible rule settings mean a precise owner question, not an admin
-  prerequisite or a claim that no rule exists.
+- **PR #2 or the expected failure is missing:** Record the current page and
+  state, mark that demonstration step **BLOCKED**, and continue with the
+  independent source reading only if its approved immutable ref is available.
+- **The check is pending, skipped, or unreadable:** Preserve that state; it
+  is not a pass. Ask the owner for the exact run or rule evidence needed.
+- **The required check is not visible:** Do not infer that no rule exists.
+  Name the target branch and ask its owner for the relevant read-only
+  evidence.
+- **The selected main ref or files differ:** Stop using the old comparison.
+  Preserve the observed SHA and ask the case owner to confirm a new approved
+  baseline.
 
 ## 70-83: Self-check and debrief
 
-- **70-75, self-check:** Check the per-passenger arithmetic, adjacent cases,
-  actual test result and all three evidence rows. A proposed 30000-cent rule
-  is not current product behavior.
-- **75-81, facilitator discussion:** Ask, "Which evidence would change your
-  merge decision?" Contrast a useful test, a check on a different revision
-  and a verified required gate. Discuss the cost of a stricter threshold
-  without silently changing the customer's commercial contract.
-- **81-83, record:** State the local decision, hosted unknown and who can
-  provide the missing PR or rule evidence.
+- **70-75 — Self-check:** Can another engineer reproduce your selected
+  input, follow the current implementation, and tell which evidence was
+  actually observed versus proposed?
+- **75-81 — Discuss:** Which assertion would distinguish a $50 policy from
+  the new $60 policy? Contrast that test with a required merge check and with
+  a check from another revision. The local and historical evidence cannot
+  establish the new rule was tested.
+- **81-83 — Record:** Write the decision, the first unresolved condition,
+  and the owner who can provide the next authorized evidence.
 
 ## 83-85: Transfer and close
 
-Ask a customer for the actual test assertion, check identity, candidate
-revision and target-branch rule before promising a merge block. A local app
-quote or test does not prove hosted enforcement. Missing hosted evidence is
-**BLOCKED**; native and classroom rehearsal remain **UNREVIEWED**.
+Tell the customer which behavior was tested, which revision the check
+covered, and whether the target branch actually requires it. Keep the $60
+change proposal separate from the observed $50 case. The data-residency
+question remains outside this repository's evidence. No learner change,
+merge, or hosted execution is claimed.
